@@ -1,6 +1,5 @@
 package com.backendfmo.controllers;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.stock.StockCreateDTO;
-import com.backendfmo.dtos.request.stock.StockDTO;
 import com.backendfmo.models.stock.ControlStock;
-import com.backendfmo.services.stock.ControlStockServiceImpl;
 
 import jakarta.validation.Valid;
 
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.PerifericoRepository;
+import com.backendfmo.services.ControlStockServiceImpl;
 
 @RestController
 @RequestMapping("/stock")

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backendfmo.dtos.request.reciboequipos.ActualizarEstatusDTO;
 import com.backendfmo.dtos.request.reciboequipos.RegistroTotalDTO;
 import com.backendfmo.dtos.response.reciboequipos.BusquedaCompletaDTO;
-import com.backendfmo.services.reciboequipos.ReciboDeEquiposServiceImpl;
+import com.backendfmo.services.ReciboDeEquiposServiceImpl;
 
 import jakarta.validation.Valid;
 

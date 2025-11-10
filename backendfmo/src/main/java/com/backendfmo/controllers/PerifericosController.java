@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
-import com.backendfmo.services.perifericos.PerifericosService;
+import com.backendfmo.services.PerifericosService;
 
 @RestController
 @CrossOrigin(origins = "*")

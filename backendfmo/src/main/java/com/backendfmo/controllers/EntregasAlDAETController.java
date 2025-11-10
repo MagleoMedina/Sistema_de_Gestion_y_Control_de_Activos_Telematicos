@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.entregasdaet.RegistroDaetDTO;
-import com.backendfmo.services.daet.DaetService;
+import com.backendfmo.services.DaetService;
 
 import jakarta.validation.Valid;
 

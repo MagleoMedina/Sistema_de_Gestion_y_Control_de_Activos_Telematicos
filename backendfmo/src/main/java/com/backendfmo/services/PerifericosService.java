@@ -1,4 +1,4 @@
-package com.backendfmo.services.perifericos;
+package com.backendfmo.services;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.backendfmo.services.reciboequipos;
+package com.backendfmo.services;
 
 import java.util.ArrayList;
 import java.util.List;

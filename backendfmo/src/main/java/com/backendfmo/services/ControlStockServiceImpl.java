@@ -1,4 +1,4 @@
-package com.backendfmo.services.stock;
+package com.backendfmo.services;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package com.backendfmo.services.usuarioSistema;
+package com.backendfmo.services;
 
 import java.net.URI;
 import java.util.List;

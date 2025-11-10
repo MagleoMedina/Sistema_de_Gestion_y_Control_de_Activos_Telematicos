@@ -1,8 +1,5 @@
 package com.backendfmo.controllers;
 
-import java.net.http.HttpResponse.ResponseInfo;
-
-import org.hibernate.internal.ExceptionConverterImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

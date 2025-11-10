@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.backendfmo.repository.EncabezadoReciboRepository;
 import com.backendfmo.repository.EntregasAlDAETRepository;
+import com.backendfmo.repository.ReciboDeEquiposRepository;
 import com.backendfmo.repository.ReciboDePerifericosRepository;
 
 @Service
@@ -12,7 +13,7 @@ public class ContadorServiceImpl {
 
 
     @Autowired
-    private EncabezadoReciboRepository equipoRepository;
+    private ReciboDeEquiposRepository equipoRepository;
 
     @Autowired
     private ReciboDePerifericosRepository perifericoRepository;
@@ -20,7 +21,7 @@ public class ContadorServiceImpl {
     @Autowired
     private EntregasAlDAETRepository daetRepository;
 
-    private static final String ESTATUS_ENTREGADO = "Entregado";
+    private static final String ESTATUS_ENTREGADO = "Listo";
 
     public long contarEquiposAtendidos() {
         return equipoRepository.contarPorEstatus(ESTATUS_ENTREGADO);

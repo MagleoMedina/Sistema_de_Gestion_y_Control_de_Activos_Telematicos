@@ -28,7 +28,7 @@ public interface EncabezadoReciboRepository extends JpaRepository<EncabezadoReci
     long contarPorEstatus(@Param("estatus") String estatus);
 
     // 2. Contar Equipos Pendientes (Distinto a 'Listo')
-    @Query("SELECT COUNT(e) FROM EncabezadoRecibo e WHERE e.estatus <> :estatus")
+    @Query("SELECT COUNT(e) FROM EncabezadoRecibo e WHERE e.estatus != :estatus")
     long contarPendientes(@Param("estatus") String estatus);
 }
 

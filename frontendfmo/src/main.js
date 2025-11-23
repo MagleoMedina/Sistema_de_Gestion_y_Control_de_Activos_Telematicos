@@ -8,12 +8,15 @@ require('./server');
 // 2. Configuración de Hot Reload
 // Esto recarga la ventana si cambias un HTML/EJS, 
 // y reinicia la app si cambias el código de Electron/Node (main.js o server.js)
+if(!app.isPackaged){
 try {
     require('electron-reload')(__dirname, {
         electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
         awaitWriteFinish: true
     });
 } catch (_) {}
+}
+
 
 function createWindow() {
     // Crear la ventana del navegador
@@ -30,6 +33,10 @@ function createWindow() {
     // Añadimos un pequeño retraso o reintentos en producción, 
     // pero para dev local esto suele ser suficiente.
     mainWindow.loadURL('http://localhost:3000');
+
+    if (app.isPackaged) {
+        mainWindow.setMenu(null);
+    }
 }
 
 // Inicialización de Electron

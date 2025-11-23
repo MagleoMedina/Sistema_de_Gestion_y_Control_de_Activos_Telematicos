@@ -1,20 +1,46 @@
 {
   "name": "frontendfmo",
   "version": "1.0.0",
-  "description": "",
+  "description": "Aplicacion de escritorio FrontendFMO",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tu Nombre <tuemail@ejemplo.com>",
+  "homepage": "https://github.com/MagleoMedina/fmo",
   "license": "ISC",
+  "build": {
+    "appId": "com.frontendfmo.app",
+    "productName": "FrontendFMO",
+    "asar": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "maintainer": "MagleoMedina xxmagleoxx.medina2003@gmail.com",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development"
+    }
+  },
   "dependencies": {
     "ejs": "^3.1.10",
-    "electron": "^39.2.3",
     "express": "^5.1.0"
   },
   "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^24.13.3",
     "electron-reload": "^2.0.0-alpha.1"
   }
 }

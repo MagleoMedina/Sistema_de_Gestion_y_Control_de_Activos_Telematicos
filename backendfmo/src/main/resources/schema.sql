@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS encabezado_recibo (
 	falla TEXT,
 	fecha TEXT,
 	observacion TEXT,
-	FOREIGN KEY(usuario) REFERENCES usuario_sistema(id) ON UPDATE CASCADE
+	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS entregas_al_daet (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,

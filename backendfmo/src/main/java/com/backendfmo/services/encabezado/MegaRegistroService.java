@@ -4,18 +4,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Verifica que tus imports sean correctos según donde creaste los archivos
+import com.backendfmo.dtos.ComponenteDetalleDTO;
 import com.backendfmo.dtos.EncabezadoDTO;
 import com.backendfmo.dtos.EquipoDTO;
 import com.backendfmo.dtos.RegistroTotalDTO;
-// Nota: Usualmente los DTOs van en el paquete dtos, verifica este import:
-import com.backendfmo.models.ComponenteDetalleDTO; 
+import com.backendfmo.dtos.SerialDetalleDTO;
 import com.backendfmo.models.CarpetaDeRed;
 import com.backendfmo.models.CarpetaRedRecibo;
 import com.backendfmo.models.ComponenteInterno;
 import com.backendfmo.models.ComponenteRecibo;
 import com.backendfmo.models.EncabezadoRecibo;
 import com.backendfmo.models.ReciboDeEquipos;
+import com.backendfmo.models.SerialComponente;
+import com.backendfmo.models.SerialRecibo;
 import com.backendfmo.models.Usuario;
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.UsuarioRepository;
@@ -96,6 +97,30 @@ public class MegaRegistroService {
                         }
                         // --- BLOQUE 2: COMPONENTES (FIN) ---
 
+                        // --- BLOQUE 3: SERIALES ESPECÍFICOS (NUEVO) ---
+                        if (equipoDto.getSeriales() != null) {
+                            for (SerialDetalleDTO serialDto : equipoDto.getSeriales()) {
+                                
+                                // A. BUSCAR EL TIPO EN BD (Catálogo)
+                                ComponenteInterno tipoExistente = componenteRepository
+                                    .findById(serialDto.getIdTipoComponente())
+                                    .orElseThrow(() -> new RuntimeException("Tipo componente no encontrado ID: " + serialDto.getIdTipoComponente()));
+
+                                // B. CREAR EL COMPONENTE FÍSICO (SerialComponente)
+                                SerialComponente fisico = new SerialComponente();
+                                fisico.setMarca(serialDto.getMarca());
+                                fisico.setSerial(serialDto.getSerial());
+                                fisico.setCapacidad(serialDto.getCapacidad());
+                                fisico.setComponenteTipo(tipoExistente); // Asignamos el tipo encontrado
+
+                                // C. CREAR LA RELACIÓN (SerialRecibo)
+                                SerialRecibo linkSerial = new SerialRecibo();
+                                linkSerial.setSerialComponente(fisico); // Gracias al CascadeType.ALL, esto guarda 'fisico'
+
+                                // D. VINCULAR AL EQUIPO
+                                equipo.agregarSerial(linkSerial);
+                            }
+                        }
                         // Finalmente agregamos el equipo al encabezado
                         encabezado.agregarEquipo(equipo);
                     }

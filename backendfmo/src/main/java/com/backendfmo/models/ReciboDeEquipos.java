@@ -68,4 +68,14 @@ public class ReciboDeEquipos {
         componentesInternos.add(relacion);
         relacion.setEquipoRelacion(this);
     }
+    // Lista de Seriales Específicos
+    @OneToMany(mappedBy = "equipoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<SerialRecibo> serialesAsignados = new ArrayList<>();
+
+    // Helper
+    public void agregarSerial(SerialRecibo relacion) {
+        serialesAsignados.add(relacion);
+        relacion.setEquipoRelacion(this);
+    }
 }

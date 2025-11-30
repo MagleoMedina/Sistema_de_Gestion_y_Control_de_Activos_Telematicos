@@ -58,4 +58,14 @@ public class ReciboDeEquipos {
         carpetasAsignadas.add(relacion);
         relacion.setEquipoRelacion(this);
     }
+    // --- NUEVO: Relación con Componentes Internos ---
+    @OneToMany(mappedBy = "equipoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ComponenteRecibo> componentesInternos = new ArrayList<>();
+
+    // Helper
+    public void agregarComponente(ComponenteRecibo relacion) {
+        componentesInternos.add(relacion);
+        relacion.setEquipoRelacion(this);
+    }
 }

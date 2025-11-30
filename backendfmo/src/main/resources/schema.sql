@@ -44,13 +44,13 @@ CREATE TABLE IF NOT EXISTS carpeta_red_recibo (
 );
 CREATE TABLE IF NOT EXISTS componentes_computadora_internos (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	nombre TEXT,
-	cantidad INTEGER
+	nombre TEXT
 );
 CREATE TABLE IF NOT EXISTS componentes_internos_cpu_daet (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	entregas_al_daet INTEGER,
 	componentes_computadora_internos INTEGER,
+	cantidad INTEGER,
 	FOREIGN KEY(entregas_al_daet) REFERENCES entregas_al_daet(id) ON UPDATE CASCADE,
 	FOREIGN KEY (componentes_computadora_internos) REFERENCES componentes_computadora_internos(id) ON UPDATE CASCADE
 
@@ -70,15 +70,18 @@ CREATE TABLE IF NOT EXISTS encabezado_recibo (
 	observacion TEXT,
 	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE
 );
+CREATE TABLE IF NOT EXISTS perifericos (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	nombre TEXT
+);
 CREATE TABLE IF NOT EXISTS entregas_al_daet (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	encabezado_recibo INTEGER,
-	actividad INTEGER,
-	perifericos TEXT,
-	componente_unico TEXT,
+	actividad TEXT,
+	perifericos INTEGER,
 	fmo_serial TEXT,
 	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE,
-	FOREIGN KEY(actividad)REFERENCES actividad(id) ON UPDATE CASCADE
+	FOREIGN KEY(perifericos)REFERENCES perifericos(id) ON UPDATE CASCADE
 
 );
 CREATE TABLE IF NOT EXISTS recibo_de_equipos(
@@ -129,6 +132,15 @@ CREATE TABLE IF NOT EXISTS usuario_sistema (
 	username TEXT UNIQUE NOT NULL,
 	clave TEXT NOT NULL,
 	tipo TEXT 
+);
+CREATE TABLE IF NOT EXISTS componentes_recibo (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	recibo_de_equipos INTEGER,
+	componentes_computadora_internos INTEGER,
+	cantidad INTEGER,
+	FOREIGN KEY(recibo_de_equipos) REFERENCES recibo_de_equipos(id) ON UPDATE CASCADE,
+	FOREIGN KEY(componentes_computadora_internos)REFERENCES componentes_computadora_internos(id) ON UPDATE CASCADE
+
 );
 
 COMMIT;

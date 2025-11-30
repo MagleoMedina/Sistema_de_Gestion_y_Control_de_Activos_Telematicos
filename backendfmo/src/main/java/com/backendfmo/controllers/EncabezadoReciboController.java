@@ -19,7 +19,8 @@ public class EncabezadoReciboController {
     private MegaRegistroService service;
 
     @PostMapping("/ingreso-equipo")
-    public ResponseEntity<Usuario> crearIngreso(@Valid @RequestBody RegistroTotalDTO dto) {
-        return ResponseEntity.ok(service.guardarTodo(dto));
+    public ResponseEntity<?> crearIngreso(@Valid @RequestBody RegistroTotalDTO dto) {
+        ResponseEntity.ok(service.guardarTodo(dto));
+        return ResponseEntity.ok().body(dto);
     }
 }

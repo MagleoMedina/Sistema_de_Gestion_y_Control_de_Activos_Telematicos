@@ -1,5 +1,7 @@
 package com.backendfmo.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -62,5 +64,6 @@ public class EncabezadoRecibo {
     // name = "usuario": Indica que la columna en la BD se llama 'usuario'
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario") 
+    @JsonBackReference
     private Usuario usuarioRelacion;
 }

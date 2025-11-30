@@ -4,6 +4,8 @@ package com.backendfmo.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,7 +52,8 @@ public class Usuario {
     // Relación 1 a N
     // mappedBy = "usuarioRelacion": Debe coincidir con el nombre del atributo en la clase hija
     @OneToMany(mappedBy = "usuarioRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EncabezadoRecibo> recibos = new ArrayList<>();
+    @JsonManagedReference
+    private final List<EncabezadoRecibo> recibos = new ArrayList<>();
 
     // Método helper para vincular
     public void agregarRecibo(EncabezadoRecibo recibo) {

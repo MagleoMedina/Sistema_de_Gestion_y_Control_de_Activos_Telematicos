@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backendfmo.dtos.request.reciboperifericos.PerifericoItemDTO;
 import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
-import com.backendfmo.dtos.response.BusquedaPerifericoDTO;
+import com.backendfmo.dtos.response.ReciboPerifericosDTO;
 import com.backendfmo.models.ComponenteInterno;
 import com.backendfmo.models.EncabezadoRecibo;
 import com.backendfmo.models.ReciboDePerifericos;
@@ -29,19 +29,21 @@ public class PerifericosService {
         // 1. Crear Usuario (Abuelo)
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setUsuario(dto.getUsuario());
-        nuevoUsuario.setClave(dto.getClave());
-        nuevoUsuario.setFicha(dto.getFicha());
-        nuevoUsuario.setNombre(dto.getNombre());
         nuevoUsuario.setGerencia(dto.getGerencia());
+        nuevoUsuario.setNombre(dto.getNombre());
+        nuevoUsuario.setFicha(dto.getFicha());
 
         // 2. Crear Encabezado (Padre)
         EncabezadoRecibo encabezado = new EncabezadoRecibo();
         encabezado.setFmoEquipo(dto.getFmoEquipo());
         encabezado.setSolicitudST(dto.getSolicitudST());
-       // encabezado.setSolicitudDAET(dto.getSolicitudDAET());
-       // encabezado.setEntregadoPor(dto.getEntregadoPor());
-        //encabezado.setRecibidoPor(dto.getRecibidoPor());
-       // encabezado.setAsignadoA(dto.getAsignadoA());
+
+
+        encabezado.setSolicitudDAET(dto.getSolicitudDAET());
+        encabezado.setEntregadoPor(dto.getEntregadoPor());
+        encabezado.setRecibidoPor(dto.getRecibidoPor());
+        encabezado.setAsignadoA(dto.getAsignadoA());
+        
         encabezado.setEstatus(dto.getEstatus());
         encabezado.setFecha(dto.getFecha());
         encabezado.setObservacion(dto.getObservacion());
@@ -75,7 +77,7 @@ public class PerifericosService {
 private ReciboDePerifericosRepository perifericoRepository;
 
 @Transactional(readOnly = true) // Optimiza la velocidad de lectura
-public BusquedaPerifericoDTO buscarPorSerial(String serial) {
+public ReciboPerifericosDTO buscarPorSerial(String serial) {
     
     // 1. Buscamos el registro específico en la tabla recibo_de_perifericos
     ReciboDePerifericos periferico = perifericoRepository.findByFmoSerial(serial)
@@ -86,22 +88,26 @@ public BusquedaPerifericoDTO buscarPorSerial(String serial) {
     Usuario usuario = encabezado.getUsuarioRelacion();
 
     // 3. Mapeamos a DTO (Llenamos el objeto de respuesta)
-    BusquedaPerifericoDTO respuesta = new BusquedaPerifericoDTO();
+    ReciboPerifericosDTO respuesta = new ReciboPerifericosDTO();
 
     // Datos del ítem
     respuesta.setFmoSerial(periferico.getFmoSerial());
     respuesta.setTipoComponente(periferico.getComponenteRef().getNombre()); // Join con tabla componentes
 
     // Datos del Encabezado
-    respuesta.setFmoEquipoLote(encabezado.getFmoEquipo());
+   // respuesta.setFmoEquipoLote(encabezado.getFmoEquipo());
     respuesta.setSolicitudST(encabezado.getSolicitudST());
     respuesta.setEstatus(encabezado.getEstatus());
     respuesta.setFecha(encabezado.getFecha());
     respuesta.setObservacion(encabezado.getObservacion());
+    respuesta.setSolicitudDAET(encabezado.getSolicitudDAET());
+    respuesta.setEntregadoPor(encabezado.getEntregadoPor());
+    respuesta.setRecibidoPor(encabezado.getRecibidoPor());
+    respuesta.setAsignadoA(encabezado.getAsignadoA());
 
     // Datos del Usuario
-    respuesta.setUsuarioNombre(usuario.getNombre());
-    respuesta.setUsuarioFicha(String.valueOf(usuario.getFicha()));
+    respuesta.setNombre(usuario.getNombre());
+    respuesta.setFicha(usuario.getFicha());
     respuesta.setUsuarioGerencia(usuario.getGerencia());
 
     return respuesta;

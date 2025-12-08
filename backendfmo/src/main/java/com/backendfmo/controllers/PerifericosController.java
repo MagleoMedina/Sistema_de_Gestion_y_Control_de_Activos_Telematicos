@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
-import com.backendfmo.dtos.response.BusquedaPerifericoDTO;
+import com.backendfmo.dtos.response.ReciboPerifericosDTO;
 import com.backendfmo.models.Usuario;
 import com.backendfmo.services.perifericos.PerifericosService;
 
@@ -25,9 +25,9 @@ public class PerifericosController {
         return ResponseEntity.ok(usuarioGuardado);
     }
 
-    @GetMapping("/buscare/{fmoSerial}") // Ejemplo URL: /api/perifericos/buscar?serial=KEY-HP-0099
-    public ResponseEntity<BusquedaPerifericoDTO> buscarPeriferico(@PathVariable String fmoSerial) {
-        BusquedaPerifericoDTO resultado = perifericosService.buscarPorSerial(fmoSerial);
+    @GetMapping("/buscare/{fmoSerial}")
+    public ResponseEntity<ReciboPerifericosDTO> buscarPeriferico(@PathVariable String fmoSerial) {
+        ReciboPerifericosDTO resultado = perifericosService.buscarPorSerial(fmoSerial);
         return ResponseEntity.ok(resultado);
     }
 }

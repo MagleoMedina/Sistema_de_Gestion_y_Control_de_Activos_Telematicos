@@ -8,7 +8,6 @@ import lombok.Data;
 public class RegistroPerifericosDTO {
     // Datos Usuario (Para crear uno nuevo siguiendo tu lógica)
     private String usuario;
-    private String clave;
     private Integer ficha;
     private String nombre;
     private String gerencia;
@@ -16,6 +15,10 @@ public class RegistroPerifericosDTO {
     // Datos Encabezado
     private String fmoEquipo; // En este caso será el código del lote de periféricos
     private String solicitudST;
+    private String solicitudDAET;
+    private String entregadoPor;
+    private String recibidoPor;
+    private String asignadoA;
     private String estatus;
     private String fecha;
     private String observacion;

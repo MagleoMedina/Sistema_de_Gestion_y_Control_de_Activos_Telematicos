@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
-import com.backendfmo.dtos.response.ReciboPerifericosDTO;
-import com.backendfmo.models.Usuario;
 import com.backendfmo.services.perifericos.PerifericosService;
 
 @RestController
@@ -19,15 +17,23 @@ public class PerifericosController {
     @Autowired
     private PerifericosService perifericosService;
 
-    @PostMapping("/crear")
-    public ResponseEntity<Usuario> crearRegistroPerifericos(@RequestBody RegistroPerifericosDTO dto) {
-        Usuario usuarioGuardado = perifericosService.registrarPerifericos(dto);
-        return ResponseEntity.ok(usuarioGuardado);
+    @PostMapping("/crearReciboPerifericos")
+    public ResponseEntity<?> crearRegistroPerifericos(@RequestBody RegistroPerifericosDTO dto) {
+         try {
+            return ResponseEntity.ok(perifericosService.registrarPerifericos(dto));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 
-    @GetMapping("/buscare/{fmoSerial}")
-    public ResponseEntity<ReciboPerifericosDTO> buscarPeriferico(@PathVariable String fmoSerial) {
-        ReciboPerifericosDTO resultado = perifericosService.buscarPorSerial(fmoSerial);
-        return ResponseEntity.ok(resultado);
+    @GetMapping("/buscarReciboPerifericos/{fmoSerial}")
+    public ResponseEntity<?> buscarPeriferico(@PathVariable String fmoSerial) {
+        try {
+            return ResponseEntity.ok(perifericosService.buscarPorSerial(fmoSerial));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 }

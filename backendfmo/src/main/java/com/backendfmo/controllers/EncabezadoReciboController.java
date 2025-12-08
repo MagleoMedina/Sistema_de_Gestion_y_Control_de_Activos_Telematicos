@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.reciboequipos.RegistroTotalDTO;
 import com.backendfmo.dtos.response.BusquedaCompletaDTO;
-import com.backendfmo.services.encabezado.ConsultaService;
-import com.backendfmo.services.encabezado.MegaRegistroService;
+import com.backendfmo.services.reciboequipos.IReciboEquiposService;
+
 
 import jakarta.validation.Valid;
 
@@ -19,20 +19,18 @@ import jakarta.validation.Valid;
 public class EncabezadoReciboController {
 
     @Autowired
-    private MegaRegistroService service;
+    private IReciboEquiposService service;
 
-    @Autowired
-    private ConsultaService consultaService;
 
     @PostMapping("/ingreso-equipo")
     public ResponseEntity<?> crearIngreso(@Valid @RequestBody RegistroTotalDTO dto) {
-        ResponseEntity.ok(service.guardarTodo(dto));
+        ResponseEntity.ok(service.guardarUsuariosYRecibos(dto));
         return ResponseEntity.ok().body(dto);
     }
 
     @GetMapping("/buscar/{fmo}")
     public ResponseEntity<?> obtenerDatosPorFmo(@Valid @PathVariable String fmo) {
-        BusquedaCompletaDTO resultado = consultaService.buscarPorFmo(fmo);
+        BusquedaCompletaDTO resultado = service.buscarPorFmo(fmo);
         return ResponseEntity.ok(resultado);
     }
 }

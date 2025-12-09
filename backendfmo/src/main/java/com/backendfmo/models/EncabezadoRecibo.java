@@ -92,4 +92,13 @@ public class EncabezadoRecibo {
         perifericos.add(periferico);
         periferico.setEncabezadoRelacion(this);
     }
+
+    @OneToMany(mappedBy = "encabezadoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<EntregasAlDAET> entregasDaet = new ArrayList<>();
+
+    public void agregarEntregaDaet(EntregasAlDAET entrega) {
+        entregasDaet.add(entrega);
+        entrega.setEncabezadoRelacion(this);
+    }
 }

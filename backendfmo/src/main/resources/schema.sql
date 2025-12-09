@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS entregas_al_daet (
 	actividad TEXT,
 	perifericos INTEGER,
 	fmo_serial TEXT,
+	estado TEXT,
 	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE,
 	FOREIGN KEY(perifericos)REFERENCES perifericos(id) ON UPDATE CASCADE
 

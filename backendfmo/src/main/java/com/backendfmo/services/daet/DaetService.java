@@ -51,7 +51,7 @@ public class DaetService {
                 
                 // A. Buscar el Periférico Base (Ej: CPU)
                 Periferico perifBase = perifericoRepository.findById(entregaDto.getIdPeriferico())
-                    .orElseThrow(() -> new RuntimeException("Periférico no encontrado ID: " + entregaDto.getIdPeriferico());
+                    .orElseThrow(() -> new RuntimeException("Periférico no encontrado ID: " + entregaDto.getIdPeriferico()));
 
                 // B. Crear la Entrega
                 EntregasAlDAET entrega = new EntregasAlDAET();

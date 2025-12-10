@@ -1,6 +1,6 @@
 package com.backendfmo.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,5 +14,5 @@ public interface EncabezadoReciboRepository extends JpaRepository<EncabezadoReci
     // "Selecciona el Encabezado (e) y haz un JOIN FETCH (trae los datos ya) de su Usuario"
     // Esto evita que Hibernate haga una segunda consulta para buscar al usuario.
     @Query("SELECT e FROM EncabezadoRecibo e JOIN FETCH e.usuarioRelacion WHERE e.fmoEquipo = :fmo")
-    Optional<EncabezadoRecibo> buscarPorFmoConUsuario(@Param("fmo") String fmoEquipo);
+    List<EncabezadoRecibo> buscarPorFmoConUsuario(@Param("fmo") String fmoEquipo);
 }

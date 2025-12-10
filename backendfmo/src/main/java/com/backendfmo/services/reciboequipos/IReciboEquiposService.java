@@ -4,8 +4,10 @@ import com.backendfmo.dtos.request.reciboequipos.RegistroTotalDTO;
 import com.backendfmo.dtos.response.reciboequipos.BusquedaCompletaDTO;
 import com.backendfmo.models.Usuario;
 
+import java.util.List;
+
 public interface IReciboEquiposService {
 
-    BusquedaCompletaDTO buscarPorFmo(String fmoEquipo);
+    List<BusquedaCompletaDTO> buscarPorFmo(String fmoEquipo);
     Usuario guardarUsuariosYRecibos(RegistroTotalDTO dto);
 }

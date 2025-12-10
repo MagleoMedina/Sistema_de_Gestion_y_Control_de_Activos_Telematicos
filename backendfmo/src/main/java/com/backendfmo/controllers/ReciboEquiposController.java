@@ -9,28 +9,27 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.reciboequipos.RegistroTotalDTO;
-import com.backendfmo.dtos.response.reciboequipos.BusquedaCompletaDTO;
 import com.backendfmo.services.reciboequipos.IReciboEquiposService;
 
 
 import jakarta.validation.Valid;
 
 @RestController
-public class EncabezadoReciboController {
+public class ReciboEquiposController {
 
     @Autowired
     private IReciboEquiposService service;
 
 
-    @PostMapping("/ingreso-equipo")
+    @PostMapping("/crearReciboEquipos")
     public ResponseEntity<?> crearIngreso(@Valid @RequestBody RegistroTotalDTO dto) {
         ResponseEntity.ok(service.guardarUsuariosYRecibos(dto));
         return ResponseEntity.ok().body(dto);
     }
 
-    @GetMapping("/buscar/{fmo}")
+    @GetMapping("/buscarReciboEquipos/{fmo}")
     public ResponseEntity<?> obtenerDatosPorFmo(@Valid @PathVariable String fmo) {
-        BusquedaCompletaDTO resultado = service.buscarPorFmo(fmo);
-        return ResponseEntity.ok(resultado);
+        
+        return ResponseEntity.ok(service.buscarPorFmo(fmo));
     }
 }

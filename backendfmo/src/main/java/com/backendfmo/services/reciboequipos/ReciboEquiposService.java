@@ -167,13 +167,20 @@ public class ReciboEquiposService implements IReciboEquiposService{
             dto.setUsuarioNombre(user.getNombre());
             dto.setUsuarioFicha(String.valueOf(user.getFicha()));
             dto.setUsuarioGerencia(user.getGerencia());
+            dto.setClave(user.getClave());
 
             // --- Mapeo Encabezado (Padre) ---
             dto.setFmoEquipo(encabezado.getFmoEquipo());
             dto.setSolicitudST(encabezado.getSolicitudST());
             dto.setFecha(encabezado.getFecha());
             dto.setEstatus(encabezado.getEstatus());
-
+            dto.setEntregadoPor(encabezado.getEntregadoPor());
+            dto.setAsignadoA(encabezado.getAsignadoA());
+            dto.setRecibidorPor(encabezado.getRecibidoPor());
+            dto.setFalla(encabezado.getFalla());
+            dto.setObservacion(encabezado.getObservacion());
+            dto.setSolicitudDAET(encabezado.getSolicitudDAET());
+            
             // --- Mapeo Equipos (Hijos) ---
             List<EquipoResponseDTO> listaEquiposDto = new ArrayList<>();
             

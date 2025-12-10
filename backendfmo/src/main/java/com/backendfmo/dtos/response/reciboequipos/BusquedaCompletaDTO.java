@@ -14,12 +14,22 @@ public class BusquedaCompletaDTO {
     private String usuarioNombre;
     private String usuarioFicha;
     private String usuarioGerencia;
+    private String clave;
+
 
     // Datos del Encabezado
     private String fmoEquipo;
     private String solicitudST;
     private String fecha;
     private String estatus;
+
+    private String entregadoPor;
+    private String recibidorPor;
+    private String asignadoA;
+    private String falla;
+    private String observacion;
+    private String solicitudDAET;
+
 
     // Lista de Equipos
     private List<EquipoResponseDTO> equipos;

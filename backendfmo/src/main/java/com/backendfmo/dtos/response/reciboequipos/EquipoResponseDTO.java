@@ -19,4 +19,5 @@ public class EquipoResponseDTO {
     private List<SerialResumenDTO> componentesConSerial;     // Detalles completos
     private String observacionSeriales;
     private List<String> aplicaciones;
+    private List<String> perifericos;
 }

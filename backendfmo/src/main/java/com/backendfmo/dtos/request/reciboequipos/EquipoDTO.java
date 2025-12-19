@@ -29,6 +29,8 @@ public class EquipoDTO {
 
     private List<String> aplicacionesExtra;
 
+    private List<Long> idsPerifericos;
+
 
     
 }

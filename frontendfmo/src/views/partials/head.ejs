@@ -20,4 +20,51 @@
         max-width: 250px;
         min-height: 100vh;
     }
+
+    /* --- ESTILOS PARA INPUTS DE ETIQUETAS (TAGS) --- */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    min-height: 25px;
+    background: transparent;
+    cursor: text;
+    overflow: auto;
+}
+
+/* La burbuja visual */
+.tag-badge {
+    background-color: #e0e0e0;
+    color: #000;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin: 2px 4px 2px 0;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    border: 1px solid #999;
+}
+
+/* El botón de eliminar (x) dentro de la burbuja */
+.tag-close {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #cc0000;
+    font-weight: 900;
+}
+
+/* El input real transparente donde escribe el usuario */
+.tag-input-real {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex-grow: 1;
+    min-width: 60px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    color: #000080;
+    font-weight: bold;
+}
 </style>

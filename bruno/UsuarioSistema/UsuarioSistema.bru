@@ -1,0 +1,25 @@
+meta {
+  name: UsuarioSistema
+  type: http
+  seq: 2
+}
+
+post {
+  url: 127.0.0.1:8081/api/crearUsuarioSistema
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+  
+    "username": "rff",
+    "clave": "12345",
+    "tipo": "admin"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

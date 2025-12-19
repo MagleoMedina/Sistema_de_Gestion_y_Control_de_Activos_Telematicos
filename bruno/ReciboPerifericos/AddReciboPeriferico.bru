@@ -1,0 +1,40 @@
+meta {
+  name: AddReciboPeriferico
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/crearReciboEquipos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "usuario": "marta.guevarA",
+    "nombre": "Yasuri",
+    "ficha": "102030",
+    "gerencia": "Administracion",
+    "solicitudST": "ST-900",
+    "solicitudDAET":"yyyy",
+    "estatus": "Entregado",
+    "fecha": "2025-12-03",
+    "observacion": "Entrega de material de oficina",
+    "asignadoA": "pabooo",
+    "recibidoPor": "Nestea",
+    "entregadoPor":"jesenia",
+    "falla": "No compila",
+    "itemsPerifericos": [
+      {
+        "idComponente": 1,
+        "fmoSerial": "NoCE"
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

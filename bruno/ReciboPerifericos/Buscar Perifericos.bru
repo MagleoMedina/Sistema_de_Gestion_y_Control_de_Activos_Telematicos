@@ -1,0 +1,16 @@
+meta {
+  name: Buscar Perifericos
+  type: http
+  seq: 2
+}
+
+get {
+  url: 127.0.0.1:8081/api/buscarReciboPerifericos/NoCE
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

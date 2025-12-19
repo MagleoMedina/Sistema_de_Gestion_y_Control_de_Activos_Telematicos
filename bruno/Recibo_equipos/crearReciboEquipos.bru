@@ -1,0 +1,78 @@
+meta {
+  name: crearReciboEquipos
+  type: http
+  seq: 5
+}
+
+post {
+  url: 127.0.0.1:8081/api/crearReciboEquipos
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "usuario":"dd",
+    "clave": "admin123",
+    "gerencia":"Gerencia",
+    "nombre": "yisus",
+    "ficha": 107021,
+    "extension":"25once",
+    "recibos": [
+      {
+        "asignadoA":"jerusalem",
+        "entregadoPor": "pdf",
+        "fmoEquipo": "1",
+        "estatus": "nitido",
+        "falla": "no COmpila",
+        "fecha": "13-28-2021",
+        "observacion":"Fuente de los deseos",
+        "recibidoPor": "hoy",
+        "solicitudDAET": "mañana",
+        "solicitudST": "Siempre",
+        "equipos": [
+          {
+            "marca": "Dell PowerEdge",
+            "respaldo": "SI",
+            "nombresCarpetas":[
+                "Carpeta de red",
+                "Carpeta de Documentos"
+            ],
+            "componentes":
+            [
+              {
+              "idComponente": 1,
+              "cantidad": 1
+              },
+             {
+              "idComponente": 1,
+              "cantidad": 100
+              }
+  
+            ],
+            "seriales": [
+              {
+                "idTipoComponente": 1, 
+                "marca": "Corsair",
+                "serial": "SN-99887766",
+                "capacidad": "32GB"
+              },
+              {
+                "idTipoComponente": 2,
+                "marca": "Samsung EVO",
+                "serial": "SSD-112233",
+                "capacidad": "1TB"
+              }
+            ],
+            "observacionSeriales": "No compilan las ram"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

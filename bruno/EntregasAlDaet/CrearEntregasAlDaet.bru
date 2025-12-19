@@ -1,0 +1,48 @@
+meta {
+  name: CrearEntregasAlDaet
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/crearEntregasAlDaet
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "asignadoA": null,
+    "entregas": [
+      {
+        "actividad": "Remplazo",
+        "componentesInternos": [
+          {
+            "cantidad": 2,
+            "idComponente": 1
+          },
+          {
+            "cantidad": 1,
+            "idComponente": 1
+          }
+        ],
+        "estado": "Malo",
+        "fmoSerial": "CPU-DELL-XYZ",
+        "idPeriferico": 1,
+        "identifique": "TTTTTTTTTT"
+      }
+    ],
+    "estatus": "En Proceso",
+    "fecha": "2025-10-10",
+    "fmoEquipo": "LOTE-DAET-2026",
+    "observacion": "Equipo para revisión de seguridad",
+    "recibidoPor": null,
+    "solicitudDAET": "SOL-001",
+    "solicitudST": "solST"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

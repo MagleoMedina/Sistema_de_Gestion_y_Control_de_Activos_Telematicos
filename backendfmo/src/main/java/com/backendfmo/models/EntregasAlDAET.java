@@ -40,6 +40,7 @@ public class EntregasAlDAET {
     // Relación Hacia Arriba (Encabezado)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "encabezado_recibo")
+    @JsonBackReference
     private EncabezadoRecibo encabezadoRelacion;
 
     // Relación Lateral (Catálogo Periféricos - Solo lectura/referencia)

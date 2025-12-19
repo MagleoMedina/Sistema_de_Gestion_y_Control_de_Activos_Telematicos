@@ -1,0 +1,27 @@
+meta {
+  name: saveUsuario
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/crearUsuario
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "usuario":"jesus1",
+    "clave" : "123",
+    "ficha":"777",
+    "nombre":"jesus",
+    "extension":"7894-98",
+    "gerencia":"telecomunicaciones"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

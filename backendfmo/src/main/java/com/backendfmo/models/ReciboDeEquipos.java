@@ -89,4 +89,15 @@ public class ReciboDeEquipos {
         aplicacionesInstaladas.add(relacion);
         relacion.setEquipoRelacion(this);
     }
+
+    // NUEVA LISTA: Periféricos Incluidos
+    @OneToMany(mappedBy = "equipoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<ReciboPeriferico> perifericosIncluidos = new ArrayList<>();
+
+    // Método Helper
+    public void agregarPeriferico(ReciboPeriferico relacion) {
+        perifericosIncluidos.add(relacion);
+        relacion.setEquipoRelacion(this);
+    }
 }

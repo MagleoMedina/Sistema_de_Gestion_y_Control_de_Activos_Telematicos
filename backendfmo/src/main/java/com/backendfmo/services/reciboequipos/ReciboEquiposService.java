@@ -23,13 +23,16 @@ import com.backendfmo.models.CarpetaRedRecibo;
 import com.backendfmo.models.ComponenteInterno;
 import com.backendfmo.models.ComponenteRecibo;
 import com.backendfmo.models.EncabezadoRecibo;
+import com.backendfmo.models.Periferico;
 import com.backendfmo.models.ReciboDeEquipos;
+import com.backendfmo.models.ReciboPeriferico;
 import com.backendfmo.models.SerialComponente;
 import com.backendfmo.models.SerialRecibo;
 import com.backendfmo.models.Usuario;
 import com.backendfmo.repository.AplicacionesRepository;
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.EncabezadoReciboRepository;
+import com.backendfmo.repository.PerifericoRepository;
 import com.backendfmo.repository.UsuarioRepository;
 
 @Service
@@ -46,6 +49,9 @@ public class ReciboEquiposService implements IReciboEquiposService {
 
     @Autowired
     private AplicacionesRepository aplicacionesRepository;
+
+    @Autowired
+    private PerifericoRepository perifericoRepository;
 
     @Override
     @Transactional
@@ -182,6 +188,23 @@ public class ReciboEquiposService implements IReciboEquiposService {
                                 equipo.agregarAplicacion(linkExtra);
                             }
                         }
+                        // --- BLOQUE 5: PERIFÉRICOS (NUEVO) ---
+                        if (equipoDto.getIdsPerifericos() != null) {
+                            for (Long idPerif : equipoDto.getIdsPerifericos()) {
+
+                                // A. Buscar en el catálogo
+                                Periferico perifExistente = perifericoRepository.findById(idPerif)
+                                        .orElseThrow(
+                                                () -> new RuntimeException("Periférico no encontrado ID: " + idPerif));
+
+                                // B. Crear la relación intermedia
+                                ReciboPeriferico relacion = new ReciboPeriferico();
+                                relacion.setPerifericoRef(perifExistente);
+
+                                // C. Vincular al equipo
+                                equipo.agregarPeriferico(relacion);
+                            }
+                        }
                         // Finalmente agregamos el equipo al encabezado
                         encabezado.agregarEquipo(equipo);
                     }
@@ -237,6 +260,18 @@ public class ReciboEquiposService implements IReciboEquiposService {
                 EquipoResponseDTO equipoDto = new EquipoResponseDTO();
                 equipoDto.setMarca(equipoEntity.getMarca());
                 equipoDto.setRespaldo(equipoEntity.getRespaldo());
+
+                List<String> listaNombresPerifericos = new ArrayList<>();
+
+                if (equipoEntity.getPerifericosIncluidos() != null) {
+                    for (ReciboPeriferico relPerif : equipoEntity.getPerifericosIncluidos()) {
+                        // Navegamos: Relación -> Objeto Periferico -> Nombre
+                        if (relPerif.getPerifericoRef() != null) {
+                            listaNombresPerifericos.add(relPerif.getPerifericoRef().getNombre());
+                        }
+                    }
+                }
+                equipoDto.setPerifericos(listaNombresPerifericos);
 
                 List<String> listaNombresApps = new ArrayList<>();
 

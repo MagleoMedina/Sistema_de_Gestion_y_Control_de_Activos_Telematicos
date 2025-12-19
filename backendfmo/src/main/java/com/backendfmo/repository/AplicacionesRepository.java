@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.backendfmo.models.Aplicaciones;
+import com.backendfmo.models.reciboequipos.Aplicaciones;
 
 public interface AplicacionesRepository extends JpaRepository<Aplicaciones, Long>{
 

@@ -7,10 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backendfmo.dtos.request.reciboperifericos.PerifericoItemDTO;
 import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
 import com.backendfmo.dtos.response.reciboperifericos.ReciboPerifericosDTO;
-import com.backendfmo.models.ComponenteInterno;
-import com.backendfmo.models.EncabezadoRecibo;
-import com.backendfmo.models.ReciboDePerifericos;
-import com.backendfmo.models.Usuario;
+import com.backendfmo.models.perifericos.Periferico;
+import com.backendfmo.models.perifericos.ReciboDePerifericos;
+import com.backendfmo.models.reciboequipos.ComponenteInterno;
+import com.backendfmo.models.reciboequipos.EncabezadoRecibo;
+import com.backendfmo.models.reciboequipos.ReciboPeriferico;
+import com.backendfmo.models.reciboequipos.Usuario;
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.ReciboDePerifericosRepository;
 import com.backendfmo.repository.UsuarioRepository;
@@ -23,6 +25,9 @@ public class PerifericosService {
 
     @Autowired
     private ComponenteInternoRepository componenteRepository;
+
+    @Autowired
+    private ReciboDePerifericosRepository perifericoRepository;
 
     @Transactional
     public Usuario registrarPerifericos(RegistroPerifericosDTO dto) {
@@ -73,8 +78,6 @@ public class PerifericosService {
         return usuarioRepository.save(nuevoUsuario);
     }
 
-    @Autowired
-private ReciboDePerifericosRepository perifericoRepository;
 
 @Transactional(readOnly = true) // Optimiza la velocidad de lectura
 public ReciboPerifericosDTO buscarPorSerial(String serial) {

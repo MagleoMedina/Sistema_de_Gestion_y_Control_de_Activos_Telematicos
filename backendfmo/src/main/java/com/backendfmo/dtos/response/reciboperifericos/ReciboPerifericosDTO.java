@@ -1,5 +1,7 @@
 package com.backendfmo.dtos.response.reciboperifericos;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -23,4 +25,7 @@ public class ReciboPerifericosDTO {
     private String nombre;
     private Integer ficha;
     private String usuarioGerencia;
+
+    // Lista de Items (Checkboxes marcados)
+    private List<ItemPerifericoDTO> itemsPerifericos;
 }

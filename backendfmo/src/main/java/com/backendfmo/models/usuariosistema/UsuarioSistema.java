@@ -1,4 +1,4 @@
-package com.backendfmo.models;
+package com.backendfmo.models.usuariosistema;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

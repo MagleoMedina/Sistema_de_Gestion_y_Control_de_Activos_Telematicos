@@ -3,7 +3,7 @@ package com.backendfmo.services.usuarioSistema;
 import java.net.URI;
 import java.util.List;
 
-import com.backendfmo.models.UsuarioSistema;
+import com.backendfmo.models.usuariosistema.UsuarioSistema;
 
 public interface IUsuarioSistemaService {
 

@@ -1,4 +1,4 @@
-package com.backendfmo.models;
+package com.backendfmo.models.reciboequipos;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -10,28 +10,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "componentes_internos_cpu_daet")
+@Table(name = "serial_componentes")
 @Data
-public class ComponenteInternoCpuDaet {
+@AllArgsConstructor
+@NoArgsConstructor
+public class SerialComponente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer cantidad;
+    private String marca;
+    private String serial;
+    private String capacidad;
 
-    // Relación Hacia Arriba (La Entrega)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "entregas_al_daet")
+    // Relación con el Catálogo (El tipo de componente, ej: RAM)
+    @ManyToOne(fetch = FetchType.LAZY)//OneToOne
     @JsonBackReference
-    private EntregasAlDAET entregaRelacion;
-
-    // Relación Lateral (Catálogo Componentes Internos)
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "componentes_computadora_internos")
-    @JsonBackReference
-    private ComponenteInterno componenteRef;
+    private ComponenteInterno componenteTipo; 
 }

@@ -20,7 +20,8 @@ public class PerifericosController {
     @PostMapping("/crearReciboPerifericos")
     public ResponseEntity<?> crearRegistroPerifericos(@RequestBody RegistroPerifericosDTO dto) {
          try {
-            return ResponseEntity.ok(perifericosService.registrarPerifericos(dto));
+            perifericosService.registrarPerifericos(dto);
+            return ResponseEntity.ok().body("Registro de periféricos creado exitosamente. ");
             
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());

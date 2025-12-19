@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-
-import com.backendfmo.models.UsuarioSistema;
+import com.backendfmo.models.usuariosistema.UsuarioSistema;
 import com.backendfmo.services.usuarioSistema.IUsuarioSistemaService;
 
 import jakarta.validation.Valid;

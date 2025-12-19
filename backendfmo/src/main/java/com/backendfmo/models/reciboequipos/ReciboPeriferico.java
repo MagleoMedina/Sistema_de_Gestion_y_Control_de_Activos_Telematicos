@@ -1,5 +1,6 @@
-package com.backendfmo.models;
+package com.backendfmo.models.reciboequipos;
 
+import com.backendfmo.models.perifericos.Periferico;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
@@ -13,26 +14,28 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "componentes_recibo")
+@Table(name = "recibo_perifericos")
 @Data
-public class ComponenteRecibo {
+public class ReciboPeriferico {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer cantidad; // Campo extra solicitado
-
-    // Relación hacia el Equipo (Muchos componentes pertenecen a un equipo)
+    // Relación con el Equipo (Padre)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recibo_de_equipos")
     @JsonBackReference
     private ReciboDeEquipos equipoRelacion;
 
-    // Relación hacia el Componente del Catálogo
-    // NO usamos CascadeType.ALL aquí, porque NO queremos borrar ni crear componentes nuevos,
-    // solo queremos referenciarlos.
+    // Relación con el Encabezado Principal (Padre)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "componentes_computadora_internos")
+    @JoinColumn(name = "encabezado_recibo")
+    private EncabezadoRecibo encabezadoRelacion;
+
+    // Relación con el Catálogo (Periférico)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "perifericos")
     @JsonBackReference
-    private ComponenteInterno componenteRef;
+    private Periferico perifericoRef;
 }

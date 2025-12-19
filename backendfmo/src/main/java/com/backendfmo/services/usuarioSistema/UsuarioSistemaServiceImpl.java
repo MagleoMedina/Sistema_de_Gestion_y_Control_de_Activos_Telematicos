@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.backendfmo.models.UsuarioSistema;
+import com.backendfmo.models.usuariosistema.UsuarioSistema;
 import com.backendfmo.repository.UsuarioSistemaRepository;
 
 @Service

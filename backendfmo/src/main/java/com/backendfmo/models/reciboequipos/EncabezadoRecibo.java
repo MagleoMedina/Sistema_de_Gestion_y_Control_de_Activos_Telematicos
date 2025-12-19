@@ -1,8 +1,10 @@
-package com.backendfmo.models;
+package com.backendfmo.models.reciboequipos;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.backendfmo.models.daet.EntregasAlDAET;
+import com.backendfmo.models.perifericos.ReciboDePerifericos;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -81,7 +83,7 @@ public class EncabezadoRecibo {
         listaEquipos.add(equipo);
         equipo.setEncabezadoRelacion(this);
     }
-
+ 
     // Relación exclusiva para Periféricos
     @OneToMany(mappedBy = "encabezadoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
@@ -100,5 +102,15 @@ public class EncabezadoRecibo {
     public void agregarEntregaDaet(EntregasAlDAET entrega) {
         entregasDaet.add(entrega);
         entrega.setEncabezadoRelacion(this);
+    }
+
+    // NUEVA LISTA: Para el formulario de Periféricos Sueltos
+    @OneToMany(mappedBy = "encabezadoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReciboPeriferico> listaPerifericos = new ArrayList<>();
+
+    // Helper
+    public void agregarReciboPeriferico(ReciboPeriferico item) {
+        listaPerifericos.add(item);
+        item.setEncabezadoRelacion(this);
     }
 }

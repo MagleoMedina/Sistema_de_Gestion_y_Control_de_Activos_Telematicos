@@ -146,6 +146,15 @@ CREATE TABLE IF NOT EXISTS componentes_recibo (
 
 );
 
+CREATE TABLE IF NOT EXISTS "recibo_perifericos" (
+	"id"	INTEGER,
+	"recibo_de_equipos"	INTEGER,
+	"perifericos"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("perifericos") REFERENCES "perifericos"("id") ON UPDATE CASCADE,
+	FOREIGN KEY("recibo_de_equipos") REFERENCES "recibo_de_equipos"("id") ON UPDATE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS aplicaciones (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	nombre TEXT
@@ -159,5 +168,32 @@ CREATE TABLE IF NOT EXISTS aplicaciones_recibo_equipos (
 	FOREIGN KEY(recibo_de_equipos) REFERENCES recibo_de_equipos(id) ON UPDATE CASCADE
 );
 
+INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
+INSERT INTO "perifericos" ("id","nombre") VALUES (2,'TECLADO');
+INSERT INTO "perifericos" ("id","nombre") VALUES (3,'MOUSE');
+INSERT INTO "perifericos" ("id","nombre") VALUES (4,'REGULADOR');
+INSERT INTO "perifericos" ("id","nombre") VALUES (5,'IMPRESORA');
+INSERT INTO "perifericos" ("id","nombre") VALUES (6,'SCANER');
+INSERT INTO "perifericos" ("id","nombre") VALUES (7,'PENDRIVES');
+INSERT INTO "perifericos" ("id","nombre") VALUES (8,'TONER');
+
+INSERT INTO "aplicaciones" ("id","nombre") VALUES (1,'SIQUEL');
+INSERT INTO "aplicaciones" ("id","nombre") VALUES (2,'SAP');
+INSERT INTO "aplicaciones" ("id","nombre") VALUES (3,'AUTOCAD');
+INSERT INTO "aplicaciones" ("id","nombre") VALUES (4,'PROJECT');
+
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (1,'');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (2,'');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (3,'MEMORIA RAM');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (4,'DISCO DURO');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (5,'TARJETA MADRE');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (6,'PROCESADOR');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (7,'TARJETA DE VIDEO');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (8,'FUENTE DE PODER');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (9,'TARJETA DE RED');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (10,'FAN COOLER');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (11,'PILA');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (12,'WINDOWS');
+INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (13,'CANAIMA');
 
 COMMIT;

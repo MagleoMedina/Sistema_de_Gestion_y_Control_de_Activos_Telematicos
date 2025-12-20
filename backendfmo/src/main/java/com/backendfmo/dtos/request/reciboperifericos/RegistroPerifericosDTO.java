@@ -22,7 +22,6 @@ public class RegistroPerifericosDTO {
     private String asignadoA;
     private String estatus;
     private String fecha;
-    private String observacion;
     private String falla;
     
 

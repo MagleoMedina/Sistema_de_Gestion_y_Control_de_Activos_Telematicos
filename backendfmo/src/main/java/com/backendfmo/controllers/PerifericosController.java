@@ -2,6 +2,7 @@ package com.backendfmo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
 import com.backendfmo.services.perifericos.PerifericosService;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class PerifericosController {
 
     @Autowired

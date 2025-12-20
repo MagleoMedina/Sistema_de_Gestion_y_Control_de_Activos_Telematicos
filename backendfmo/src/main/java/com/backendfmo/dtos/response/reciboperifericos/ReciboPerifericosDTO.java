@@ -14,7 +14,6 @@ public class ReciboPerifericosDTO {
     private String solicitudST;
     private String estatus;
     private String fecha;
-    private String observacion;
     private String solicitudDAET;
     private String entregadoPor;
     private String recibidoPor;

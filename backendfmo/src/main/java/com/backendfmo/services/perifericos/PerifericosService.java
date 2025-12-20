@@ -61,7 +61,6 @@ public class PerifericosService {
         
         encabezado.setEstatus(dto.getEstatus());
         encabezado.setFecha(dto.getFecha());
-        encabezado.setObservacion(dto.getObservacion());
         encabezado.setFalla(dto.getFalla());
         
         ReciboDePerifericos periferico = new ReciboDePerifericos();
@@ -153,7 +152,6 @@ public class PerifericosService {
         response.setSolicitudDAET(encabezado.getSolicitudDAET());
         response.setEstatus(encabezado.getEstatus());
         response.setFecha(encabezado.getFecha()); 
-        response.setObservacion(encabezado.getObservacion());
         response.setAsignadoA(encabezado.getAsignadoA());
         response.setRecibidoPor(encabezado.getRecibidoPor());
         response.setEntregadoPor(encabezado.getEntregadoPor());

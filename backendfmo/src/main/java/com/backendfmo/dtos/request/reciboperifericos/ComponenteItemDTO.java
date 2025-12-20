@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class ComponenteItemDTO {
     private Long idComponente; // ID de la tabla componentes_computadora_internos (Debe existir)
-    private String fmoSerial;  // Serial del periférico
+
 }

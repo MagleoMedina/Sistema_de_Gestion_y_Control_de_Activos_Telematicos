@@ -64,7 +64,7 @@ public class PerifericosService {
         encabezado.setObservacion(dto.getObservacion());
         encabezado.setFalla(dto.getFalla());
         
-
+        ReciboDePerifericos periferico = new ReciboDePerifericos();
         // 3. Procesar COMPONENTES (Hijos)
         if (dto.getComponentePerifericos() != null) {
             for (ComponenteItemDTO itemDto : dto.getComponentePerifericos()) {
@@ -74,8 +74,7 @@ public class PerifericosService {
                     .orElseThrow(() -> new RuntimeException("Componente no encontrado con ID: " + itemDto.getIdComponente()));
 
                 // B. CREAR la entidad del periférico
-                ReciboDePerifericos periferico = new ReciboDePerifericos();
-                periferico.setFmoSerial(itemDto.getFmoSerial());
+                
                 periferico.setComponenteRef(componenteBD); // Asignamos la referencia encontrada
                 periferico.setOtro(dto.getOtro());
                 // C. VINCULAR al Encabezado
@@ -107,6 +106,8 @@ public class PerifericosService {
         // 4. VINCULAR Encabezado al Usuario
         nuevoUsuario.agregarRecibo(encabezado);
 
+        //Seteamos el fmo serial del periférico que se vaya a registrar
+        periferico.setFmoSerial(dto.getFmoSerial());
         // 5. GUARDAR (Cascada: Usuario -> Encabezado -> Perifericos)
         return usuarioRepository.save(nuevoUsuario);
     }
@@ -167,7 +168,6 @@ public class PerifericosService {
                 // CASO A: Es un Componente Interno (Disco, RAM, etc.)
                 if (item.getComponenteRef() != null) {
                     ComponenteItemResponseDTO itemDto = new ComponenteItemResponseDTO();
-                    itemDto.setFmoSerial(item.getFmoSerial());
                     itemDto.setIdComponente(item.getComponenteRef().getId());
                     listaComponentes.add(itemDto);
                 } 
@@ -186,6 +186,7 @@ public class PerifericosService {
         response.setComponentePerifericos(listaComponentes);
         response.setPerifericos(listaCatalogo);
         
+        response.setFmoSerial(perifericoHijo.getFmoSerial());
         response.setOtro(perifericoHijo.getOtro());
 
         return response;

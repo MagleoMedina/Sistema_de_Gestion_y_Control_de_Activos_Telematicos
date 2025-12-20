@@ -160,19 +160,30 @@
                         </div>
                     </div>
 
-                    <div class="row row-compact">
+           <div class="row row-compact">
                         <div class="col-12 cell-border">
                             <div class="form-check p-0 m-0 w-100">
-                                <input class="form-check-input mt-1" type="checkbox" id="chkComponentes" disabled style="visibility: hidden;">
                                 <span class="label-text me-2">COMPONENTES:</span>
-                                <input type="text" class="input-line" id="componentesTxt">
+                                
+                                <select class="input-line" id="selectComponentes" style="cursor: pointer;">
+                                    <option value="" selected></option>
+                                    <option value="3">MEMORIA RAM</option>
+                                    <option value="4">DISCO DURO</option>
+                                    <option value="5">TARJETA MADRE</option>
+                                    <option value="6">PROCESADOR</option>
+                                    <option value="7">TARJETA DE VIDEO</option>
+                                    <option value="8">FUENTE DE PODER</option>
+                                    <option value="9">TARJETA DE RED</option>
+                                    <option value="10">FAN COOLER</option>
+                                    <option value="11">PILA</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                     <div class="row row-compact">
                         <div class="col-12 cell-border">
                             <div class="form-check p-0 m-0 w-100">
-                                <span class="label-text me-2 ms-1">OTROS:</span>
+                                <span class="label-text me-2">OTROS:</span>
                                 <input type="text" class="input-line" id="otrosTxt">
                             </div>
                         </div>
@@ -242,76 +253,111 @@
 
     <script src="/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        document.getElementById('fecha').valueAsDate = new Date();
+   <script>
+    // Establecer fecha actual al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+        const fechaInput = document.getElementById('fecha');
+        if(fechaInput) fechaInput.valueAsDate = new Date();
+    });
 
-        async function guardarPerifericos() {
-            const mapIds = {
-                'Monitor': 1, 'Teclado': 2, 'Scaner': 3, 'Pendrive': 4,
-                'Regulador': 5, 'Impresora': 6, 'Mouse': 7, 'Toner': 8, 'Otros': 9
+    async function guardarPerifericos() {
+        console.log("Botón presionado: Iniciando recolección de datos...");
+
+        try {
+            // 1. MAPA DE PERIFÉRICOS (Checkboxes)
+            const mapPerifericosIds = {
+                'Monitor': 1, 'Teclado': 2, 'Mouse': 3, 'Regulador': 4,
+                'Impresora': 5, 'Scaner': 6, 'Pendrive': 7, 'Toner': 8
             };
 
-            const itemsPerifericos = [];
-            
+            // 2. RECOLECTAR PERIFÉRICOS
+            const listaPerifericos = [];
             document.querySelectorAll('.peri-check:checked').forEach(chk => {
-                itemsPerifericos.push({
-                    idComponente: mapIds[chk.value], 
-                    fmoSerial: document.getElementById('fmoSerial').value || "S/N"
-                });
+                const idBd = mapPerifericosIds[chk.value];
+                if (idBd) listaPerifericos.push({ id: idBd });
             });
 
-            if(document.getElementById('chkOtros').checked) {
-                itemsPerifericos.push({
-                    idComponente: mapIds['Otros'],
-                    fmoSerial: document.getElementById('otrosTxt').value || "Ver Obs."
-                });
+            // 3. RECOLECTAR COMPONENTE INTERNO (Nueva Lógica Dropdown)
+            // Obtenemos el valor del select (ej: "3", "4"...)
+            const idComponenteSeleccionado = document.getElementById('selectComponentes').value;
+            const serialGeneral = document.getElementById('fmoSerial').value;
+            
+            let listaComponentes = null;
+
+            // Si el usuario seleccionó algo (value no está vacío)
+            if (idComponenteSeleccionado) {
+                listaComponentes = [{
+                    idComponente: parseInt(idComponenteSeleccionado),
+                    // Opcional: Si el backend pide serial para el componente, usamos el general
+                    fmoSerial: serialGeneral || "S/N" 
+                }];
             }
 
+            // Helper para obtener valores seguros
+            const getVal = (id) => document.getElementById(id)?.value || "";
+
+            // 4. CONSTRUIR EL PAYLOAD
             const payload = {
-                usuario: document.getElementById('usuario').value,
-                clave: "1234",
-                ficha: parseInt(document.getElementById('ficha').value) || 0,
-                nombre: document.getElementById('usuario').value,
-                gerencia: document.getElementById('gerencia').value,
+                usuario: getVal('usuario'),
+                ficha: parseInt(getVal('ficha')) || 0,
+                nombre: getVal('usuario'), 
+                gerencia: getVal('gerencia'),
 
-                fmoEquipo: document.getElementById('fmoAsignado').value || "LOTE-PERIF",
-                solicitudST: document.getElementById('solicitudST').value,
-                estatus: "Ingresado",
-                fecha: document.getElementById('fecha').value,
+                fmoEquipo: getVal('fmoAsignado') || "S/N",
+                solicitudST: getVal('solicitudST'), 
+                solicitudDAET: getVal('solicitudDaet'),
+
+                entregadoPor: getVal('entregadoPor'),
+                recibidoPor: getVal('recibidoPor'),
+                asignadoA: getVal('asignadoA'),
+
+                estatus: "Entregado", 
+                fecha: getVal('fecha'),
                 
-                observacion: "Falla: " + document.getElementById('falla').value + 
-                             " | Componentes: " + document.getElementById('componentesTxt').value + 
-                             " | Asignado A: " + document.getElementById('asignadoA').value +
-                             " | Solicitud DAET: " + document.getElementById('solicitudDaet').value,
+                falla: getVal('falla'),
+                otro: getVal('otrosTxt'),
+                fmoSerial: serialGeneral, // Serial general del recibo
 
-                itemsPerifericos: itemsPerifericos
+                // ARRAYS
+                // Aquí enviamos la lista creada desde el Dropdown
+                componentePerifericos: listaComponentes, 
+                perifericos: listaPerifericos.length > 0 ? listaPerifericos : null
             };
 
-            console.log("Enviando Periféricos:", payload);
+            console.log("Payload generado:", payload);
 
-            if(itemsPerifericos.length === 0) {
-                alert("Debes seleccionar al menos un periférico.");
-                return;
+            // VALIDACIÓN: Debe haber al menos (Periférico O Componente O Texto 'Otros')
+            const tienePeriferico = payload.perifericos && payload.perifericos.length > 0;
+            const tieneComponente = payload.componentePerifericos && payload.componentePerifericos.length > 0;
+            const tieneOtro = !!payload.otro;
+
+            if (!tienePeriferico && !tieneComponente && !tieneOtro) {
+                alert("⚠️ Atención: Debes seleccionar un Periférico, un Componente o escribir en 'Otros'.");
+                return; 
             }
 
-            try {
-                const response = await fetch('http://localhost:8080/api/perifericos/crear', { 
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
+            // 5. ENVÍO AL BACKEND
+            const response = await fetch('http://127.0.0.1:8081/api/crearReciboPerifericos', { 
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
 
-                if(response.ok) {
-                    alert("Recibo de Periféricos Guardado");
-                    window.location.reload();
-                } else {
-                    alert("Error del servidor");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Error de conexión");
+            if(response.ok) {
+                const data = await response.json();
+                alert("✅ ¡Recibo Guardado Exitosamente!");
+                // window.location.reload();
+            } else {
+                const errorText = await response.text();
+                console.error("Error servidor:", errorText);
+                alert("❌ Error del servidor: " + errorText);
             }
+
+        } catch (e) {
+            console.error("Error crítico en JS:", e);
+            alert("❌ Ocurrió un error en la aplicación: " + e.message);
         }
-    </script>
+    }
+</script>
 </body>
 </html>

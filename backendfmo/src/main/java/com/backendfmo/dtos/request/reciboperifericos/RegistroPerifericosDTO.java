@@ -11,6 +11,7 @@ public class RegistroPerifericosDTO {
     private Integer ficha;
     private String nombre;
     private String gerencia;
+   
 
     // Datos Encabezado
     private String fmoEquipo; // En este caso será el código del lote de periféricos
@@ -21,8 +22,13 @@ public class RegistroPerifericosDTO {
     private String asignadoA;
     private String estatus;
     private String fecha;
-    private String observacion;
+    private String falla;
+    
 
-    // La lista de periféricos
-    private List<PerifericoItemDTO> itemsPerifericos;
+    // La lista de Componentes 
+    private List<ComponenteItemDTO> componentePerifericos;
+
+    private List<PerifericoDTO> perifericos;
+    private String otro;
+    private String fmoSerial;
 }

@@ -1,4 +1,4 @@
-package com.backendfmo.models;
+package com.backendfmo.models.reciboequipos;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 

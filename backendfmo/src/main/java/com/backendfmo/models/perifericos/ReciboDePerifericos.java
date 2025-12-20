@@ -1,4 +1,7 @@
-package com.backendfmo.models;
+package com.backendfmo.models.perifericos;
+
+import com.backendfmo.models.reciboequipos.ComponenteInterno;
+import com.backendfmo.models.reciboequipos.EncabezadoRecibo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,16 +23,24 @@ public class ReciboDePerifericos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fmo_serial")
-    private String fmoSerial;
-
-    // Relación con el Encabezado (Padre)
+    // Relación con el Encabezado Principal (Padre)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "encabezado_recibo")
     private EncabezadoRecibo encabezadoRelacion;
 
-    // Relación con el Catálogo (Data existente en BD)
+    // Relación con la tabla Periféricos (Monitor, Mouse, etc.)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "perifericos")
+    private Periferico perifericoRef;
+
+    // Relación con Componentes Internos (Opcional, según tu SQL)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "componentes_computadora_internos")
     private ComponenteInterno componenteRef;
+
+    @Column(name = "fmo_serial")
+    private String fmoSerial;
+    
+    @Column(name = "otro")
+    private String otro;
 }

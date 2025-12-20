@@ -1,5 +1,8 @@
-package com.backendfmo.models;
+package com.backendfmo.models.reciboequipos;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -12,23 +15,25 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "aplicaciones_recibo_equipos")
+@Table(name = "serial_recibo")
 @Data
-public class AplicacionReciboEquipos {
+public class SerialRecibo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación con el Catálogo (Solo lectura/referencia)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "aplicaciones")
-    //@Column(name = "aplicaciones")
-    private Aplicaciones aplicacionRef;
-
-    // Relación con el Equipo (Padre)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recibo_de_equipos")
-    //@Column(name = "recibo_de_equipos")
+    @JsonBackReference
     private ReciboDeEquipos equipoRelacion;
+
+    // AL GUARDAR ESTE LINK, GUARDAMOS TAMBIÉN EL OBJETO SERIAL_COMPONENTE
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "serial_componentes")
+    private SerialComponente serialComponente;
+    
+    @Column(name = "observacion")
+    private String observacion;
+
 }

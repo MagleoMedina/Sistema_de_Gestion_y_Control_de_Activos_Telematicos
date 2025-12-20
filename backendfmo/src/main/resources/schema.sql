@@ -98,7 +98,10 @@ CREATE TABLE IF NOT EXISTS recibo_de_perifericos (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	encabezado_recibo INTEGER,
 	componentes_computadora_internos INTEGER,
+	perifericos INTEGER,
 	fmo_serial TEXT,
+	otro Text,
+	FOREIGN KEY(perifericos) REFERENCES perifericos(id) ON UPDATE CASCADE,
 	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE,
 	FOREIGN KEY(componentes_computadora_internos)REFERENCES componentes_computadora_internos(id) ON UPDATE CASCADE
 

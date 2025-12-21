@@ -11,7 +11,7 @@
             color: #000;
             font-family: 'Courier New', Courier, monospace;
             font-size: 13px;
-            max-width: 700px; /* Es un recibo más angosto según la foto */
+            max-width: 550px;
             margin: 0 auto;
         }
         
@@ -54,11 +54,17 @@
         
         .row-compact { --bs-gutter-x: 0; }
         
-        /* Para alinear el título con el icono */
         .header-title {
             letter-spacing: 2px;
             font-weight: 900;
             text-decoration: underline;
+        }
+
+        /* Clase para deshabilitar visualmente */
+        .disabled-section {
+            opacity: 0.5;
+            pointer-events: none;
+            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -141,19 +147,40 @@
                     <div class="row row-compact">
                         <div class="col-12 cell-border">
                             <span class="label-text me-2">EQUIPO:</span>
-                            <input type="text" class="input-line" id="nombreEquipo" placeholder="Ej: CPU Torre / Laptop">
+                            <input type="text" class="input-line" id="nombreEquipo" placeholder="Escriba aquí si envía un CPU completo">
                         </div>
                     </div>
                     <div class="row row-compact">
                         <div class="col-12 cell-border">
                             <span class="label-text me-2">COMPONENTES:</span>
-                            <input type="text" class="input-line" id="componentesTexto">
+                            <select class="input-line" id="selectComponentes" style="cursor: pointer;">
+                                <option value="" selected></option>
+                                <option value="3">MEMORIA RAM</option>
+                                <option value="4">DISCO DURO</option>
+                                <option value="5">TARJETA MADRE</option>
+                                <option value="6">PROCESADOR</option>
+                                <option value="7">TARJETA DE VIDEO</option>
+                                <option value="8">FUENTE DE PODER</option>
+                                <option value="9">TARJETA DE RED</option>
+                                <option value="10">FAN COOLER</option>
+                                <option value="11">PILA</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row row-compact">
                         <div class="col-12 cell-border">
                             <span class="label-text me-2">PERIFÉRICOS:</span>
-                            <input type="text" class="input-line" id="perifericosTexto">
+                            <select class="input-line" id="selectPerifericos" style="cursor: pointer;">
+                                <option value="" selected></option>
+                                <option value="1">MONITOR</option>
+                                <option value="2">TECLADO</option>
+                                <option value="3">MOUSE</option>
+                                <option value="4">REGULADOR</option>
+                                <option value="5">IMPRESORA</option>
+                                <option value="6">SCANER</option>
+                                <option value="7">PENDRIVES</option>
+                                <option value="8">TONER</option>
+                            </select>
                         </div>
                     </div>
                     <div class="row row-compact">
@@ -163,59 +190,61 @@
                         </div>
                     </div>
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border bg-light">
-                            <span class="label-text">ENTREGA DE CPU:</span>
-                        </div>
-                    </div>
-                    
-                    <div class="row row-compact">
-                        <div class="col-6 cell-border cell-block">
-                            <div class="form-check mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkDisco" value="Disco Duro">
-                                <label class="label-text" for="chkDisco">DISCO DURO</label>
-                            </div>
-                            
-                            <div class="d-flex align-items-center mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkRam" value="Memoria RAM">
-                                <label class="label-text me-1" for="chkRam">MEMORIAS RAM</label>
-                                <span style="font-size:10px;">----</span>
-                                <span class="label-text ms-1 me-1">CANT:</span>
-                                <input type="number" class="input-line text-center" id="cantRam" value="1" style="width: 40px; height: 20px;">
-                            </div>
-
-                            <div class="form-check mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkMadre" value="Tarjeta Madre">
-                                <label class="label-text" for="chkMadre">TARJETA MADRE</label>
-                            </div>
-                            <div class="form-check mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkProc" value="Procesador">
-                                <label class="label-text" for="chkProc">PROCESADOR</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkFan" value="Fan Cooler">
-                                <label class="label-text" for="chkFan">FAN COOLER</label>
+                    <div id="wrapperEntregaCpu">
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border bg-light">
+                                <span class="label-text">ENTREGA DE CPU (Detalles):</span>
                             </div>
                         </div>
+                        
+                        <div class="row row-compact">
+                            <div class="col-6 cell-border cell-block">
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkDisco" value="Disco Duro">
+                                    <label class="label-text" for="chkDisco">DISCO DURO</label>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkRam" value="Memoria RAM">
+                                    <label class="label-text me-1" for="chkRam">MEMORIAS RAM</label>
+                                    <span style="font-size:10px;">----</span>
+                                    <span class="label-text ms-1 me-1">CANT:</span>
+                                    <input type="number" class="input-line text-center" id="cantRam" value="1" style="width: 40px; height: 20px;">
+                                </div>
 
-                        <div class="col-6 cell-border cell-block">
-                            <div class="form-check mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkVideo" value="Tarjeta de Video">
-                                <label class="label-text" for="chkVideo">TARJETA DE VIDEO</label>
-                            </div>
-                            
-                            <div class="form-check mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkFuente" value="Fuente de Poder">
-                                <label class="label-text" for="chkFuente">FUENTE DE PODER</label>
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkMadre" value="Tarjeta Madre">
+                                    <label class="label-text" for="chkMadre">TARJETA MADRE</label>
+                                </div>
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkProc" value="Procesador">
+                                    <label class="label-text" for="chkProc">PROCESADOR</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkFan" value="Fan Cooler">
+                                    <label class="label-text" for="chkFan">FAN COOLER</label>
+                                </div>
                             </div>
 
-                            <div class="form-check mb-1">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkPila" value="Pila">
-                                <label class="label-text" for="chkPila">PILA</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input daet-check" type="checkbox" id="chkRed" value="Tarjeta de Red">
-                                <label class="label-text" for="chkRed">TARJETA DE RED</label>
+                            <div class="col-6 cell-border cell-block">
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkVideo" value="Tarjeta de Video">
+                                    <label class="label-text" for="chkVideo">TARJETA DE VIDEO</label>
+                                </div>
+                                
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkFuente" value="Fuente de Poder">
+                                    <label class="label-text" for="chkFuente">FUENTE DE PODER</label>
+                                </div>
+
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkPila" value="Pila">
+                                    <label class="label-text" for="chkPila">PILA</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input daet-check" type="checkbox" id="chkRed" value="Tarjeta de Red">
+                                    <label class="label-text" for="chkRed">TARJETA DE RED</label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -268,88 +297,193 @@
     <script src="/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Setear fecha actual por defecto
-        document.getElementById('fecha').valueAsDate = new Date();
+    document.addEventListener('DOMContentLoaded', () => {
+        const fechaInput = document.getElementById('fecha');
+        if(fechaInput) fechaInput.valueAsDate = new Date();
+        
+        // Inicializar validaciones de campos
+        initValidations();
+    });
 
-        async function guardarEntregaDAET() {
-            // 1. Recolección de Componentes Internos (CPU)
-            const componentesInternos = [];
+    // --- 1. LÓGICA DE VALIDACIÓN VISUAL (EXCLUSIVIDAD) ---
+    function initValidations() {
+        const inputEquipo = document.getElementById('nombreEquipo');
+        const selectComp = document.getElementById('selectComponentes');
+        const selectPeri = document.getElementById('selectPerifericos');
+        const wrapperCpu = document.getElementById('wrapperEntregaCpu');
+        
+        // Función auxiliar para habilitar/deshabilitar contenedor de checkboxes
+        const toggleCpuCheckboxes = (disable) => {
+            if (disable) {
+                wrapperCpu.classList.add('disabled-section');
+                wrapperCpu.querySelectorAll('input').forEach(chk => {
+                    chk.disabled = true;
+                    chk.checked = false; // Resetear
+                });
+            } else {
+                wrapperCpu.classList.remove('disabled-section');
+                wrapperCpu.querySelectorAll('input').forEach(chk => chk.disabled = false);
+            }
+        };
+
+        // A. Caso: Escribir en EQUIPO (CPU Completo)
+        inputEquipo.addEventListener('input', (e) => {
+            if (e.target.value.trim() !== "") {
+                // Deshabilitar Selects
+                selectComp.disabled = true; selectComp.value = "";
+                selectPeri.disabled = true; selectPeri.value = "";
+                // Habilitar Checkboxes (Porque es un equipo)
+                toggleCpuCheckboxes(false);
+            } else {
+                // Si borra, habilitar selects
+                selectComp.disabled = false;
+                selectPeri.disabled = false;
+            }
+        });
+
+        // B. Caso: Seleccionar COMPONENTE (Suelto)
+        selectComp.addEventListener('change', (e) => {
+            if (e.target.value !== "") {
+                // Deshabilitar Equipo y Periférico
+                inputEquipo.disabled = true; inputEquipo.value = "";
+                selectPeri.disabled = true; selectPeri.value = "";
+                // Deshabilitar Checkboxes (Es un componente suelto, no un CPU con detalle)
+                toggleCpuCheckboxes(true);
+            } else {
+                // Si vuelve a nulo
+                inputEquipo.disabled = false;
+                selectPeri.disabled = false;
+                toggleCpuCheckboxes(false);
+            }
+        });
+
+        // C. Caso: Seleccionar PERIFÉRICO
+        selectPeri.addEventListener('change', (e) => {
+            if (e.target.value !== "") {
+                // Deshabilitar Equipo y Componente
+                inputEquipo.disabled = true; inputEquipo.value = "";
+                selectComp.disabled = true; selectComp.value = "";
+                // Deshabilitar Checkboxes
+                toggleCpuCheckboxes(true);
+            } else {
+                // Si vuelve a nulo
+                inputEquipo.disabled = false;
+                selectComp.disabled = false;
+                toggleCpuCheckboxes(false);
+            }
+        });
+    }
+
+    // --- 2. LÓGICA DE ENVÍO ---
+    async function guardarEntregaDAET() {
+        console.log("Iniciando recolección de datos DAET...");
+        
+        const inputEquipo = document.getElementById('nombreEquipo').value;
+        const selectComp = document.getElementById('selectComponentes').value;
+        const selectPeri = document.getElementById('selectPerifericos').value;
+        const fmoSerial = document.getElementById('fmoSerial').value;
+
+        // Validar que al menos uno esté lleno
+        if (!inputEquipo && !selectComp && !selectPeri) {
+            alert("⚠️ Debes indicar qué estás enviando (Equipo, Componente o Periférico).");
+            return;
+        }
+
+        // --- MAPA DE IDs PARA CHECKBOXES DE CPU ---
+        const mapComponentesIds = {
+            'chkRam': 3, 'chkDisco': 4, 'chkMadre': 5, 'chkProc': 6,
+            'chkVideo': 7, 'chkFuente': 8, 'chkRed': 9, 'chkFan': 10, 'chkPila': 11
+        };
+
+        // --- CONSTRUCCIÓN DINÁMICA DE LA ENTREGA ---
+        let idPerifericoFinal = null;
+        let listaComponentesFinal = [];
+
+        // CASO 1: Es un PERIFÉRICO
+        if (selectPeri) {
+            idPerifericoFinal = parseInt(selectPeri);
+            listaComponentesFinal = []; // Sin hijos
+        } 
+        // CASO 2: Es un COMPONENTE SUELTO
+        else if (selectComp) {
+            idPerifericoFinal = 1; // Usamos 1 (CPU/Generico) como contenedor
+            listaComponentesFinal.push({
+                idComponente: parseInt(selectComp),
+                cantidad: 1
+            });
+        }
+        // CASO 3: Es un EQUIPO (CPU) con Checkboxes
+        else if (inputEquipo) {
+            idPerifericoFinal = 1; // ID 1 representa CPU/Equipo Base
             
-            // Lógica específica para RAM (que tiene cantidad)
-            if(document.getElementById('chkRam').checked) {
-                componentesInternos.push({
-                    idComponente: 1, // ID Ficticio de RAM en tu BD
+            // Recolectar RAM (cantidad)
+            const ramCheck = document.getElementById('chkRam');
+            if (ramCheck && ramCheck.checked) {
+                listaComponentesFinal.push({
+                    idComponente: mapComponentesIds['chkRam'],
                     cantidad: parseInt(document.getElementById('cantRam').value) || 1
                 });
             }
+            // Recolectar resto
+            document.querySelectorAll('.daet-check:checked:not(#chkRam)').forEach(chk => {
+                const id = mapComponentesIds[chk.id];
+                if (id) listaComponentesFinal.push({ idComponente: id, cantidad: 1 });
+            });
+        }
 
-            // Lógica para el resto de checkboxes
-            const otrosChecks = document.querySelectorAll('.daet-check:checked:not(#chkRam)');
-            otrosChecks.forEach((chk, index) => {
-                componentesInternos.push({
-                    idComponente: index + 5, // IDs ficticios (ajustar a tu BD real)
-                    cantidad: 1
-                });
+        const getVal = (id) => document.getElementById(id)?.value || "";
+
+        // --- ARMAR PAYLOAD ---
+        const payload = {
+            asignadoA: getVal('analista') || null,
+            estatus: "En Proceso", 
+            fecha: getVal('fecha'),
+            
+            fmoEquipo: "LOTE-" + (fmoSerial || "GEN"), 
+            
+            observacion: getVal('observacion'),
+            recibidoPor: getVal('recibidoPor') || null,
+            
+            solicitudDAET: getVal('solicitudDAET'),
+            solicitudST: getVal('solicitudST'),
+
+            entregas: [
+                {
+                    actividad: document.querySelector('input[name="actividad"]:checked')?.value || "Entrega",
+                    estado: document.querySelector('input[name="estado"]:checked')?.value || "Bueno",
+                    
+                    fmoSerial: fmoSerial,
+                    idPeriferico: idPerifericoFinal, // ID dinámico según selección
+                    
+                    identifique: getVal('identifiqueReemplazo'), 
+                    
+                    componentesInternos: listaComponentesFinal
+                }
+            ]
+        };
+
+        console.log("Payload generado:", JSON.stringify(payload, null, 2));
+
+        // ENVÍO
+        try {
+            const response = await fetch('http://127.0.0.1:8081/api/crearEntregasAlDaet', { 
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
             });
 
-            // 2. Construcción del JSON (RegistroDaetDTO)
-            // NOTA: Como el formulario físico es "plano" pero el backend espera una estructura jerárquica,
-            // mapeamos los campos visuales a la estructura del DTO.
-            
-            const payload = {
-                // Datos Usuario (Quemados o tomados del analista)
-                usuario: document.getElementById('analista').value.toLowerCase().replace(/\s/g, '.') || "admin.daet",
-                clave: "1234", // Temporal
-                ficha: 9999, // Temporal
-                nombre: document.getElementById('analista').value || "Analista TI",
-                gerencia: "Soporte Tecnico",
-
-                // Datos Encabezado (Padre)
-                fmoEquipo: "LOTE-" + document.getElementById('fmoSerial').value, // Generamos un código de lote
-                solicitudDAET: document.getElementById('solicitudDAET').value,
-                estatus: "Enviado DAET",
-                fecha: document.getElementById('fecha').value,
-                // Concatenamos observaciones con la info de reemplazo
-                observacion: document.getElementById('observacion').value + 
-                             " | Reemplazo: " + document.querySelector('input[name="reemplazo"]:checked').value + 
-                             " (" + document.getElementById('identifiqueReemplazo').value + ")",
-
-                // Lista de Entregas (Items)
-                entregas: [
-                    {
-                        // Asumimos que el "Equipo" principal es un CPU Torre (ID 1)
-                        // Si quisieras hacerlo dinámico, necesitarías un <select> invisible o lógica extra.
-                        idPeriferico: 1, 
-                        actividad: document.querySelector('input[name="actividad"]:checked').value,
-                        fmoSerial: document.getElementById('fmoSerial').value,
-                        estado: document.querySelector('input[name="estado"]:checked').value,
-                        
-                        // Lista de hijos (RAM, Disco, etc)
-                        componentesInternos: componentesInternos
-                    }
-                ]
-            };
-
-            console.log("Enviando DAET:", payload);
-
-            try {
-                const response = await fetch('http://localhost:8080/api/daet/entregas', { 
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-
-                if(response.ok) {
-                    alert("Entrega DAET registrada con éxito");
-                    window.location.reload();
-                } else {
-                    alert("Error en el servidor");
-                }
-            } catch (e) {
-                console.error(e);
-                alert("Error de conexión");
+            if(response.ok) {
+                alert("✅ Entrega DAET registrada con éxito");
+                window.location.reload();
+            } else {
+                const text = await response.text();
+                alert("❌ Error en el servidor: " + text);
             }
+        } catch (e) {
+            console.error(e);
+            alert("❌ Error de conexión: " + e.message);
         }
+    }
     </script>
 </body>
 </html>

@@ -36,7 +36,97 @@ public class DaetService {
     @Autowired
     private EntregasAlDAETRepository entregasRepository;
 
-    @Transactional
+
+// MÉTODO AUXILIAR (Privado para uso interno del servicio)
+private BusquedaDaetDTO convertirEntidadADTO(EntregasAlDAET entrega) {
+    BusquedaDaetDTO dto = new BusquedaDaetDTO();
+
+    // --- A. MAPEO DE DATOS DE LA ENTREGA ---
+    dto.setFmoSerial(entrega.getFmoSerial());
+    dto.setActividad(entrega.getActividad());
+    dto.setEstado(entrega.getEstado());
+    dto.setIdentifique(entrega.getIdentifique());
+
+    if (entrega.getPerifericoRef() != null) {
+         dto.setTipoPeriferico(entrega.getPerifericoRef().getNombre());
+    }
+
+    // --- B. MAPEO DE DATOS DEL ENCABEZADO ---
+    EncabezadoRecibo encabezado = entrega.getEncabezadoRelacion();
+    if (encabezado != null) {
+        dto.setFmoEquipoLote(encabezado.getFmoEquipo());
+        dto.setSolicitudDAET(encabezado.getSolicitudDAET());
+        dto.setSolicitudST(encabezado.getSolicitudST());
+        dto.setEstatus(encabezado.getEstatus());
+        dto.setFecha(encabezado.getFecha());
+        dto.setObservacion(encabezado.getObservacion());
+        dto.setAsignadoA(encabezado.getAsignadoA());
+        dto.setRecibidoPor(encabezado.getRecibidoPor());
+    }
+
+    // --- C. MAPEO: LISTA DE COMPONENTES INTERNOS ---
+    List<ComponenteInternoResumenDTO> listaHijos = new ArrayList<>();
+    if (entrega.getComponentesInternos() != null && !entrega.getComponentesInternos().isEmpty()) {
+        for (ComponenteInternoCpuDaet comp : entrega.getComponentesInternos()) {
+            ComponenteInternoResumenDTO dtoComp = new ComponenteInternoResumenDTO();
+            dtoComp.setCantidad(comp.getCantidad());
+            if (comp.getComponenteRef() != null) {
+                dtoComp.setNombreComponente(comp.getComponenteRef().getNombre());
+            }
+            listaHijos.add(dtoComp);
+        }
+    }
+    dto.setComponentesInternos(listaHijos);
+
+    // --- D. MAPEO: COMPONENTE ÚNICO ---
+    List<ComponenteInternoResumenDTO> listaUnico = new ArrayList<>();
+    if (entrega.getComponenteDirectoRef() != null) {
+        ComponenteInternoResumenDTO dtoUnico = new ComponenteInternoResumenDTO();
+        dtoUnico.setCantidad(1); 
+        dtoUnico.setNombreComponente(entrega.getComponenteDirectoRef().getNombre());
+        listaUnico.add(dtoUnico);
+    }
+    dto.setComponenteUnico(listaUnico.isEmpty() ? null : listaUnico);
+
+    return dto;
+}
+
+@Transactional(readOnly = true)
+public List<BusquedaDaetDTO> listarTodoDAET() {
+    // 1. Buscar TODOS en la BD
+    List<EntregasAlDAET> todasLasEntregas = entregasRepository.findAll();
+
+    // 2. Preparar lista de respuesta
+    List<BusquedaDaetDTO> respuesta = new ArrayList<>();
+
+    // 3. Convertir usando el método auxiliar
+    for (EntregasAlDAET entrega : todasLasEntregas) {
+        // REUTILIZACIÓN DE LÓGICA AQUÍ:
+        respuesta.add(convertirEntidadADTO(entrega));
+    }
+
+    return respuesta;
+}
+
+@Transactional(readOnly = true)
+public List<BusquedaDaetDTO> buscarPorSerialDaet2(String serial) {
+    
+    List<EntregasAlDAET> entregasEncontradas = entregasRepository.findByFmoSerial(serial);
+
+    if (entregasEncontradas.isEmpty()) {
+        throw new RuntimeException("No se encontraron registros con el Serial: " + serial);
+    }
+
+    List<BusquedaDaetDTO> respuesta = new ArrayList<>();
+
+    for (EntregasAlDAET entrega : entregasEncontradas) {
+        // REUTILIZACIÓN DE LÓGICA AQUÍ TAMBIÉN:
+        respuesta.add(convertirEntidadADTO(entrega));
+    }
+
+    return respuesta;
+}
+@Transactional
     public Usuario registrarEntregasDaet(RegistroDaetDTO dto) {
         // 1. Crear Usuario
         Usuario nuevoUsuario = new Usuario();
@@ -104,95 +194,5 @@ public class DaetService {
         // 4. Vincular y Guardar
         nuevoUsuario.agregarRecibo(encabezado);
         return usuarioRepository.save(nuevoUsuario);
-    }
-
-
-
-@Transactional(readOnly = true)
-    public List<BusquedaDaetDTO> buscarPorSerialDaet(String serial) {
-        
-        // 1. Buscar en BD (Puede haber varios registros con el mismo serial en distintas fechas)
-        List<EntregasAlDAET> entregasEncontradas = entregasRepository.findByFmoSerial(serial);
-
-        // Validación: Si no existe, lanzamos error
-        if (entregasEncontradas.isEmpty()) {
-            throw new RuntimeException("No se encontraron registros de entrega DAET con el Serial: " + serial);
-        }
-
-        // 2. Preparamos la lista de respuesta
-        List<BusquedaDaetDTO> listaRespuesta = new ArrayList<>();
-
-        // 3. Iteramos sobre cada entrega encontrada
-        for (EntregasAlDAET entrega : entregasEncontradas) {
-            BusquedaDaetDTO dto = new BusquedaDaetDTO();
-
-            // --- A. MAPEO DE DATOS DE LA ENTREGA (Tabla Hija) ---
-            dto.setFmoSerial(entrega.getFmoSerial());
-            dto.setActividad(entrega.getActividad());
-            dto.setEstado(entrega.getEstado());
-            dto.setIdentifique(entrega.getIdentifique());
-
-            // Tipo de Periférico (Si aplica, ej: "CPU", "Monitor")
-            if (entrega.getPerifericoRef() != null) {
-                 dto.setTipoPeriferico(entrega.getPerifericoRef().getNombre());
-            }
-
-            // --- B. MAPEO DE DATOS DEL ENCABEZADO (Tabla Padre) ---
-            EncabezadoRecibo encabezado = entrega.getEncabezadoRelacion();
-            if (encabezado != null) {
-                dto.setFmoEquipoLote(encabezado.getFmoEquipo());
-                dto.setSolicitudDAET(encabezado.getSolicitudDAET());
-                dto.setSolicitudST(encabezado.getSolicitudST()); // Agregado si lo necesitas
-                dto.setEstatus(encabezado.getEstatus());
-                dto.setFecha(encabezado.getFecha());
-                dto.setObservacion(encabezado.getObservacion());
-                // Datos extra opcionales del encabezado
-                dto.setAsignadoA(encabezado.getAsignadoA());
-                dto.setRecibidoPor(encabezado.getRecibidoPor());
-            }
-
-            // --- C. MAPEO: LISTA DE COMPONENTES INTERNOS (Para CPUs) ---
-            // Esto lee de la tabla hija 'entregas_componentes_daet' (OneToMany)
-            List<ComponenteInternoResumenDTO> listaHijos = new ArrayList<>();
-            
-            if (entrega.getComponentesInternos() != null && !entrega.getComponentesInternos().isEmpty()) {
-                for (ComponenteInternoCpuDaet comp : entrega.getComponentesInternos()) {
-                    ComponenteInternoResumenDTO dtoComp = new ComponenteInternoResumenDTO();
-                    dtoComp.setCantidad(comp.getCantidad());
-                    
-                    if (comp.getComponenteRef() != null) {
-                        dtoComp.setNombreComponente(comp.getComponenteRef().getNombre());
-                    }
-                    listaHijos.add(dtoComp);
-                }
-            }
-            // Asignamos la lista al campo correspondiente
-            dto.setComponentesInternos(listaHijos);
-
-
-            // --- D. MAPEO: COMPONENTE ÚNICO (Para RAM/Disco suelto) ---
-            // Esto lee directamente de la columna 'componentes_computadora_internos' en la tabla 'entregas_al_daet'
-            List<ComponenteInternoResumenDTO> listaUnico = new ArrayList<>();
-            
-            // Verificamos el campo mapeado directo (ManyToOne)
-            if (entrega.getComponenteDirectoRef() != null) {
-                ComponenteInternoResumenDTO dtoUnico = new ComponenteInternoResumenDTO();
-                
-                // Asumimos cantidad 1 porque es un registro directo
-                dtoUnico.setCantidad(1); 
-                dtoUnico.setNombreComponente(entrega.getComponenteDirectoRef().getNombre());
-                
-                listaUnico.add(dtoUnico);
-            }
-            
-            // Si la lista está vacía, mandamos null para limpiar el JSON, o la lista vacía según prefieras
-            dto.setComponenteUnico(listaUnico.isEmpty() ? null : listaUnico);
-
-
-            // Agregamos el DTO final a la respuesta
-            listaRespuesta.add(dto);
-        }
-
-        return listaRespuesta;
     }
 }

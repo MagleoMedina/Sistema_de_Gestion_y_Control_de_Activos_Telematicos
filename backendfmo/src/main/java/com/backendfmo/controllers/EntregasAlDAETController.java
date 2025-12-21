@@ -36,7 +36,12 @@ public class EntregasAlDAETController {
 
     @GetMapping("/buscarEntregasAlDaet/{fmoSerial}") 
     public ResponseEntity<?> buscarPorSerial(@PathVariable String fmoSerial) {
-        return ResponseEntity.ok(daetService.buscarPorSerialDaet(fmoSerial));
+        return ResponseEntity.ok(daetService.buscarPorSerialDaet2(fmoSerial));
+    }
+
+    @GetMapping("/buscarEntregasAlDaet") 
+    public ResponseEntity<?> listarTodoDAET() {
+        return ResponseEntity.ok(daetService.listarTodoDAET());
     }
     }
 

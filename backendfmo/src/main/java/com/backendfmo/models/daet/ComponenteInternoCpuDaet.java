@@ -35,4 +35,6 @@ public class ComponenteInternoCpuDaet {
     @JoinColumn(name = "componentes_computadora_internos")
     @JsonBackReference
     private ComponenteInterno componenteRef;
+
+    
 }

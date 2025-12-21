@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.backendfmo.models.perifericos.Periferico;
+import com.backendfmo.models.reciboequipos.ComponenteInterno;
 import com.backendfmo.models.reciboequipos.EncabezadoRecibo;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -30,13 +31,16 @@ public class EntregasAlDAET {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "actividad")
     private String actividad;
     
     @Column(name = "fmo_serial")
     private String fmoSerial;
     
+    @Column(name = "estado")    
     private String estado;
 
+    @Column(name = "identifique")
     private String identifique;
 
     // Relación Hacia Arriba (Encabezado)
@@ -61,4 +65,12 @@ public class EntregasAlDAET {
         componentesInternos.add(comp);
         comp.setEntregaRelacion(this);
     }
+    
+// --- NUEVO CAMPO: Mapeo directo a la columna de componentes ---
+    // Esto guardará el "Componente Único" directamente en la tabla padre
+    @ManyToOne
+    @JoinColumn(name = "componentes_computadora_internos")
+    @JsonBackReference
+    private ComponenteInterno componenteDirectoRef;
+
 }

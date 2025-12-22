@@ -3,39 +3,463 @@
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda Equipos</title>
+    <style>
+        /* ESTILOS DEL FORMULARIO PAPEL (Reutilizados para el Modal) */
+        .paper-form {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .cell-border {
+            border: 1px solid #000;
+            padding: 2px 5px;
+            display: flex;
+            align-items: center;
+        }
+        .cell-block { display: block; }
+        .input-line {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-weight: bold;
+            color: #000080;
+            height: 20px;
+            font-size: 13px;
+            padding: 0 5px;
+        }
+        .input-line:focus { outline: none; }
+        .label-text {
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .form-check { min-height: auto; margin-bottom: 0; margin-right: 10px; }
+        .form-check-input { border: 1px solid #000; width: 13px; height: 13px; margin-top: 3px; }
+        .row-compact { --bs-gutter-x: 0; }
+        
+        /* Estilos de Tags (Burbujas) en modo lectura */
+        .tag-badge {
+            background-color: #000080;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-size: 11px;
+        }
+    </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4">
             
-            <div class="mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">
-                    ⬅ Volver al Menú
-                </a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver</a>
+                <h5 class="m-0 fw-bold">🖥️ Historial de Recibo de Equipos</h5>
             </div>
 
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="m-0 fw-bold">🖥️ Historial de Recibo de Equipos</h5>
-                </div>
                 <div class="card-body">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="inputBusquedaEquipos" placeholder="Buscar por FMO, Usuario o Ficha...">
-                        <button class="btn btn-primary" type="button" onclick="buscarEquipos()">🔍 Buscar</button>
+                    
+                    <div class="row g-2 align-items-center mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
+                                <option value="todo">Listar Todo</option>
+                                <option value="fmo">FMO / Serial</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-7" id="containerInputTexto" style="display: none;">
+                            <label class="form-label small fw-bold">Ingrese FMO o Serial:</label>
+                            <input type="text" class="form-control" id="inputBusquedaFmo" placeholder="Ej: 119000 o Serial...">
+                        </div>
+
+                        <div class="col-md-7" id="containerInputFecha" style="display: none;">
+                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <input type="date" class="form-control" id="inputBusquedaFecha">
+                        </div>
+
+                        <div class="col-md-7" id="containerVacio"></div>
+
+                        <div class="col-md-2 text-end">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="buscarEquipos()">🔍 Buscar</button>
+                        </div>
                     </div>
 
-                    <div id="resultadosEquipos" class="mt-4 text-center text-muted">
-                        Realice una búsqueda para ver los resultados...
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th>FMO / Equipo</th>
+                                    <th>Fecha Ingreso</th>
+                                    <th>Usuario</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResultados" class="text-center">
+                                <tr><td colspan="5" class="text-muted">Seleccione un filtro y busque para ver resultados.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+
                 </div>
             </div>
-
         </div>
     </div>
-    <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <div class="modal fade" id="modalVerEquipo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl"> <div class="modal-content">
+                <div class="modal-header bg-light py-2">
+                    <h6 class="modal-title fw-bold">📄 Detalle del Recibo</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-secondary bg-opacity-10">
+                    
+                    <div class="paper-form container p-0" id="formularioPapel">
+                        
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light" style="padding: 4px;">
+                                <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS (VISTA PREVIA)</h6>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="text" class="input-line" id="modal_fecha" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">USUARIO:</span>
+                                <input type="text" class="input-line" id="modal_usuario" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">FICHA:</span>
+                                <input type="text" class="input-line" id="modal_ficha" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">CLAVE:</span>
+                                <input type="text" class="input-line" value="****" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">NOMBRE:</span>
+                                <input type="text" class="input-line" id="modal_nombre" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-5 cell-border">
+                                <span class="label-text me-2">EXT./TLF.:</span>
+                                <input type="text" class="input-line" id="modal_extension" readonly>
+                            </div>
+                            <div class="col-md-7 cell-border justify-content-between">
+                                <span class="label-text me-3">RESPALDO:</span>
+                                <span class="input-line fw-bold" id="modal_respaldo"></span>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text">GCIA./DPTO.:</span>
+                                <input type="text" class="input-line ms-2" id="modal_gerencia" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">SOLIC. DAET:</span>
+                                <input type="text" class="input-line" id="modal_solicitudDAET" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">SOLIC. S.T.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudST" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">CPU FMO:</span>
+                                <input type="text" class="input-line" id="modal_fmoEquipo" readonly>
+                            </div>
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">MARCA:</span>
+                                <input type="text" class="input-line" id="modal_marca" readonly>
+                            </div>
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">FALLA:</span>
+                                <input type="text" class="input-line" id="modal_falla" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border flex-wrap bg-light">
+                                <span class="label-text w-100 text-center">COMPONENTES DETECTADOS</span>
+                            </div>
+                            <div class="col-12 cell-border p-2">
+                                <div id="modal_lista_componentes" class="d-flex flex-wrap gap-2">
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-2 cell-border bg-light justify-content-center">
+                                <span class="label-text">INCLUYE:</span>
+                            </div>
+                            <div class="col-10 cell-border p-2">
+                                <div id="modal_lista_perifericos" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-2 cell-border bg-light justify-content-center">
+                                <span class="label-text">APPS:</span>
+                            </div>
+                            <div class="col-10 cell-border p-2">
+                                <div id="modal_lista_apps" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">CARPETA RED:</span>
+                                <div id="modal_lista_carpetas" class="d-flex flex-wrap gap-1 p-1"></div>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">OBSERVACIÓN SERIALES:</span>
+                                <input type="text" class="input-line" id="modal_observacionSeriales" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border cell-block">
+                                <span class="label-text">OBSERVACIÓN GENERAL:</span>
+                                <textarea class="input-line" rows="1" id="modal_observacion" readonly style="resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">ASIGNADO A:</span>
+                                <input type="text" class="input-line" id="modal_asignadoA" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">ESTATUS:</span>
+                                <input type="text" class="input-line" id="modal_estatus" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-6 cell-border cell-block" style="height: 50px;">
+                                <span class="label-text">ENTREGADO POR:</span>
+                                <input type="text" class="input-line mt-2" id="modal_entregadoPor" readonly>
+                            </div>
+                            <div class="col-6 cell-border cell-block" style="height: 50px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line mt-2" id="modal_recibidoPor" readonly>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" onclick="alert('Función de imprimir modal pendiente')">🖨️ Imprimir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+
     <script>
-        function buscarEquipos() { alert("Lógica de búsqueda Equipos pendiente..."); }
+        // --- 1. LÓGICA DE FILTROS DINÁMICOS ---
+        function cambiarFiltro() {
+            const filtro = document.getElementById('filtroSelect').value;
+            const divTexto = document.getElementById('containerInputTexto');
+            const divFecha = document.getElementById('containerInputFecha');
+            const divVacio = document.getElementById('containerVacio');
+
+            // Resetear
+            divTexto.style.display = 'none';
+            divFecha.style.display = 'none';
+            divVacio.style.display = 'none';
+
+            if (filtro === 'fmo') {
+                divTexto.style.display = 'block';
+            } else if (filtro === 'fecha') {
+                divFecha.style.display = 'block';
+            } else {
+                divVacio.style.display = 'block'; // Espaciador para 'todo'
+            }
+        }
+
+        // --- 2. LÓGICA DE BÚSQUEDA ---
+        async function buscarEquipos() {
+            const filtro = document.getElementById('filtroSelect').value;
+            let url = 'http://127.0.0.1:8081/api/buscarReciboEquipos'; // Default: Listar Todo
+            
+            // Construir URL según filtro
+            if (filtro === 'fmo') {
+                const val = document.getElementById('inputBusquedaFmo').value;
+                if(!val) return alert("Ingrese un FMO o Serial");
+                url = `http://127.0.0.1:8081/api/recibo-equipos/buscar?fmo=${val}`;
+            } 
+            else if (filtro === 'fecha') {
+                const val = document.getElementById('inputBusquedaFecha').value;
+                if(!val) return alert("Seleccione una fecha");
+                url = `http://127.0.0.1:8081/api/recibo-equipos/buscar-fecha?fecha=${val}`;
+            }
+
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+
+            try {
+                const response = await fetch(url);
+                if(!response.ok) throw new Error("No se encontraron resultados o error de servidor.");
+                
+                const data = await response.json();
+                renderizarTabla(data);
+
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-danger">${error.message}</td></tr>`;
+            }
+        }
+
+        function renderizarTabla(data) {
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '';
+
+            // Si data no es array (ej: busqueda unica devuelve objeto), lo convertimos
+            const lista = Array.isArray(data) ? data : [data];
+
+            if(lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No hay registros.</td></tr>';
+                return;
+            }
+
+            lista.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${index + 1}</td>
+                    <td class="text-primary fw-bold">${item.fmoEquipo || "N/A"}</td>
+                    <td>${item.fecha || "N/A"}</td>
+                    <td>${item.usuarioNombre || "N/A"}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger me-1" onclick="descargarPdf('${item.fmoEquipo}')">
+                            📄 PDF
+                        </button>
+                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
+                            👁️ Ver
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 3. LÓGICA DE PDF ---
+        function descargarPdf(fmo) {
+            // Aquí llamarías a tu endpoint de generación de PDF
+            alert("Generando PDF para el equipo: " + fmo);
+            // window.open(`http://.../api/pdf/${fmo}`, '_blank');
+        }
+
+        // --- 4. LÓGICA DE VISUALIZACIÓN (MODAL) ---
+        function abrirModalVer(data) {
+            // A. Llenar Inputs Simples (Usamos los IDs del form con prefijo modal_)
+            // Nota: En el HTML del modal agregué IDs 'modal_X' para no chocar con otros forms si los hubiera.
+            
+            // Mapeo JSON -> ID HTML
+            setVal('modal_fecha', data.fecha);
+            setVal('modal_usuario', data.usuarioNombre);
+            setVal('modal_ficha', data.usuarioFicha);
+            setVal('modal_nombre', data.usuarioNombre);
+            setVal('modal_extension', data.extension); // Si viniera en el JSON lo pones
+            setVal('modal_gerencia', data.usuarioGerencia);
+            
+            setVal('modal_solicitudDAET', data.solicitudDAET);
+            setVal('modal_solicitudST', data.solicitudST);
+            setVal('modal_fmoEquipo', data.fmoEquipo);
+            setVal('modal_falla', data.falla);
+            setVal('modal_observacion', data.observacion);
+            
+            setVal('modal_asignadoA', data.asignadoA);
+            setVal('modal_estatus', data.estatus);
+            setVal('modal_entregadoPor', data.entregadoPor);
+            setVal('modal_recibidoPor', data.recibidorPor);
+
+            // B. Datos dentro del array de Equipos (Tomamos el primero por defecto para visualizar)
+            if(data.equipos && data.equipos.length > 0) {
+                const equipo = data.equipos[0];
+                setVal('modal_marca', equipo.marca);
+                document.getElementById('modal_respaldo').textContent = equipo.respaldo || "NO";
+                setVal('modal_observacionSeriales', equipo.observacionSeriales);
+
+                // C. Llenar Listas Visuales (Tags)
+                llenarTags('modal_lista_componentes', equipo.componentesGenericos, 'nombreComponente');
+                llenarTags('modal_lista_perifericos', equipo.perifericos); // es array de strings
+                llenarTags('modal_lista_apps', equipo.aplicaciones); // array strings
+                llenarTags('modal_lista_carpetas', equipo.carpetas); // array strings
+            }
+
+            // D. Mostrar Modal
+            const myModal = new bootstrap.Modal(document.getElementById('modalVerEquipo'));
+            myModal.show();
+        }
+
+        // Helpers para el modal
+        function setVal(id, val) {
+            const el = document.getElementById(id);
+            if(el) el.value = val || "";
+        }
+
+       function llenarTags(containerId, dataArray, keyName = null) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Limpiar
+            
+            if(!dataArray || dataArray.length === 0) {
+                container.innerHTML = '<span class="text-muted small">Ninguno</span>';
+                return;
+            }
+
+            dataArray.forEach(item => {
+                // 1. Obtenemos el texto base (Ej: "MEMORIA RAM", "DISCO DURO", "SAP")
+                let texto = keyName ? item[keyName] : item; 
+
+                // 2. Lógica Especial: Solo si estamos llenando componentes y es RAM
+                // Verificamos que sea un objeto (keyName existe) y que tenga cantidad
+                if (keyName === 'nombreComponente' && item.cantidad) {
+                    
+                    // Convertimos a mayúsculas para comparar seguro
+                    const nombreUpper = String(texto).toUpperCase();
+
+                    // Si incluye la palabra "RAM", le agregamos la cantidad
+                    if (nombreUpper.includes("RAM") || nombreUpper.includes("MEMORIA")) {
+                        texto = `${texto} (${item.cantidad})`; 
+                    }
+                }
+
+                // 3. Crear y agregar la burbuja
+                const span = document.createElement('span');
+                span.className = 'tag-badge';
+                span.textContent = texto;
+                container.appendChild(span);
+            });
+        }
     </script>
 </body>
 </html>

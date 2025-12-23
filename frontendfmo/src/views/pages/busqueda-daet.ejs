@@ -3,39 +3,441 @@
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda DAET</title>
+    <style>
+        /* --- ESTILOS COMPACTOS (Paper Form) --- */
+        .paper-form {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cell-border {
+            border: 1px solid #000;
+            padding: 2px 5px;
+            display: flex;
+            align-items: center;
+        }
+        .cell-block { display: block; }
+        .input-line {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-weight: bold;
+            color: #000080;
+            height: 20px;
+            font-size: 13px;
+            padding: 0 5px;
+        }
+        .input-line:focus { outline: none; }
+        .label-text {
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .form-check { margin-bottom: 0; margin-right: 10px; }
+        .form-check-input { border: 1px solid #000; width: 13px; height: 13px; margin-top: 3px; }
+        .row-compact { --bs-gutter-x: 0; }
+        .header-title { letter-spacing: 2px; font-weight: 900; text-decoration: underline; }
+    </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4">
             
-            <div class="mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">
-                    ⬅ Volver al Menú
-                </a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
+                <h5 class="m-0 fw-bold">🚚 Historial de Entregas al DAET</h5>
             </div>
 
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="m-0 fw-bold">🚚 Búsqueda de Entregas al DAET</h5>
-                </div>
                 <div class="card-body">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="inputBusquedaDaet" placeholder="Buscar por Serial, Solicitud DAET o Fecha...">
-                        <button class="btn btn-primary" type="button" onclick="buscarDaet()">🔍 Buscar</button>
+                    
+                    <div class="row g-2 align-items-center mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
+                                <option value="todo">Listar Todo</option>
+                                <option value="fmoSerial">FMO / Serial (Individual)</option>
+                                <option value="fmoEquipo">FMO Equipo (Lote)</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-7" id="containerInputSerial" style="display: none;">
+                            <label class="form-label small fw-bold">Ingrese Serial del Equipo:</label>
+                            <input type="text" class="form-control" id="inputBusquedaSerial" placeholder="Ej: XYZ-123...">
+                        </div>
+
+                        <div class="col-md-7" id="containerInputLote" style="display: none;">
+                            <label class="form-label small fw-bold">Ingrese FMO del Lote/Equipo:</label>
+                            <input type="text" class="form-control" id="inputBusquedaLote" placeholder="Ej: LOTE-GEN-2025...">
+                        </div>
+
+                        <div class="col-md-7" id="containerInputFecha" style="display: none;">
+                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <input type="date" class="form-control" id="inputBusquedaFecha">
+                        </div>
+
+                        <div class="col-md-7" id="containerVacio"></div>
+
+                        <div class="col-md-2 text-end">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="buscarDaet()">🔍 Buscar</button>
+                        </div>
                     </div>
 
-                    <div id="resultadosDaet" class="mt-4 text-center text-muted">
-                        Realice una búsqueda para ver los resultados...
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th>Solicitud DAET</th>
+                                    <th>FMO Lote</th>
+                                    <th>FMO Serial</th>
+                                    <th>Actividad</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResultados" class="text-center">
+                                <tr><td colspan="7" class="text-muted">Seleccione un filtro y busque para ver resultados.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+
                 </div>
             </div>
 
         </div>
     </div>
-    <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <div class="modal fade" id="modalVerDaet" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light py-2">
+                    <h6 class="modal-title fw-bold">📄 Detalle de Entrega</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-secondary bg-opacity-10">
+                    
+                    <div class="paper-form container p-0" id="formDaetModal">
+                        
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-between bg-light p-2">
+                                <div style="width: 30px;"></div> <span class="header-title">ENTREGAS AL DAET</span>
+                                <span style="font-size: 20px;">📦</span> </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="text" class="input-line" id="modal_fecha" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">SOLICITUD DAET.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudDAET" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">SOLICITUD S.T.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudST" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border justify-content-center bg-light">
+                                <span class="label-text">ACTIVIDAD:</span>
+                            </div>
+                            <div class="col-12 cell-border justify-content-center">
+                                <div class="form-check form-check-inline me-5">
+                                    <input class="form-check-input modal-radio" type="radio" name="actividad_modal" id="modal_act_reemplazo" disabled>
+                                    <label class="label-text">REEMPLAZO</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input modal-radio" type="radio" name="actividad_modal" id="modal_act_entrega" disabled>
+                                    <label class="label-text">ENTREGA</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-3">ESTADO:</span>
+                                <div class="form-check form-check-inline me-4">
+                                    <input class="form-check-input modal-radio" type="radio" name="estado_modal" id="modal_est_bueno" disabled>
+                                    <label class="label-text">BUENO</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input modal-radio" type="radio" name="estado_modal" id="modal_est_danado" disabled>
+                                    <label class="label-text">DAÑADO</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">TIPO PERIFÉRICO:</span>
+                                <input type="text" class="input-line" id="modal_tipoPeriferico" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">COMPONENTE ÚNICO:</span>
+                                <input type="text" class="input-line" id="modal_compUnico" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO/SERIAL:</span>
+                                <input type="text" class="input-line" id="modal_fmoSerial" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO LOTE (EQUIPO):</span>
+                                <input type="text" class="input-line" id="modal_fmoLote" readonly>
+                            </div>
+                        </div>
+
+                        <div id="wrapperEntregaCpu">
+                            <div class="row row-compact">
+                                <div class="col-12 cell-border bg-light">
+                                    <span class="label-text">ENTREGA DE CPU (Detalles):</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row row-compact">
+                                <div class="col-6 cell-border cell-block">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_disco" disabled>
+                                        <label class="label-text">DISCO DURO</label>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_ram" disabled>
+                                        <label class="label-text me-1">MEMORIAS RAM</label>
+                                        <span style="font-size:10px;">--</span>
+                                        <span class="label-text ms-1 me-1">CANT:</span>
+                                        <input type="text" class="input-line text-center" id="modal_cantRam" style="width: 30px;" readonly>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_madre" disabled>
+                                        <label class="label-text">TARJETA MADRE</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_procesador" disabled>
+                                        <label class="label-text">PROCESADOR</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_fan" disabled>
+                                        <label class="label-text">FAN COOLER</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 cell-border cell-block">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_video" disabled>
+                                        <label class="label-text">TARJETA DE VIDEO</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_fuente" disabled>
+                                        <label class="label-text">FUENTE DE PODER</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_pila" disabled>
+                                        <label class="label-text">PILA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_red" disabled>
+                                        <label class="label-text">TARJETA DE RED</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border bg-light justify-content-center">
+                                <span class="label-text">SE RECIBE REEMPLAZO</span>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border align-items-center">
+                                <span class="label-text me-2 border-start border-dark ps-2">IDENTIFIQUE:</span>
+                                <input type="text" class="input-line" id="modal_identifique" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border cell-block">
+                                <span class="label-text">(OBSERVACIÓN):</span>
+                                <textarea class="input-line" rows="2" id="modal_observacion" style="resize: none;" readonly></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-        function buscarDaet() { alert("Lógica de búsqueda DAET pendiente..."); }
+        // --- 1. LÓGICA DE FILTROS ---
+        function cambiarFiltro() {
+            const filtro = document.getElementById('filtroSelect').value;
+            const divSerial = document.getElementById('containerInputSerial');
+            const divLote = document.getElementById('containerInputLote');
+            const divFecha = document.getElementById('containerInputFecha');
+            const divVacio = document.getElementById('containerVacio');
+
+            // Reset
+            divSerial.style.display = 'none';
+            divLote.style.display = 'none';
+            divFecha.style.display = 'none';
+            divVacio.style.display = 'none';
+
+            if (filtro === 'fmoSerial') divSerial.style.display = 'block';
+            else if (filtro === 'fmoEquipo') divLote.style.display = 'block';
+            else if (filtro === 'fecha') divFecha.style.display = 'block';
+            else divVacio.style.display = 'block'; // Para "todo"
+        }
+
+        // --- 2. LÓGICA DE BÚSQUEDA ---
+        async function buscarDaet() {
+            const filtro = document.getElementById('filtroSelect').value;
+            // Endpoint base para listar todo
+            let url = 'http://127.0.0.1:8081/api/buscarEntregasAlDaet'; 
+
+            if (filtro === 'fmoSerial') {
+                const val = document.getElementById('inputBusquedaSerial').value;
+                if(!val) return alert("Ingrese Serial");
+                url = `http://127.0.0.1:8081/api/daet/buscar?serial=${val}`;
+            }
+            else if (filtro === 'fmoEquipo') {
+                const val = document.getElementById('inputBusquedaLote').value;
+                if(!val) return alert("Ingrese Lote/FMO Equipo");
+                // Asumimos que el backend busca en general o usa un parámetro específico
+                url = `http://127.0.0.1:8081/api/daet/buscar?serial=${val}`; // Usamos mismo endpoint si la BD busca en ambas columnas o ajusta según tu API
+            }
+            else if (filtro === 'fecha') {
+                const val = document.getElementById('inputBusquedaFecha').value;
+                if(!val) return alert("Seleccione Fecha");
+                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fecha/${val}`;
+            }
+
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+
+            try {
+                const response = await fetch(url);
+                if(!response.ok) throw new Error("Sin resultados o error de conexión.");
+                const data = await response.json();
+                renderizarTabla(data);
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="7" class="text-danger">${error.message}</td></tr>`;
+            }
+        }
+
+        function renderizarTabla(data) {
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '';
+            const lista = Array.isArray(data) ? data : [data];
+
+            if(lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">No hay registros.</td></tr>';
+                return;
+            }
+
+            lista.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${index + 1}</td>
+                    <td>${item.solicitudDAET || "N/A"}</td>
+                    <td class="text-primary fw-bold">${item.fmoEquipoLote || "N/A"}</td>
+                    <td>${item.fmoSerial || "S/N"}</td>
+                    <td><span class="badge bg-secondary">${item.actividad}</span></td>
+                    <td>${item.fecha}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
+                            👁️ Ver
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 3. LÓGICA DE VISUALIZACIÓN ---
+        function abrirModalVer(data) {
+            // A. Datos Generales
+            document.getElementById('modal_fecha').value = data.fecha;
+            document.getElementById('modal_solicitudDAET').value = data.solicitudDAET;
+            document.getElementById('modal_solicitudST').value = data.solicitudST || "";
+            document.getElementById('modal_fmoLote').value = data.fmoEquipoLote;
+            document.getElementById('modal_fmoSerial').value = data.fmoSerial;
+            document.getElementById('modal_observacion').value = data.observacion;
+            document.getElementById('modal_identifique').value = data.identifique || "N/A";
+            document.getElementById('modal_tipoPeriferico').value = data.tipoPeriferico || "";
+
+            // B. Radios (Actividad y Estado)
+            // Desmarcamos todos primero
+            document.querySelectorAll('.modal-radio').forEach(r => r.checked = false);
+
+            if(data.actividad === 'Reemplazo') document.getElementById('modal_act_reemplazo').checked = true;
+            else document.getElementById('modal_act_entrega').checked = true;
+
+            if(data.estado === 'Bueno') document.getElementById('modal_est_bueno').checked = true;
+            else document.getElementById('modal_est_danado').checked = true;
+
+            // C. Resetear Checkboxes de CPU
+            document.querySelectorAll('.modal-cpu-check').forEach(c => c.checked = false);
+            document.getElementById('modal_cantRam').value = "";
+            document.getElementById('modal_compUnico').value = "";
+
+            // D. Mapeo de Componentes Internos (CPU)
+            if(data.componentesInternos && data.componentesInternos.length > 0) {
+                data.componentesInternos.forEach(comp => {
+                    const nombre = (comp.nombreComponente || "").toUpperCase();
+                    
+                    if(nombre.includes("DISCO")) document.getElementById('chk_disco').checked = true;
+                    if(nombre.includes("RAM") || nombre.includes("MEMORIA")) {
+                        document.getElementById('chk_ram').checked = true;
+                        document.getElementById('modal_cantRam').value = comp.cantidad;
+                    }
+                    if(nombre.includes("MADRE")) document.getElementById('chk_madre').checked = true;
+                    if(nombre.includes("PROCESADOR")) document.getElementById('chk_procesador').checked = true;
+                    if(nombre.includes("FAN") || nombre.includes("COOLER")) document.getElementById('chk_fan').checked = true;
+                    if(nombre.includes("VIDEO")) document.getElementById('chk_video').checked = true;
+                    if(nombre.includes("FUENTE")) document.getElementById('chk_fuente').checked = true;
+                    if(nombre.includes("PILA")) document.getElementById('chk_pila').checked = true;
+                    if(nombre.includes("RED")) document.getElementById('chk_red').checked = true;
+                });
+            }
+
+            // E. Mapeo de Componente Único (Si aplica)
+            if(data.componenteUnico && data.componenteUnico.length > 0) {
+                const unico = data.componenteUnico[0];
+                document.getElementById('modal_compUnico').value = unico.nombreComponente + (unico.cantidad > 1 ? ` (${unico.cantidad})` : "");
+            }
+
+            // F. Mostrar
+            const myModal = new bootstrap.Modal(document.getElementById('modalVerDaet'));
+            myModal.show();
+        }
     </script>
 </body>
 </html>

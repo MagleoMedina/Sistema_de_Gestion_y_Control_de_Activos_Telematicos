@@ -3,39 +3,392 @@
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda Periféricos</title>
+    <style>
+        /* --- ESTILOS COMPACTOS (Paper Form) --- */
+        .paper-form {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .cell-border {
+            border: 1px solid #000;
+            padding: 2px 5px;
+            display: flex;
+            align-items: center;
+        }
+        .input-line {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-weight: bold;
+            color: #000080;
+            height: 20px;
+            font-size: 13px;
+            padding: 0 5px;
+        }
+        .input-line:focus { outline: none; }
+        .label-text {
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .form-check { margin-bottom: 0; margin-right: 10px; }
+        .form-check-input { border: 1px solid #000; width: 13px; height: 13px; margin-top: 3px; }
+        .row-compact { --bs-gutter-x: 0; }
+    </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4">
             
-            <div class="mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">
-                    ⬅ Volver al Menú
-                </a>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
+                <h5 class="m-0 fw-bold">⌨️ Historial de Periféricos</h5>
             </div>
 
             <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="m-0 fw-bold">⌨️ Historial de Periféricos y Componentes</h5>
-                </div>
                 <div class="card-body">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="inputBusquedaPerifericos" placeholder="Buscar por Serial, Tipo o Usuario...">
-                        <button class="btn btn-primary" type="button" onclick="buscarPerifericos()">🔍 Buscar</button>
+                    
+                    <div class="row g-2 align-items-center mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
+                                <option value="todo">Listar Todo</option>
+                                <option value="serial">Serial / FMO</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-7" id="containerInputSerial" style="display: none;">
+                            <label class="form-label small fw-bold">Ingrese Serial o FMO:</label>
+                            <input type="text" class="form-control" id="inputBusquedaSerial" placeholder="Ej: 452 o S/N...">
+                        </div>
+
+                        <div class="col-md-7" id="containerInputFecha" style="display: none;">
+                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <input type="date" class="form-control" id="inputBusquedaFecha">
+                        </div>
+
+                        <div class="col-md-7" id="containerVacio"></div>
+
+                        <div class="col-md-2 text-end">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="buscarPerifericos()">🔍 Buscar</button>
+                        </div>
                     </div>
 
-                    <div id="resultadosPerifericos" class="mt-4 text-center text-muted">
-                        Realice una búsqueda para ver los resultados...
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th>Serial / FMO</th>
+                                    <th>Tipo Componente</th>
+                                    <th>Fecha</th>
+                                    <th>Usuario</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResultados" class="text-center">
+                                <tr><td colspan="6" class="text-muted">Seleccione un filtro y busque para ver resultados.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
+
                 </div>
             </div>
 
         </div>
     </div>
-    <script src="/js/bootstrap.bundle.min.js"></script>
+
+    <div class="modal fade" id="modalVerPeriferico" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-light py-2">
+                    <h6 class="modal-title fw-bold">📄 Detalle del Recibo</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-secondary bg-opacity-10">
+                    
+                    <div class="paper-form container p-0" id="formPerifericosModal">
+                        
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light p-2">
+                                <h6 class="m-0 fw-bold">RECIBO DE PERIFÉRICOS</h6>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="text" class="input-line" id="modal_fecha" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FICHA:</span>
+                                <input type="text" class="input-line" id="modal_ficha" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">USUARIO:</span>
+                                <input type="text" class="input-line" id="modal_usuario" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_1" disabled>
+                                    <label class="label-text">MONITOR</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_2" disabled>
+                                    <label class="label-text">TECLADO</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_6" disabled>
+                                    <label class="label-text">SCANER</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_7" disabled>
+                                    <label class="label-text">PENDRIVE</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_4" disabled>
+                                    <label class="label-text">REGULADOR</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_5" disabled>
+                                    <label class="label-text">IMPRESORA</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_3" disabled>
+                                    <label class="label-text">MOUSE</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input modal-peri-check" type="checkbox" id="chk_8" disabled>
+                                    <label class="label-text">TÓNER</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">COMPONENTES:</span>
+                                <input type="text" class="input-line" id="modal_componenteTexto" readonly placeholder="Ninguno">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">OTROS:</span>
+                                <input type="text" class="input-line" id="modal_otros" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO/SERIAL:</span>
+                                <input type="text" class="input-line" id="modal_fmoSerial" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">OBSERVACIÓN / FALLA:</span>
+                                <input type="text" class="input-line" id="modal_observacion" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">ASIGNADO A:</span>
+                                <input type="text" class="input-line" id="modal_asignadoA" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border" style="height: 45px;">
+                                <span class="label-text">ENTREGADO POR:</span>
+                                <input type="text" class="input-line mt-2" id="modal_entregadoPor" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border" style="height: 45px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line mt-2" id="modal_recibidoPor" readonly>
+                            </div>
+                        </div>
+
+                    </div>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" onclick="alert('Pendiente')">🖨️ PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+
     <script>
-        function buscarPerifericos() { alert("Lógica de búsqueda Periféricos pendiente..."); }
+        // --- 1. LÓGICA DE FILTROS ---
+        function cambiarFiltro() {
+            const filtro = document.getElementById('filtroSelect').value;
+            const divSerial = document.getElementById('containerInputSerial');
+            const divFecha = document.getElementById('containerInputFecha');
+            const divVacio = document.getElementById('containerVacio');
+
+            divSerial.style.display = 'none';
+            divFecha.style.display = 'none';
+            divVacio.style.display = 'none';
+
+            if (filtro === 'serial') divSerial.style.display = 'block';
+            else if (filtro === 'fecha') divFecha.style.display = 'block';
+            else divVacio.style.display = 'block';
+        }
+
+        // --- 2. LÓGICA DE BÚSQUEDA ---
+        async function buscarPerifericos() {
+            const filtro = document.getElementById('filtroSelect').value;
+            // Asegúrate que tu Controller tenga estas rutas
+            let url = 'http://127.0.0.1:8081/api/recibo-perifericos/listar-todo'; 
+
+            if (filtro === 'serial') {
+                const val = document.getElementById('inputBusquedaSerial').value;
+                if(!val) return alert("Ingrese Serial");
+                url = `http://127.0.0.1:8081/api/recibo-perifericos/buscar?serial=${val}`;
+            } 
+            else if (filtro === 'fecha') {
+                const val = document.getElementById('inputBusquedaFecha').value;
+                if(!val) return alert("Seleccione Fecha");
+                url = `http://127.0.0.1:8081/api/recibo-perifericos/buscar-fecha?fecha=${val}`;
+            }
+
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
+
+            try {
+                const response = await fetch(url);
+                if(!response.ok) throw new Error("Sin resultados o error servidor.");
+                const data = await response.json();
+                renderizarTabla(data);
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="6" class="text-danger">${error.message}</td></tr>`;
+            }
+        }
+
+        function renderizarTabla(data) {
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '';
+            const lista = Array.isArray(data) ? data : [data];
+
+            if(lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
+                return;
+            }
+
+            lista.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${index + 1}</td>
+                    <td class="text-primary fw-bold">${item.fmoSerial || "S/N"}</td>
+                    <td><span class="badge bg-secondary">${item.tipoComponente || "Varios"}</span></td>
+                    <td>${item.fecha || "N/A"}</td>
+                    <td>${item.nombre || "N/A"}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
+                            👁️ Ver
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 3. LÓGICA DE VISUALIZACIÓN ---
+        function abrirModalVer(data) {
+            // A. Datos Generales
+            document.getElementById('modal_fecha').value = data.fecha;
+            document.getElementById('modal_usuario').value = data.nombre;
+            document.getElementById('modal_ficha').value = data.ficha;
+            document.getElementById('modal_fmoSerial').value = data.fmoSerial;
+            
+            // Campos de encabezado
+            document.getElementById('modal_observacion').value = data.observacion || data.falla || "";
+            document.getElementById('modal_asignadoA').value = data.asignadoA;
+            document.getElementById('modal_entregadoPor').value = data.entregadoPor;
+            document.getElementById('modal_recibidoPor').value = data.recibidoPor;
+
+            // B. Resetear Checkboxes y Textos
+            document.querySelectorAll('.modal-peri-check').forEach(c => c.checked = false);
+            document.getElementById('modal_componenteTexto').value = "";
+            document.getElementById('modal_otros').value = "";
+
+            // C. Llenar Detalles (itemsComponente viene del Service)
+            if(data.itemsComponente && data.itemsComponente.length > 0) {
+                
+                data.itemsComponente.forEach(item => {
+                    const nombre = (item.nombre || "").toUpperCase();
+                    const idComp = item.idComponente; 
+
+                    // 1. Chequear si es Periférico (Checkbox)
+                    // Mapa ID -> Checkbox ID (Ajustado a los IDs del HTML arriba)
+                    // MONITOR=1, TECLADO=2, MOUSE=3, REGULADOR=4, IMPRESORA=5, SCANER=6, PENDRIVE=7, TONER=8
+                    if(idComp === 1) document.getElementById('chk_1').checked = true; // Monitor
+                    else if(idComp === 2) document.getElementById('chk_2').checked = true; // Teclado
+                    else if(idComp === 3) document.getElementById('chk_3').checked = true; // Mouse
+                    else if(idComp === 4) document.getElementById('chk_4').checked = true; // Regulador
+                    else if(idComp === 5) document.getElementById('chk_5').checked = true; // Impresora
+                    else if(idComp === 6) document.getElementById('chk_6').checked = true; // Scaner
+                    else if(idComp === 7) document.getElementById('chk_7').checked = true; // Pendrive
+                    else if(idComp === 8) document.getElementById('chk_8').checked = true; // Toner
+                    
+                    // 2. Chequear si es "OTRO"
+                    else if(nombre.startsWith("OTRO:")) {
+                        document.getElementById('modal_otros').value = nombre.replace("OTRO: ", "");
+                    }
+                    
+                    // 3. Chequear si es COMPONENTE INTERNO (RAM, DISCO...)
+                    // Si el nombre no es OTRO y el ID es > 8 (o es un componente interno conocido)
+                    // Lo mostramos en el input de texto de componentes
+                    else if(idComp > 8 || ["RAM", "DISCO", "TARJETA", "FUENTE", "PILA", "FAN", "PROCESADOR"].some(x => nombre.includes(x))) {
+                        document.getElementById('modal_componenteTexto').value = nombre;
+                    }
+                });
+            }
+
+            // D. Mostrar
+            const myModal = new bootstrap.Modal(document.getElementById('modalVerPeriferico'));
+            myModal.show();
+        }
     </script>
 </body>
 </html>

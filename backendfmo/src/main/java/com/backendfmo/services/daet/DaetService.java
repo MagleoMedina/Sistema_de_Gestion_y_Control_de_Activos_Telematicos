@@ -1,5 +1,6 @@
 package com.backendfmo.services.daet;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,6 +127,25 @@ public List<BusquedaDaetDTO> buscarPorSerialDaet2(String serial) {
 
     return respuesta;
 }
+@Transactional(readOnly = true)
+    public List<BusquedaDaetDTO> buscarPorFecha(String fecha) {
+        
+        // 1. Buscamos en BD usando el repositorio
+        List<EntregasAlDAET> entregasEncontradas = entregasRepository.findByFechaEncabezado(fecha);
+
+        if (entregasEncontradas.isEmpty()) {
+            throw new RuntimeException("No se encontraron registros para la fecha: " + fecha);
+        }
+
+        List<BusquedaDaetDTO> respuesta = new ArrayList<>();
+
+        // 2. Convertimos cada entidad encontrada a DTO
+        for (EntregasAlDAET entrega : entregasEncontradas) {
+            respuesta.add(convertirEntidadADTO(entrega));
+        }
+
+        return respuesta;
+    }
 @Transactional
     public Usuario registrarEntregasDaet(RegistroDaetDTO dto) {
         // 1. Crear Usuario

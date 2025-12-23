@@ -40,4 +40,5 @@ public class ReciboEquiposController {
         
         return ResponseEntity.ok(service.listarTodoReciboDeEquipos());
     }
+    
 }

@@ -283,11 +283,12 @@
             if (filtro === 'serial') {
                 const val = document.getElementById('inputBusquedaSerial').value;
                 if(!val) return alert("Ingrese Serial");
-                url = `http://127.0.0.1:8081/api/recibo-perifericos/buscar?serial=${val}`;
+                url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/${val}`;
             } 
             else if (filtro === 'fecha') {
                 const val = document.getElementById('inputBusquedaFecha').value;
                 if(!val) return alert("Seleccione Fecha");
+                
                 let fechaFormateada = "";
                 if (val) {
                     const [yyyy, mm, dd] = val.split("-");

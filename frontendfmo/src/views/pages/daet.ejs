@@ -439,13 +439,13 @@
             fecha: fechaFormateada,
             
             // FMO Equipo (Encabezado)
-            fmoEquipo: "LOTE-" + (fmoSerial || "GEN"), 
+            fmoEquipo: getVal('nombreEquipo')|| null, 
             
-            observacion: getVal('observacion'),
+            observacion: getVal('observacion')|| null,
             recibidoPor: getVal('recibidoPor') || null,
             
-            solicitudDAET: getVal('solicitudDAET'),
-            solicitudST: getVal('solicitudST'),
+            solicitudDAET: getVal('solicitudDAET') || null,
+            solicitudST: getVal('solicitudST') || null,
 
             entregas: [
                 {
@@ -453,7 +453,7 @@
                     estado: document.querySelector('input[name="estado"]:checked')?.value || "Bueno",
                     
                     fmoSerial: fmoSerial,
-                    identifique: getVal('identifiqueReemplazo'), 
+                    identifique: getVal('identifiqueReemplazo')|| null, 
                     
                     // Aquí asignamos las variables calculadas arriba
                     idPeriferico: idPerifericoFinal,
@@ -474,7 +474,7 @@
 
             if(response.ok) {
                 alert("✅ Entrega DAET registrada con éxito");
-               // window.location.reload();
+               window.location.reload();
             } else {
                 const text = await response.text();
                 alert("❌ Error en el servidor: " + text);

@@ -15,6 +15,9 @@ public interface EntregasAlDAETRepository extends JpaRepository<EntregasAlDAET, 
 
     List<EntregasAlDAET> findByFmoSerial(String fmoSerial);
 
+    @Query("SELECT e FROM EntregasAlDAET e WHERE e.encabezadoRelacion.fmoEquipo = :fmoEquipo")
+    List<EntregasAlDAET> findByFmoEquipo(@Param("fmoEquipo") String fmoEquipo);
+
     @Query("SELECT e FROM EntregasAlDAET e WHERE e.encabezadoRelacion.fecha = :fecha")
     List<EntregasAlDAET> findByFechaEncabezado(@Param("fecha") String fecha);
 }

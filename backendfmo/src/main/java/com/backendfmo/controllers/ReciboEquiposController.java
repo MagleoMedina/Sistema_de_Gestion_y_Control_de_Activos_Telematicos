@@ -39,5 +39,11 @@ public class ReciboEquiposController {
         
         return ResponseEntity.ok(service.listarTodoReciboDeEquipos());
     }
+
+    @GetMapping("/buscarReciboEquipos/fecha/{fecha}")
+    public ResponseEntity<?> listarReciboDeEquiposPorFecha(@PathVariable String fecha) {
+        
+        return ResponseEntity.ok(service.listarReciboDeEquiposPorFecha(fecha));
+    }
     
 }

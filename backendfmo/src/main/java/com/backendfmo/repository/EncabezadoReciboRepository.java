@@ -18,6 +18,8 @@ public interface EncabezadoReciboRepository extends JpaRepository<EncabezadoReci
 
     List<EncabezadoRecibo> findByFmoEquipo(String fmoEquipo);
 
+    List<EncabezadoRecibo> findByFecha(String fecha);
+
 
 }
 

@@ -146,6 +146,25 @@ public List<BusquedaDaetDTO> buscarPorSerialDaet(String serial) {
 
         return respuesta;
     }
+    @Transactional(readOnly = true)
+    public List<BusquedaDaetDTO> buscarPorFmoEquipo(String fmoEquipo) {
+        
+        // 1. Buscamos en BD usando el repositorio
+        List<EntregasAlDAET> entregasEncontradas = entregasRepository.findByFmoEquipo(fmoEquipo);
+
+        if (entregasEncontradas.isEmpty()) {
+            throw new RuntimeException("No se encontraron registros para el FMO Equipo: " + fmoEquipo);
+        }
+
+        List<BusquedaDaetDTO> respuesta = new ArrayList<>();
+
+        // 2. Convertimos cada entidad encontrada a DTO
+        for (EntregasAlDAET entrega : entregasEncontradas) {
+            respuesta.add(convertirEntidadADTO(entrega));
+        }
+
+        return respuesta;
+    }
 @Transactional
     public Usuario registrarEntregasDaet(RegistroDaetDTO dto) {
         // 1. Crear Usuario

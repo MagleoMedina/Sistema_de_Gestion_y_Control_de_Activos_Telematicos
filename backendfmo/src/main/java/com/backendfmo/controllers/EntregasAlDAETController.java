@@ -35,9 +35,15 @@ public class EntregasAlDAETController {
         }
     }
 
-    @GetMapping("/buscarEntregasAlDaet/{fmoSerial}") 
+    @GetMapping("/buscarEntregasAlDaet/fmoSerial/{fmoSerial}") 
     public ResponseEntity<?> buscarPorSerial(@PathVariable String fmoSerial) {
         return ResponseEntity.ok(daetService.buscarPorSerialDaet(fmoSerial));
+    }
+
+    @GetMapping("/buscarEntregasAlDaet/fmoEquipo/{fmoEquipo}")
+    public ResponseEntity<?> buscarPorFmoEquipo(@PathVariable String fmoEquipo) {
+        
+        return ResponseEntity.ok(daetService.buscarPorFmoEquipo(fmoEquipo));
     }
 
     @GetMapping("/buscarEntregasAlDaet") 
@@ -50,6 +56,12 @@ public class EntregasAlDAETController {
         
         return ResponseEntity.ok(daetService.buscarPorFecha(fecha));
     }
+
+
+ 
+
+    
+
     }
 
    

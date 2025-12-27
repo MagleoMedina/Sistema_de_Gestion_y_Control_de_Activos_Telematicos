@@ -315,12 +315,18 @@
             if (filtro === 'fmo') {
                 const val = document.getElementById('inputBusquedaFmo').value;
                 if(!val) return alert("Ingrese un FMO o Serial");
-                url = `http://127.0.0.1:8081/api/recibo-equipos/buscar?fmo=${val}`;
+                url = `http://127.0.0.1:8081/api/buscarReciboEquipos/${val}`;
             } 
             else if (filtro === 'fecha') {
                 const val = document.getElementById('inputBusquedaFecha').value;
                 if(!val) return alert("Seleccione una fecha");
-                url = `http://127.0.0.1:8081/api/recibo-equipos/buscar-fecha?fecha=${val}`;
+
+                let fechaFormateada = "";
+                if (val) {
+                    const [yyyy, mm, dd] = val.split("-");
+                    fechaFormateada = `${dd}-${mm}-${yyyy}`;
+                }
+                url = `http://127.0.0.1:8081/api/buscarReciboEquipos/fecha/${fechaFormateada}`;
             }
 
             const tbody = document.getElementById('tablaResultados');

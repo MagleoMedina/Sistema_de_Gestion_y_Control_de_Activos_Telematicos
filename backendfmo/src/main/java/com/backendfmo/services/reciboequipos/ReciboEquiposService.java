@@ -255,6 +255,22 @@ public class ReciboEquiposService implements IReciboEquiposService {
         return respuestaLista;
     }
 
+       @Transactional(readOnly = true)
+    public List<BusquedaCompletaDTO> listarReciboDeEquiposPorFecha(String fecha) {
+        
+        // 1. Buscamos todos
+        List<EncabezadoRecibo> todos = encabezadoRepository.findByFecha(fecha);
+        
+        List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
+
+        // 2. Reutilizamos la lógica de conversión
+        for (EncabezadoRecibo encabezado : todos) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
+
+        return respuestaLista;
+    }
+
     private BusquedaCompletaDTO convertirEntidadADTO(EncabezadoRecibo encabezado) {
         BusquedaCompletaDTO dto = new BusquedaCompletaDTO();
 

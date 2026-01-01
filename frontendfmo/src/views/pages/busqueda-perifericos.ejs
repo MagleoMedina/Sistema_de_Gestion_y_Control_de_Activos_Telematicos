@@ -38,8 +38,8 @@
             text-transform: uppercase;
             white-space: nowrap;
         }
-        .form-check { margin-bottom: 0; margin-right: 10px; }
-        .form-check-input { border: 1px solid #000; width: 13px; height: 13px; margin-top: 3px; }
+        .form-check { margin-bottom: 0; margin-right: 10px; display: flex; align-items: center;}
+        .form-check-input { border: 1px solid #000; width: 14px; height: 14px; margin-top: 0; margin-right: 5px; border-radius: 0;}
         .row-compact { --bs-gutter-x: 0; }
     </style>
 </head>
@@ -104,7 +104,6 @@
 
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -121,14 +120,14 @@
                         
                         <div class="row row-compact">
                             <div class="col-12 text-center cell-border justify-content-center bg-light p-2">
-                                <h6 class="m-0 fw-bold">RECIBO DE PERIFÉRICOS</h6>
+                                <h6 class="m-0 fw-bold" style="letter-spacing: 1px;">RECIBO DE PERIFÉRICOS Y COMPONENTES</h6>
                             </div>
                         </div>
 
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
                                 <span class="label-text me-2">FECHA:</span>
-                                <input type="text" class="input-line" id="modal_fecha" readonly>
+                                <input type="text" class="input-line" id="modal_fecha" readonly style="max-width: 150px;">
                             </div>
                         </div>
                         <div class="row row-compact">
@@ -143,30 +142,36 @@
                                 <input type="text" class="input-line" id="modal_usuario" readonly>
                             </div>
                         </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">EXT/TLF:</span>
+                                <input type="text" class="input-line" id="modal_ext" readonly>
+                            </div>
+                        </div>
 
                         <div class="row row-compact">
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_1" disabled>
-                                    <label class="label-text">MONITOR</label>
+                                    <label class="label-text" style="font-size: 11px;">MONITOR</label>
                                 </div>
                             </div>
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_2" disabled>
-                                    <label class="label-text">TECLADO</label>
+                                    <label class="label-text" style="font-size: 11px;">TECLADO</label>
                                 </div>
                             </div>
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_6" disabled>
-                                    <label class="label-text">SCANER</label>
+                                    <label class="label-text" style="font-size: 11px;">SCANER</label>
                                 </div>
                             </div>
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_7" disabled>
-                                    <label class="label-text">PENDRIVE</label>
+                                    <label class="label-text" style="font-size: 11px;">PENDRIVES</label>
                                 </div>
                             </div>
                         </div>
@@ -175,60 +180,86 @@
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_4" disabled>
-                                    <label class="label-text">REGULADOR</label>
+                                    <label class="label-text" style="font-size: 11px;">REGULADOR</label>
                                 </div>
                             </div>
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_5" disabled>
-                                    <label class="label-text">IMPRESORA</label>
+                                    <label class="label-text" style="font-size: 11px;">IMPRESORA</label>
                                 </div>
                             </div>
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_3" disabled>
-                                    <label class="label-text">MOUSE</label>
+                                    <label class="label-text" style="font-size: 11px;">MOUSE</label>
                                 </div>
                             </div>
                             <div class="col-3 cell-border">
                                 <div class="form-check">
                                     <input class="form-check-input modal-peri-check" type="checkbox" id="chk_8" disabled>
-                                    <label class="label-text">TÓNER</label>
+                                    <label class="label-text" style="font-size: 11px;">TÓNER</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
-                                <span class="label-text me-2">COMPONENTES:</span>
-                                <input type="text" class="input-line" id="modal_componenteTexto" readonly placeholder="Ninguno">
+                                <div class="form-check p-0 m-0 w-100">
+                                    <span class="label-text me-2">COMPONENTES:</span>
+                                    <input type="text" class="input-line" id="modal_componenteTexto" readonly placeholder="Ninguno">
+                                </div>
                             </div>
                         </div>
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
-                                <span class="label-text me-2">OTROS:</span>
-                                <input type="text" class="input-line" id="modal_otros" readonly>
+                                <div class="form-check p-0 m-0 w-100">
+                                    <span class="label-text me-2">OTROS:</span>
+                                    <input type="text" class="input-line" id="modal_otros" readonly>
+                                </div>
                             </div>
                         </div>
 
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
-                                <span class="label-text me-2">FMO/SERIAL:</span>
+                                <span class="label-text me-2">FMO/ SERIAL:</span>
                                 <input type="text" class="input-line" id="modal_fmoSerial" readonly>
                             </div>
                         </div>
-                        
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
-                                <span class="label-text me-2">OBSERVACIÓN / FALLA:</span>
-                                <input type="text" class="input-line" id="modal_observacion" readonly>
+                                <span class="label-text me-2">FMO ASIGNADO:</span>
+                                <input type="text" class="input-line" id="modal_fmoAsignado" readonly>
                             </div>
                         </div>
-
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">DPTO/GCIA:</span>
+                                <input type="text" class="input-line" id="modal_gerencia" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FALLA:</span>
+                                <input type="text" class="input-line" id="modal_falla" readonly>
+                            </div>
+                        </div>
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
                                 <span class="label-text me-2">ASIGNADO A:</span>
                                 <input type="text" class="input-line" id="modal_asignadoA" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">N.º SOLICITUD S.T.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudST" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">N.º SOLICITUD DAET:</span>
+                                <input type="text" class="input-line" id="modal_solicitudDaet" readonly> 
                             </div>
                         </div>
 
@@ -257,144 +288,174 @@
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
 
-    <script>
-        // --- 1. LÓGICA DE FILTROS ---
-        function cambiarFiltro() {
-            const filtro = document.getElementById('filtroSelect').value;
-            const divSerial = document.getElementById('containerInputSerial');
-            const divFecha = document.getElementById('containerInputFecha');
-            const divVacio = document.getElementById('containerVacio');
+<script>
+    // --- 1. LÓGICA DE FILTROS ---
+    function cambiarFiltro() {
+        const filtro = document.getElementById('filtroSelect').value;
+        const divSerial = document.getElementById('containerInputSerial');
+        const divFecha = document.getElementById('containerInputFecha');
+        const divVacio = document.getElementById('containerVacio');
 
-            divSerial.style.display = 'none';
-            divFecha.style.display = 'none';
-            divVacio.style.display = 'none';
+        divSerial.style.display = 'none';
+        divFecha.style.display = 'none';
+        divVacio.style.display = 'none';
 
-            if (filtro === 'serial') divSerial.style.display = 'block';
-            else if (filtro === 'fecha') divFecha.style.display = 'block';
-            else divVacio.style.display = 'block';
+        if (filtro === 'serial') divSerial.style.display = 'block';
+        else if (filtro === 'fecha') divFecha.style.display = 'block';
+        else divVacio.style.display = 'block';
+    }
+
+    // --- 2. LÓGICA DE BÚSQUEDA ---
+    async function buscarPerifericos() {
+        const filtro = document.getElementById('filtroSelect').value;
+        let url = 'http://127.0.0.1:8081/api/buscarReciboPerifericos'; 
+
+        if (filtro === 'serial') {
+            const val = document.getElementById('inputBusquedaSerial').value;
+            if(!val) return alert("Ingrese Serial");
+            url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/${val}`;
+        } 
+        else if (filtro === 'fecha') {
+            const val = document.getElementById('inputBusquedaFecha').value;
+            if(!val) return alert("Seleccione Fecha");
+            
+            // Formatear fecha si es necesario según tu backend
+            let fechaFormateada = "";
+            if (val) {
+                const [yyyy, mm, dd] = val.split("-");
+                fechaFormateada = `${dd}-${mm}-${yyyy}`;
+            }
+            url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/fecha/${fechaFormateada}`;
         }
 
-        // --- 2. LÓGICA DE BÚSQUEDA ---
-        async function buscarPerifericos() {
-            const filtro = document.getElementById('filtroSelect').value;
-            // Asegúrate que tu Controller tenga estas rutas
-            let url = 'http://127.0.0.1:8081/api/buscarReciboPerifericos'; 
+        const tbody = document.getElementById('tablaResultados');
+        tbody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
 
-            if (filtro === 'serial') {
-                const val = document.getElementById('inputBusquedaSerial').value;
-                if(!val) return alert("Ingrese Serial");
-                url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/${val}`;
-            } 
-            else if (filtro === 'fecha') {
-                const val = document.getElementById('inputBusquedaFecha').value;
-                if(!val) return alert("Seleccione Fecha");
-                
-                let fechaFormateada = "";
-                if (val) {
-                    const [yyyy, mm, dd] = val.split("-");
-                    fechaFormateada = `${dd}-${mm}-${yyyy}`;
+        try {
+            const response = await fetch(url);
+            if(!response.ok) throw new Error("Sin resultados o error servidor.");
+            const data = await response.json();
+            renderizarTabla(data);
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `<tr><td colspan="6" class="text-danger">${error.message}</td></tr>`;
+        }
+    }
+
+    function renderizarTabla(data) {
+        const tbody = document.getElementById('tablaResultados');
+        tbody.innerHTML = '';
+        const lista = Array.isArray(data) ? data : [data];
+
+        if(lista.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
+            return;
+        }
+
+        lista.forEach((item, index) => {
+            // Lógica para determinar qué mostrar en la columna "Tipo"
+            let tipoMostrar = "Varios";
+            if (item.componentePerifericos && item.componentePerifericos.length > 0) tipoMostrar = "Componente Interno";
+            else if (item.perifericos && item.perifericos.length > 0) tipoMostrar = "Periférico";
+            else if (item.otro) tipoMostrar = "Otro";
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="fw-bold">${index + 1}</td>
+                <td class="text-primary fw-bold">${item.fmoSerial || "S/N"}</td>
+                <td><span class="badge bg-secondary">${tipoMostrar}</span></td>
+                <td>${item.fecha || "N/A"}</td>
+                <td>${item.usuario || "N/A"}</td>
+                <td>
+                    <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
+                        👁️ Ver
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- 3. LÓGICA DE VISUALIZACIÓN (MODAL) ---
+    function abrirModalVer(data) {
+        console.log("Datos recibidos en modal:", data);
+
+        // A. RESETEAR CAMPOS (Limpieza previa)
+        document.querySelectorAll('.modal-peri-check').forEach(c => c.checked = false);
+        setVal('modal_componenteTexto', "");
+        setVal('modal_otros', "");
+
+        // B. MAPEO DE CAMPOS SIMPLES
+        setVal('modal_fecha', data.fecha);
+        setVal('modal_usuario', data.usuario); // El payload dice 'nombre', no 'usuario' (aunque hay campo usuario)
+        setVal('modal_ficha', data.ficha);
+        setVal('modal_ext', data.extension); 
+        
+        setVal('modal_fmoSerial', data.fmoSerial);
+        setVal('modal_fmoAsignado', data.fmoEquipo || "S/N"); // A veces no viene en payload plano, verificar
+        setVal('modal_gerencia', data.gerencia);
+        setVal('modal_falla', data.falla);
+        setVal('modal_solicitudST', data.solicitudST);
+        setVal('modal_solicitudDaet', data.solicitudDAET);
+        
+        setVal('modal_asignadoA', data.asignadoA);
+        setVal('modal_entregadoPor', data.entregadoPor);
+        setVal('modal_recibidoPor', data.recibidoPor);
+
+        // C. MAPEO DE PERIFÉRICOS (Checkboxes)
+        // El payload trae: "perifericos": [ { "id": 1 }, { "id": 5 } ]
+        if (data.perifericos && data.perifericos.length > 0) {
+            data.perifericos.forEach(p => {
+                // Construimos el ID del checkbox: 'chk_' + id
+                // Ejemplo: ID 1 -> busca 'chk_1' (Monitor) y lo marca.
+                const checkId = 'chk_' + p.id;
+                const checkbox = document.getElementById(checkId);
+                if (checkbox) {
+                    checkbox.checked = true;
                 }
-                url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/fecha/${fechaFormateada}`;
-            }
-
-            const tbody = document.getElementById('tablaResultados');
-            tbody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
-
-            try {
-                const response = await fetch(url);
-                if(!response.ok) throw new Error("Sin resultados o error servidor.");
-                const data = await response.json();
-                renderizarTabla(data);
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="6" class="text-danger">${error.message}</td></tr>`;
-            }
-        }
-
-        function renderizarTabla(data) {
-            const tbody = document.getElementById('tablaResultados');
-            tbody.innerHTML = '';
-            const lista = Array.isArray(data) ? data : [data];
-
-            if(lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
-                return;
-            }
-
-            lista.forEach((item, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="fw-bold">${index + 1}</td>
-                    <td class="text-primary fw-bold">${item.fmoSerial || "S/N"}</td>
-                    <td><span class="badge bg-secondary">${item.tipoComponente || "Varios"}</span></td>
-                    <td>${item.fecha || "N/A"}</td>
-                    <td>${item.nombre || "N/A"}</td>
-                    <td>
-                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
-                            👁️ Ver
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
             });
         }
 
-        // --- 3. LÓGICA DE VISUALIZACIÓN ---
-        function abrirModalVer(data) {
-            // A. Datos Generales
-            document.getElementById('modal_fecha').value = data.fecha;
-            document.getElementById('modal_usuario').value = data.nombre;
-            document.getElementById('modal_ficha').value = data.ficha;
-            document.getElementById('modal_fmoSerial').value = data.fmoSerial;
-            
-            // Campos de encabezado
-            document.getElementById('modal_observacion').value = data.observacion || data.falla || "";
-            document.getElementById('modal_asignadoA').value = data.asignadoA;
-            document.getElementById('modal_entregadoPor').value = data.entregadoPor;
-            document.getElementById('modal_recibidoPor').value = data.recibidoPor;
+        // D. MAPEO DE COMPONENTES INTERNOS (Texto)
+        // El payload trae: "componentePerifericos": [ { "idComponente": 10 } ]
+        // Necesitamos convertir ID 10 -> "FAN COOLER"
+        const mapNombresComponentes = {
+            3: "MEMORIA RAM",
+            4: "DISCO DURO",
+            5: "TARJETA MADRE",
+            6: "PROCESADOR",
+            7: "TARJETA DE VIDEO",
+            8: "FUENTE DE PODER",
+            9: "TARJETA DE RED",
+            10: "FAN COOLER",
+            11: "PILA"
+        };
 
-            // B. Resetear Checkboxes y Textos
-            document.querySelectorAll('.modal-peri-check').forEach(c => c.checked = false);
-            document.getElementById('modal_componenteTexto').value = "";
-            document.getElementById('modal_otros').value = "";
-
-            // C. Llenar Detalles (itemsComponente viene del Service)
-            if(data.itemsComponente && data.itemsComponente.length > 0) {
-                
-                data.itemsComponente.forEach(item => {
-                    const nombre = (item.nombre || "").toUpperCase();
-                    const idComp = item.idComponente; 
-
-                    // 1. Chequear si es Periférico (Checkbox)
-                    // Mapa ID -> Checkbox ID (Ajustado a los IDs del HTML arriba)
-                    // MONITOR=1, TECLADO=2, MOUSE=3, REGULADOR=4, IMPRESORA=5, SCANER=6, PENDRIVE=7, TONER=8
-                    if(idComp === 1) document.getElementById('chk_1').checked = true; // Monitor
-                    else if(idComp === 2) document.getElementById('chk_2').checked = true; // Teclado
-                    else if(idComp === 3) document.getElementById('chk_3').checked = true; // Mouse
-                    else if(idComp === 4) document.getElementById('chk_4').checked = true; // Regulador
-                    else if(idComp === 5) document.getElementById('chk_5').checked = true; // Impresora
-                    else if(idComp === 6) document.getElementById('chk_6').checked = true; // Scaner
-                    else if(idComp === 7) document.getElementById('chk_7').checked = true; // Pendrive
-                    else if(idComp === 8) document.getElementById('chk_8').checked = true; // Toner
-                    
-                    // 2. Chequear si es "OTRO"
-                    else if(nombre.startsWith("OTRO:")) {
-                        document.getElementById('modal_otros').value = nombre.replace("OTRO: ", "");
-                    }
-                    
-                    // 3. Chequear si es COMPONENTE INTERNO (RAM, DISCO...)
-                    // Si el nombre no es OTRO y el ID es > 8 (o es un componente interno conocido)
-                    // Lo mostramos en el input de texto de componentes
-                    else if(idComp > 8 || ["RAM", "DISCO", "TARJETA", "FUENTE", "PILA", "FAN", "PROCESADOR"].some(x => nombre.includes(x))) {
-                        document.getElementById('modal_componenteTexto').value = nombre;
-                    }
-                });
-            }
-
-            // D. Mostrar
-            const myModal = new bootstrap.Modal(document.getElementById('modalVerPeriferico'));
-            myModal.show();
+        if (data.componentePerifericos && data.componentePerifericos.length > 0) {
+            // Creamos un array con los nombres encontrados
+            const nombres = data.componentePerifericos.map(c => {
+                return mapNombresComponentes[c.idComponente] || ("ID " + c.idComponente);
+            });
+            // Los unimos con comas por si hay más de uno
+            setVal('modal_componenteTexto', nombres.join(", "));
         }
-    </script>
+
+        // E. MAPEO DE OTROS
+        // El payload trae: "otro": "Incluye regleta"
+        if (data.otro) {
+            setVal('modal_otros', data.otro);
+        }
+
+        // F. MOSTRAR MODAL
+        const myModal = new bootstrap.Modal(document.getElementById('modalVerPeriferico'));
+        myModal.show();
+    }
+
+    // Helper para setear valor seguro (si es null pone vacío)
+    function setVal(id, val) {
+        const el = document.getElementById(id);
+        if(el) el.value = val || "";
+    }
+</script>
 </body>
 </html>

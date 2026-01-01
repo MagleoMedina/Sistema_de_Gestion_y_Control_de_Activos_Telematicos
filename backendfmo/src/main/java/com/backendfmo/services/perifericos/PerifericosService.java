@@ -191,6 +191,8 @@ public class PerifericosService {
             response.setFicha(usuario.getFicha()); 
             response.setUsuario(usuario.getUsuario());
             response.setExtension(usuario.getExtension());
+            response.setGerencia(usuario.getGerencia());
+            
         }
         
         // Mapear Datos del Encabezado
@@ -202,6 +204,8 @@ public class PerifericosService {
         response.setRecibidoPor(encabezado.getRecibidoPor());
         response.setEntregadoPor(encabezado.getEntregadoPor());
         response.setFalla(encabezado.getFalla());
+        response.setFmoEquipo(encabezado.getFmoEquipo());
+        
 
         List<ComponenteItemResponseDTO> listaComponentes = new ArrayList<>();
         List<PerifericoResponseDTO> listaCatalogo = new ArrayList<>();

@@ -10,7 +10,7 @@ public class ReciboPerifericosDTO {
     private String fmoSerial;
 
     // Datos del Encabezado (Padre)
-    //private String fmoEquipoLote; // El código del encabezado
+    private String fmoEquipo; // El código del encabezado
     private String solicitudST;
     private String estatus;
     private String fecha;
@@ -19,6 +19,7 @@ public class ReciboPerifericosDTO {
     private String recibidoPor;
     private String asignadoA;
     private String falla;
+    private String gerencia;
 
     // Datos del Usuario (Abuelo)
     private String nombre;

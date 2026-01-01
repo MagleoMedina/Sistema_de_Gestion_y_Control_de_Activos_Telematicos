@@ -251,7 +251,7 @@
         </div>
     </div>
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
 
    <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -376,7 +376,7 @@
             const payload = {
                 usuario: getVal('usuario'),
                 ficha: parseInt(getVal('ficha')) || 0,
-                nombre: getVal('usuario'), 
+                //nombre: getVal('usuario'), 
                 gerencia: getVal('gerencia'),
                 extension: getVal('ext'),
 
@@ -420,7 +420,7 @@
 
             if(response.ok) {
                 alert("✅ ¡Guardado Exitosamente!");
-                window.location.reload();
+                //window.location.reload();
             } else {
                 const txt = await response.text();
                 alert("❌ Error Backend: " + txt);

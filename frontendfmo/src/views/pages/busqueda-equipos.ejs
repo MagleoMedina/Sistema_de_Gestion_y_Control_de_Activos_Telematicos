@@ -158,7 +158,7 @@
                         <div class="row row-compact">
                             <div class="col-12 text-center cell-border justify-content-center bg-light"
                                 style="padding: 4px;">
-                                <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS (VISTA PREVIA)</h6>
+                                <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
                             </div>
                         </div>
 
@@ -180,7 +180,7 @@
                             </div>
                             <div class="col-md-6 cell-border">
                                 <span class="label-text me-2">CLAVE:</span>
-                                <input type="text" class="input-line" value="****" readonly>
+                                <input type="text" class="input-line" id="modal_clave" readonly>
                             </div>
                         </div>
 
@@ -263,7 +263,7 @@
                         </div>
 
                         <div class="row row-compact">
-                            <div class="col-md-6 cell-border">
+                            <div class="col-md-14 cell-border">
                                 <span class="label-text me-2">CARPETA RED:</span>
                                 <div id="modal_lista_carpetas" class="d-flex flex-wrap gap-1 p-1"></div>
                             </div>
@@ -290,11 +290,11 @@
                         <div class="row row-compact">
                             <div class="col-6 cell-border cell-block" style="height: 50px;">
                                 <span class="label-text">ENTREGADO POR:</span>
-                                <input type="text" class="input-line mt-2" id="modal_entregadoPor" readonly>
+                                <input type="text" class="input-line" id="modal_entregadoPor" readonly>
                             </div>
                             <div class="col-6 cell-border cell-block" style="height: 50px;">
                                 <span class="label-text">RECIBIDO POR:</span>
-                                <input type="text" class="input-line mt-2" id="modal_recibidoPor" readonly>
+                                <input type="text" class="input-line" id="modal_recibidoPor" readonly>
                             </div>
                         </div>
 
@@ -506,6 +506,7 @@
             setVal('modal_estatus', data.estatus);
             setVal('modal_entregadoPor', data.entregadoPor);
             setVal('modal_recibidoPor', data.recibidorPor);
+            setVal("modal_clave", data.clave); // Campo clave no tiene ID en el HTML
 
             // B. Datos del Equipo
             if (data.equipos && data.equipos.length > 0) {

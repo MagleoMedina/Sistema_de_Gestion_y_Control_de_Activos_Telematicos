@@ -133,7 +133,7 @@
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
                                 <span class="label-text me-2">FICHA:</span>
-                                <input type="text" class="input-line" id="modal_ficha" readonly>
+                                <input type="number" class="input-line" id="modal_ficha" readonly>
                             </div>
                         </div>
                         <div class="row row-compact">
@@ -215,7 +215,7 @@
                             <div class="col-12 cell-border">
                                 <div class="form-check p-0 m-0 w-100">
                                     <span class="label-text me-2">OTROS:</span>
-                                    <input type="text" class="input-line" id="modal_otros" readonly>
+                                    <input type="text" class="input-line" id="modal_otros" readonly placeholder="Ninguno">
                                 </div>
                             </div>
                         </div>
@@ -266,13 +266,13 @@
                         <div class="row row-compact">
                             <div class="col-12 cell-border" style="height: 45px;">
                                 <span class="label-text">ENTREGADO POR:</span>
-                                <input type="text" class="input-line mt-2" id="modal_entregadoPor" readonly>
+                                <input type="text" class="input-line" id="modal_entregadoPor" readonly>
                             </div>
                         </div>
                         <div class="row row-compact">
                             <div class="col-12 cell-border" style="height: 45px;">
                                 <span class="label-text">RECIBIDO POR:</span>
-                                <input type="text" class="input-line mt-2" id="modal_recibidoPor" readonly>
+                                <input type="text" class="input-line" id="modal_recibidoPor" readonly>
                             </div>
                         </div>
 
@@ -333,7 +333,7 @@
 
         try {
             const response = await fetch(url);
-            if(!response.ok) throw new Error("Sin resultados o error servidor.");
+            if(!response.ok) throw new Error("Error de servidor.");
             const data = await response.json();
             renderizarTabla(data);
         } catch (error) {
@@ -392,7 +392,7 @@
         setVal('modal_ext', data.extension); 
         
         setVal('modal_fmoSerial', data.fmoSerial);
-        setVal('modal_fmoAsignado', data.fmoEquipo || "S/N"); // A veces no viene en payload plano, verificar
+        setVal('modal_fmoAsignado', data.fmoEquipo); // A veces no viene en payload plano, verificar
         setVal('modal_gerencia', data.gerencia);
         setVal('modal_falla', data.falla);
         setVal('modal_solicitudST', data.solicitudST);

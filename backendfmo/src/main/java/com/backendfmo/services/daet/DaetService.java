@@ -52,6 +52,11 @@ private BusquedaDaetDTO convertirEntidadADTO(EntregasAlDAET entrega) {
          dto.setTipoPeriferico(entrega.getPerifericoRef().getNombre());
     }
 
+    Usuario nuevoUsuario = entrega.getEncabezadoRelacion().getUsuarioRelacion();
+    if (nuevoUsuario != null) {
+        dto.setFicha(nuevoUsuario.getFicha());
+    }
+
     // --- B. MAPEO DE DATOS DEL ENCABEZADO ---
     EncabezadoRecibo encabezado = entrega.getEncabezadoRelacion();
     if (encabezado != null) {
@@ -169,6 +174,7 @@ public List<BusquedaDaetDTO> buscarPorSerialDaet(String serial) {
     public Usuario registrarEntregasDaet(RegistroDaetDTO dto) {
         // 1. Crear Usuario
         Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setFicha(dto.getFicha());
       
         // 2. Crear Encabezado
         EncabezadoRecibo encabezado = new EncabezadoRecibo();

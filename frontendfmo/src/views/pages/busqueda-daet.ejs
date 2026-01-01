@@ -11,7 +11,7 @@
             color: #000;
             font-family: 'Courier New', Courier, monospace;
             font-size: 13px;
-            max-width: 700px;
+            max-width: 550px; /* Ancho ajustado igual que en daet.ejs */
             margin: 0 auto;
         }
         
@@ -40,9 +40,12 @@
             white-space: nowrap;
         }
         .form-check { margin-bottom: 0; margin-right: 10px; }
-        .form-check-input { border: 1px solid #000; width: 13px; height: 13px; margin-top: 3px; }
+        .form-check-input { border: 1px solid #000; width: 14px; height: 14px; margin-top: 2px; margin-right: 5px; }
         .row-compact { --bs-gutter-x: 0; }
         .header-title { letter-spacing: 2px; font-weight: 900; text-decoration: underline; }
+        
+        /* Clase para ocultar secciones visualmente si no aplican (opcional) */
+        .hidden-section { display: none; }
     </style>
 </head>
 <body>
@@ -137,7 +140,7 @@
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
                                 <span class="label-text me-2">FECHA:</span>
-                                <input type="text" class="input-line" id="modal_fecha" readonly>
+                                <input type="text" class="input-line" id="modal_fecha" readonly style="max-width: 150px;">
                             </div>
                         </div>
                         <div class="row row-compact">
@@ -152,7 +155,13 @@
                                 <input type="text" class="input-line" id="modal_solicitudST" readonly>
                             </div>
                         </div>
-                        
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">ANALISTA:</span>
+                                <input type="text" class="input-line" id="modal_analista" readonly>
+                            </div>
+                        </div>
+
                         <div class="row row-compact">
                             <div class="col-12 cell-border justify-content-center bg-light">
                                 <span class="label-text">ACTIVIDAD:</span>
@@ -185,26 +194,26 @@
 
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
-                                <span class="label-text me-2">TIPO PERIFÉRICO:</span>
-                                <input type="text" class="input-line" id="modal_tipoPeriferico" readonly>
+                                <span class="label-text me-2">EQUIPO:</span>
+                                <input type="text" class="input-line" id="modal_nombreEquipo" readonly>
                             </div>
                         </div>
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
-                                <span class="label-text me-2">COMPONENTE ÚNICO:</span>
-                                <input type="text" class="input-line" id="modal_compUnico" readonly>
+                                <span class="label-text me-2">COMPONENTES:</span>
+                                <input type="text" class="input-line" id="modal_componentesTexto" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">PERIFÉRICOS:</span>
+                                <input type="text" class="input-line" id="modal_perifericosTexto" readonly>
                             </div>
                         </div>
                         <div class="row row-compact">
                             <div class="col-12 cell-border">
                                 <span class="label-text me-2">FMO/SERIAL:</span>
                                 <input type="text" class="input-line" id="modal_fmoSerial" readonly>
-                            </div>
-                        </div>
-                        <div class="row row-compact">
-                            <div class="col-12 cell-border">
-                                <span class="label-text me-2">FMO LOTE (EQUIPO):</span>
-                                <input type="text" class="input-line" id="modal_fmoLote" readonly>
                             </div>
                         </div>
 
@@ -270,6 +279,14 @@
                         </div>
                         <div class="row row-compact">
                             <div class="col-12 cell-border align-items-center">
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input modal-radio" type="radio" name="reemplazo_modal" id="modal_reemplazoSi" disabled>
+                                    <label class="label-text">SI</label>
+                                </div>
+                                <div class="form-check form-check-inline me-4">
+                                    <input class="form-check-input modal-radio" type="radio" name="reemplazo_modal" id="modal_reemplazoNo" disabled>
+                                    <label class="label-text">NO</label>
+                                </div>
                                 <span class="label-text me-2 border-start border-dark ps-2">IDENTIFIQUE:</span>
                                 <input type="text" class="input-line" id="modal_identifique" readonly>
                             </div>
@@ -279,6 +296,17 @@
                             <div class="col-12 cell-border cell-block">
                                 <span class="label-text">(OBSERVACIÓN):</span>
                                 <textarea class="input-line" rows="2" id="modal_observacion" style="resize: none;" readonly></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-8 cell-border" style="height: 50px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line mt-3" id="modal_recibidoPor" readonly>
+                            </div>
+                            <div class="col-4 cell-border" style="height: 50px;">
+                                <span class="label-text">FICHA:</span>
+                                <input type="text" class="input-line mt-3" id="modal_fichaRecibido" readonly>
                             </div>
                         </div>
 
@@ -303,7 +331,6 @@
             const divFecha = document.getElementById('containerInputFecha');
             const divVacio = document.getElementById('containerVacio');
 
-            // Reset
             divSerial.style.display = 'none';
             divLote.style.display = 'none';
             divFecha.style.display = 'none';
@@ -312,13 +339,12 @@
             if (filtro === 'fmoSerial') divSerial.style.display = 'block';
             else if (filtro === 'fmoEquipo') divLote.style.display = 'block';
             else if (filtro === 'fecha') divFecha.style.display = 'block';
-            else divVacio.style.display = 'block'; // Para "todo"
+            else divVacio.style.display = 'block'; 
         }
 
         // --- 2. LÓGICA DE BÚSQUEDA ---
         async function buscarDaet() {
             const filtro = document.getElementById('filtroSelect').value;
-            // Endpoint base para listar todo
             let url = 'http://127.0.0.1:8081/api/buscarEntregasAlDaet'; 
 
             if (filtro === 'fmoSerial') {
@@ -329,19 +355,12 @@
             else if (filtro === 'fmoEquipo') {
                 const val = document.getElementById('inputBusquedaLote').value;
                 if(!val) return alert("Ingrese el FMO Equipo");
-                // Asumimos que el backend busca en general o usa un parámetro específico
-                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fmoEquipo/${val}`; // Usamos mismo endpoint si la BD busca en ambas columnas o ajusta según tu API
+                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fmoEquipo/${val}`; 
             }
             else if (filtro === 'fecha') {
                 const val = document.getElementById('inputBusquedaFecha').value;
                 if(!val) return alert("Seleccione Fecha");
-
-                let fechaFormateada = "";
-                if (val) {
-                    const [yyyy, mm, dd] = val.split("-");
-                    fechaFormateada = `${dd}-${mm}-${yyyy}`;
-                }
-                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fecha/${fechaFormateada}`;
+                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fecha/${val}`;
             }
 
             const tbody = document.getElementById('tablaResultados');
@@ -390,31 +409,56 @@
         // --- 3. LÓGICA DE VISUALIZACIÓN ---
         function abrirModalVer(data) {
             // A. Datos Generales
-            document.getElementById('modal_fecha').value = data.fecha;
-            document.getElementById('modal_solicitudDAET').value = data.solicitudDAET;
-            document.getElementById('modal_solicitudST').value = data.solicitudST || "";
-            document.getElementById('modal_fmoLote').value = data.fmoEquipoLote;
-            document.getElementById('modal_fmoSerial').value = data.fmoSerial;
-            document.getElementById('modal_observacion').value = data.observacion;
-            document.getElementById('modal_identifique').value = data.identifique || "N/A";
-            document.getElementById('modal_tipoPeriferico').value = data.tipoPeriferico || "";
+            setVal('modal_fecha', data.fecha);
+            setVal('modal_solicitudDAET', data.solicitudDAET);
+            setVal('modal_solicitudST', data.solicitudST);
+            setVal('modal_analista', data.asignadoA); // Analista es el asignado
+            
+            
+            // B. Mapeo Inteligente de TIPO (Equipo / Componente / Periférico)
+            setVal('modal_nombreEquipo', "");
+            setVal('modal_componentesTexto', "");
+            setVal('modal_perifericosTexto', "");
+            
+            // Si el nombre del periférico base es "CPU", "LAPTOP", etc., va en EQUIPO
+            const tipo = (data.tipoPeriferico || "").toUpperCase();
+            if (tipo.includes("CPU") || tipo.includes("LAPTOP") || tipo.includes("EQUIPO")) {
+                setVal('modal_nombreEquipo', data.fmoEquipoLote || data.fmoSerial); // Usamos lote o serial como nombre ref
+            } else if (data.componenteUnico && data.componenteUnico.length > 0) {
+                // Es un componente suelto
+                const unico = data.componenteUnico[0];
+                setVal('modal_componentesTexto', unico.nombreComponente + (unico.cantidad > 1 ? ` (${unico.cantidad})` : ""));
+            } else if (tipo) {
+                // Es un periférico suelto (Monitor, etc.)
+                setVal('modal_perifericosTexto', tipo);
+            }
 
-            // B. Radios (Actividad y Estado)
-            // Desmarcamos todos primero
+            setVal('modal_fmoSerial', data.fmoSerial);
+            setVal('modal_observacion', data.observacion);
+            setVal('modal_identifique', data.identifique);
+            setVal('modal_recibidoPor', data.recibidoPor);
+            setVal('modal_fichaRecibido', data.ficha);
+            
+
+            // C. Radios Actividad / Estado
             document.querySelectorAll('.modal-radio').forEach(r => r.checked = false);
-
             if(data.actividad === 'Reemplazo') document.getElementById('modal_act_reemplazo').checked = true;
             else document.getElementById('modal_act_entrega').checked = true;
 
             if(data.estado === 'Bueno') document.getElementById('modal_est_bueno').checked = true;
             else document.getElementById('modal_est_danado').checked = true;
 
-            // C. Resetear Checkboxes de CPU
-            document.querySelectorAll('.modal-cpu-check').forEach(c => c.checked = false);
-            document.getElementById('modal_cantRam').value = "";
-            document.getElementById('modal_compUnico').value = "";
+            // D. Radios Reemplazo (Abajo)
+            if(data.identifique && data.identifique.length > 0 && data.identifique !== "N/A") {
+                document.getElementById('modal_reemplazoSi').checked = true;
+            } else {
+                document.getElementById('modal_reemplazoNo').checked = true;
+            }
 
-            // D. Mapeo de Componentes Internos (CPU)
+            // E. Detalles de CPU (Checkboxes)
+            document.querySelectorAll('.modal-cpu-check').forEach(c => c.checked = false);
+            setVal('modal_cantRam', "");
+
             if(data.componentesInternos && data.componentesInternos.length > 0) {
                 data.componentesInternos.forEach(comp => {
                     const nombre = (comp.nombreComponente || "").toUpperCase();
@@ -422,7 +466,7 @@
                     if(nombre.includes("DISCO")) document.getElementById('chk_disco').checked = true;
                     if(nombre.includes("RAM") || nombre.includes("MEMORIA")) {
                         document.getElementById('chk_ram').checked = true;
-                        document.getElementById('modal_cantRam').value = comp.cantidad;
+                        setVal('modal_cantRam', comp.cantidad);
                     }
                     if(nombre.includes("MADRE")) document.getElementById('chk_madre').checked = true;
                     if(nombre.includes("PROCESADOR")) document.getElementById('chk_procesador').checked = true;
@@ -434,15 +478,13 @@
                 });
             }
 
-            // E. Mapeo de Componente Único (Si aplica)
-            if(data.componenteUnico && data.componenteUnico.length > 0) {
-                const unico = data.componenteUnico[0];
-                document.getElementById('modal_compUnico').value = unico.nombreComponente + (unico.cantidad > 1 ? ` (${unico.cantidad})` : "");
-            }
-
-            // F. Mostrar
             const myModal = new bootstrap.Modal(document.getElementById('modalVerDaet'));
             myModal.show();
+        }
+
+        function setVal(id, val) {
+            const el = document.getElementById(id);
+            if(el) el.value = val || "";
         }
     </script>
 </body>

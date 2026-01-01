@@ -23,6 +23,7 @@ public class BusquedaDaetDTO {
     private String observacion;
     private String recibidoPor;
     private String asignadoA;
+    private Integer ficha;
     // --- Lista de Componentes Internos (Hijos) ---
     private List<ComponenteInternoResumenDTO> componentesInternos;
 

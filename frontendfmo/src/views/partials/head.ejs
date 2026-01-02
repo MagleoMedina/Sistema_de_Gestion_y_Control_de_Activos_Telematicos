@@ -67,4 +67,21 @@
     color: #000080;
     font-weight: bold;
 }
+
+.table-scroll-wrapper {
+            max-height: 55vh; /* Ajusta la altura visible (55% del alto de la pantalla) */
+            overflow-y: auto; /* Habilita el scroll vertical */
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        /* Hacer que la cabecera se quede fija al bajar (Sticky Header) */
+        .table-scroll-wrapper thead th {
+            position: sticky;
+            /*top: 0px; para hacer que la cabecera quede justo en la parte superior */
+            background-color: #e9ecef; /* Un gris claro para tapar el contenido que pasa por debajo */
+            z-index: 2; /* Asegura que esté por encima de las filas */
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* Sombra sutil para distinguir */
+        }
 </style>

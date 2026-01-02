@@ -315,12 +315,20 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" onclick="generarPDFRecibo()">
+                        🖨️ Descargar PDF
+                </button>
                 </div>
+                   
             </div>
         </div>
     </div>
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="/js/html2pdf.bundle.min.js"></script>
+
+    <script src="/js/pdf.js"></script>
 
     <script>
         // --- 1. LÓGICA DE FILTROS ---

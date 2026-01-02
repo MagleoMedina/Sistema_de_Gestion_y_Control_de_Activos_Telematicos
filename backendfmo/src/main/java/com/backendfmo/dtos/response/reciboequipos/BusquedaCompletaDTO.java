@@ -25,7 +25,7 @@ public class BusquedaCompletaDTO {
     private String extension;
 
     private String entregadoPor;
-    private String recibidorPor;
+    private String recibidoPor;
     private String asignadoA;
     private String falla;
     private String observacion;

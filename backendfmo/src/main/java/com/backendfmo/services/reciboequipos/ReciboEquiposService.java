@@ -291,7 +291,7 @@ public class ReciboEquiposService implements IReciboEquiposService {
         dto.setEstatus(encabezado.getEstatus());
         dto.setEntregadoPor(encabezado.getEntregadoPor());
         dto.setAsignadoA(encabezado.getAsignadoA());
-        dto.setRecibidorPor(encabezado.getRecibidoPor());
+        dto.setRecibidoPor(encabezado.getRecibidoPor());
         dto.setFalla(encabezado.getFalla());
         dto.setObservacion(encabezado.getObservacion());
         dto.setSolicitudDAET(encabezado.getSolicitudDAET());

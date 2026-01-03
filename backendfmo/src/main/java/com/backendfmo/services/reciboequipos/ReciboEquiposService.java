@@ -215,57 +215,116 @@ public class ReciboEquiposService implements IReciboEquiposService {
         return usuarioRepository.save(nuevoUsuario);
     }
 
+
     @Transactional(readOnly = true)
     public List<BusquedaCompletaDTO> buscarPorFmo(String fmoEquipo) {
-
-        // 1. Buscamos en BD (Ahora recibimos una LISTA)
+        
+        // 1. Buscamos en BD
         List<EncabezadoRecibo> listaEncabezados = encabezadoRepository.buscarPorFmoConUsuario(fmoEquipo);
 
-        // Opcional: Si quieres mantener la excepción si no encuentra nada
         if (listaEncabezados.isEmpty()) {
             throw new RuntimeException("No se encontró ningún recibo con el FMO: " + fmoEquipo);
         }
 
-        // Preparamos la lista final de respuesta
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
-        // 2. Iteramos sobre cada Encabezado encontrado
+        // 2. Usamos el método auxiliar para convertir cada elemento
         for (EncabezadoRecibo encabezado : listaEncabezados) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
 
-            BusquedaCompletaDTO dto = new BusquedaCompletaDTO();
+        return respuestaLista;
+    }
 
-            // --- Mapeo Usuario (Abuelo) ---
-            Usuario user = encabezado.getUsuarioRelacion();
+    /**
+     * NUEVO MÉTODO: Listar todos los recibos de equipos registrados en la base de datos.
+     */
+    @Transactional(readOnly = true)
+    public List<BusquedaCompletaDTO> listarTodoReciboDeEquipos() {
+        
+        // 1. Buscamos todos
+        List<EncabezadoRecibo> todos = encabezadoRepository.findAll();
+        
+        List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
+
+        // 2. Reutilizamos la lógica de conversión
+        for (EncabezadoRecibo encabezado : todos) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
+
+        return respuestaLista;
+    }
+
+    @Transactional(readOnly = true)
+    public List<BusquedaCompletaDTO> listarReciboDeEquiposPorFecha(String fecha) {
+        
+        // 1. Buscamos todos
+        List<EncabezadoRecibo> todos = encabezadoRepository.findByFecha(fecha);
+        
+        List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
+
+        // 2. Reutilizamos la lógica de conversión
+        for (EncabezadoRecibo encabezado : todos) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
+
+        return respuestaLista;
+    }
+
+    @Transactional(readOnly = true)
+    public List<BusquedaCompletaDTO> listarReciboDeEquiposPorRangoFechas(String fechaInicio, String fechaFin) {
+        
+        // 1. Buscamos todos
+        List<EncabezadoRecibo> todos = encabezadoRepository.findByFechaBetween(fechaInicio, fechaFin);
+        
+        List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
+
+        // 2. Reutilizamos la lógica de conversión
+        for (EncabezadoRecibo encabezado : todos) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
+
+        return respuestaLista;
+    }
+
+    private BusquedaCompletaDTO convertirEntidadADTO(EncabezadoRecibo encabezado) {
+        BusquedaCompletaDTO dto = new BusquedaCompletaDTO();
+
+        // --- Mapeo Usuario (Abuelo) ---
+        Usuario user = encabezado.getUsuarioRelacion();
+        if (user != null) {
             dto.setUsuarioNombre(user.getNombre());
             dto.setUsuarioFicha(String.valueOf(user.getFicha()));
             dto.setUsuarioGerencia(user.getGerencia());
             dto.setClave(user.getClave());
+            dto.setExtension(user.getExtension());
+        }
 
-            // --- Mapeo Encabezado (Padre) ---
-            dto.setFmoEquipo(encabezado.getFmoEquipo());
-            dto.setSolicitudST(encabezado.getSolicitudST());
-            dto.setFecha(encabezado.getFecha());
-            dto.setEstatus(encabezado.getEstatus());
-            dto.setEntregadoPor(encabezado.getEntregadoPor());
-            dto.setAsignadoA(encabezado.getAsignadoA());
-            dto.setRecibidorPor(encabezado.getRecibidoPor());
-            dto.setFalla(encabezado.getFalla());
-            dto.setObservacion(encabezado.getObservacion());
-            dto.setSolicitudDAET(encabezado.getSolicitudDAET());
+        // --- Mapeo Encabezado (Padre) ---
+        dto.setFmoEquipo(encabezado.getFmoEquipo());
+        dto.setSolicitudST(encabezado.getSolicitudST());
+        dto.setFecha(encabezado.getFecha());
+        dto.setEstatus(encabezado.getEstatus());
+        dto.setEntregadoPor(encabezado.getEntregadoPor());
+        dto.setAsignadoA(encabezado.getAsignadoA());
+        dto.setRecibidoPor(encabezado.getRecibidoPor());
+        dto.setFalla(encabezado.getFalla());
+        dto.setObservacion(encabezado.getObservacion());
+        dto.setSolicitudDAET(encabezado.getSolicitudDAET());
 
-            // --- Mapeo Equipos (Hijos) ---
-            List<EquipoResponseDTO> listaEquiposDto = new ArrayList<>();
+        // --- Mapeo Equipos (Hijos) ---
+        List<EquipoResponseDTO> listaEquiposDto = new ArrayList<>();
 
+        if (encabezado.getListaEquipos() != null) {
             for (ReciboDeEquipos equipoEntity : encabezado.getListaEquipos()) {
                 EquipoResponseDTO equipoDto = new EquipoResponseDTO();
                 equipoDto.setMarca(equipoEntity.getMarca());
                 equipoDto.setRespaldo(equipoEntity.getRespaldo());
 
+                // A. Periféricos
                 List<String> listaNombresPerifericos = new ArrayList<>();
-
                 if (equipoEntity.getPerifericosIncluidos() != null) {
                     for (ReciboPeriferico relPerif : equipoEntity.getPerifericosIncluidos()) {
-                        // Navegamos: Relación -> Objeto Periferico -> Nombre
                         if (relPerif.getPerifericoRef() != null) {
                             listaNombresPerifericos.add(relPerif.getPerifericoRef().getNombre());
                         }
@@ -273,11 +332,10 @@ public class ReciboEquiposService implements IReciboEquiposService {
                 }
                 equipoDto.setPerifericos(listaNombresPerifericos);
 
+                // B. Aplicaciones
                 List<String> listaNombresApps = new ArrayList<>();
-
                 if (equipoEntity.getAplicacionesInstaladas() != null) {
                     for (AplicacionReciboEquipos appRecibo : equipoEntity.getAplicacionesInstaladas()) {
-                        // Navegamos: Link -> Objeto Aplicacion -> Nombre
                         if (appRecibo.getAplicacionRef() != null) {
                             listaNombresApps.add(appRecibo.getAplicacionRef().getNombre());
                         }
@@ -285,55 +343,61 @@ public class ReciboEquiposService implements IReciboEquiposService {
                 }
                 equipoDto.setAplicaciones(listaNombresApps);
 
+                // C. Observación Seriales
                 if (equipoEntity.getSerialesAsignados() != null && !equipoEntity.getSerialesAsignados().isEmpty()) {
-                    // Tomamos la observación del PRIMER elemento (index 0)
-                    // Asumimos que es idéntica para todos los seriales de este grupo
                     String obs = equipoEntity.getSerialesAsignados().get(0).getObservacion();
                     equipoDto.setObservacionSeriales(obs);
                 }
 
-                // A. Extraer Carpetas
+                // D. Carpetas
                 List<String> carpetas = new ArrayList<>();
-                for (CarpetaRedRecibo cr : equipoEntity.getCarpetasAsignadas()) {
-                    carpetas.add(cr.getCarpetaRelacion().getNombreCarpeta());
+                if (equipoEntity.getCarpetasAsignadas() != null) {
+                    for (CarpetaRedRecibo cr : equipoEntity.getCarpetasAsignadas()) {
+                        if (cr.getCarpetaRelacion() != null) {
+                            carpetas.add(cr.getCarpetaRelacion().getNombreCarpeta());
+                        }
+                    }
                 }
                 equipoDto.setCarpetas(carpetas);
 
-                // B. Extraer Componentes Genéricos
+                // E. Componentes Genéricos
                 List<ComponenteResumenDTO> compGen = new ArrayList<>();
-                for (ComponenteRecibo cr : equipoEntity.getComponentesInternos()) {
-                    ComponenteResumenDTO cDto = new ComponenteResumenDTO();
-                    cDto.setCantidad(cr.getCantidad());
-                    cDto.setNombreComponente(cr.getComponenteRef().getNombre());
-                    compGen.add(cDto);
+                if (equipoEntity.getComponentesInternos() != null) {
+                    for (ComponenteRecibo cr : equipoEntity.getComponentesInternos()) {
+                        ComponenteResumenDTO cDto = new ComponenteResumenDTO();
+                        cDto.setCantidad(cr.getCantidad());
+                        if (cr.getComponenteRef() != null) {
+                            cDto.setNombreComponente(cr.getComponenteRef().getNombre());
+                        }
+                        compGen.add(cDto);
+                    }
                 }
                 equipoDto.setComponentesGenericos(compGen);
 
-                // C. Extraer Seriales Específicos
+                // F. Seriales Específicos
                 List<SerialResumenDTO> seriales = new ArrayList<>();
-                for (SerialRecibo sr : equipoEntity.getSerialesAsignados()) {
-                    SerialResumenDTO sDto = new SerialResumenDTO();
-                    SerialComponente fisico = sr.getSerialComponente();
-
-                    sDto.setMarca(fisico.getMarca());
-                    sDto.setSerial(fisico.getSerial());
-                    sDto.setCapacidad(fisico.getCapacidad());
-                    sDto.setTipoComponente(fisico.getComponenteTipo().getNombre());
-
-                    seriales.add(sDto);
+                if (equipoEntity.getSerialesAsignados() != null) {
+                    for (SerialRecibo sr : equipoEntity.getSerialesAsignados()) {
+                        SerialResumenDTO sDto = new SerialResumenDTO();
+                        SerialComponente fisico = sr.getSerialComponente();
+                        if (fisico != null) {
+                            sDto.setMarca(fisico.getMarca());
+                            sDto.setSerial(fisico.getSerial());
+                            sDto.setCapacidad(fisico.getCapacidad());
+                            if (fisico.getComponenteTipo() != null) {
+                                sDto.setTipoComponente(fisico.getComponenteTipo().getNombre());
+                            }
+                        }
+                        seriales.add(sDto);
+                    }
                 }
                 equipoDto.setComponentesConSerial(seriales);
 
                 listaEquiposDto.add(equipoDto);
             }
-
-            dto.setEquipos(listaEquiposDto);
-
-            // Agregamos el DTO completo a la lista de respuesta
-            respuestaLista.add(dto);
         }
-
-        return respuestaLista;
+        dto.setEquipos(listaEquiposDto);
+        return dto;
     }
 
 }

@@ -10,4 +10,5 @@ public interface IReciboEquiposService {
 
     List<BusquedaCompletaDTO> buscarPorFmo(String fmoEquipo);
     Usuario guardarUsuariosYRecibos(RegistroTotalDTO dto);
+    List<BusquedaCompletaDTO> listarReciboDeEquiposPorFecha(String fecha);
 }

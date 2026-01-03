@@ -235,13 +235,13 @@
                     <div class="row row-compact">
                         <div class="col-12 cell-border" style="height: 45px;">
                             <span class="label-text">ENTREGADO POR:</span>
-                            <input type="text" class="input-line mt-2" id="entregadoPor">
+                            <input type="text" class="input-line" id="entregadoPor">
                         </div>
                     </div>
                     <div class="row row-compact">
                         <div class="col-12 cell-border" style="height: 45px;">
                             <span class="label-text">RECIBIDO POR:</span>
-                            <input type="text" class="input-line mt-2" id="recibidoPor">
+                            <input type="text" class="input-line" id="recibidoPor">
                         </div>
                     </div>
 
@@ -251,57 +251,127 @@
         </div>
     </div>
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
 
    <script>
-    // Establecer fecha actual al cargar
     document.addEventListener('DOMContentLoaded', () => {
+        // 1. Fecha por defecto
         const fechaInput = document.getElementById('fecha');
         if(fechaInput) fechaInput.valueAsDate = new Date();
+
+        // 2. Iniciar Validaciones de Exclusividad
+        initValidations();
     });
 
+    // --- LÓGICA DE VALIDACIÓN VISUAL (DINÁMICA) ---
+    function initValidations() {
+        const checkboxes = document.querySelectorAll('.peri-check');
+        const selectComp = document.getElementById('selectComponentes');
+        const inputOtro = document.getElementById('otrosTxt');
+
+        // A. Lógica para Checkboxes (Periféricos)
+        checkboxes.forEach(chk => {
+            chk.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+
+                if (isChecked) {
+                    // 1. Regla: Solo uno a la vez (Desmarcar los demás)
+                    checkboxes.forEach(c => { if(c !== e.target) c.checked = false; });
+                    
+                    // 2. Deshabilitar los otros campos
+                    selectComp.value = ""; // Resetear select
+                    selectComp.disabled = true;
+                    inputOtro.value = "";  // Limpiar texto
+                    inputOtro.disabled = true;
+                } else {
+                    // Si el usuario desmarca el único que había, habilitar todo
+                    selectComp.disabled = false;
+                    inputOtro.disabled = false;
+                }
+            });
+        });
+
+        // B. Lógica para Select (Componentes)
+        selectComp.addEventListener('change', (e) => {
+            if (e.target.value !== "") {
+                // Si seleccionó algo: Deshabilitar checkboxes y Otro
+                checkboxes.forEach(c => {
+                    c.checked = false;
+                    c.disabled = true;
+                });
+                inputOtro.value = "";
+                inputOtro.disabled = true;
+            } else {
+                // Si volvió a "Ninguno": Habilitar todo
+                checkboxes.forEach(c => c.disabled = false);
+                inputOtro.disabled = false;
+            }
+        });
+
+        // C. Lógica para Input (Otros)
+        inputOtro.addEventListener('input', (e) => {
+            if (e.target.value.trim() !== "") {
+                // Si escribió algo: Deshabilitar checkboxes y Select
+                checkboxes.forEach(c => {
+                    c.checked = false;
+                    c.disabled = true;
+                });
+                selectComp.value = "";
+                selectComp.disabled = true;
+            } else {
+                // Si borró el texto: Habilitar todo
+                checkboxes.forEach(c => c.disabled = false);
+                selectComp.disabled = false;
+            }
+        });
+    }
+
+    // --- FUNCIÓN DE GUARDADO ---
     async function guardarPerifericos() {
-        console.log("Botón presionado: Iniciando recolección de datos...");
+        console.log("Iniciando guardado...");
 
         try {
-            // 1. MAPA DE PERIFÉRICOS (Checkboxes)
+            // 1. MAPAS
             const mapPerifericosIds = {
                 'Monitor': 1, 'Teclado': 2, 'Mouse': 3, 'Regulador': 4,
                 'Impresora': 5, 'Scaner': 6, 'Pendrive': 7, 'Toner': 8
             };
 
-            // 2. RECOLECTAR PERIFÉRICOS
+            // 2. RECOLECTAR DATOS (Solo capturamos lo que esté habilitado y lleno)
+            
+            // A. Periféricos
             const listaPerifericos = [];
             document.querySelectorAll('.peri-check:checked').forEach(chk => {
                 const idBd = mapPerifericosIds[chk.value];
                 if (idBd) listaPerifericos.push({ id: idBd });
             });
 
-            // 3. RECOLECTAR COMPONENTE INTERNO (Nueva Lógica Dropdown)
-            // Obtenemos el valor del select (ej: "3", "4"...)
-            const idComponenteSeleccionado = document.getElementById('selectComponentes').value;
-            const serialGeneral = document.getElementById('fmoSerial').value;
-            
+            // B. Componentes
+            const idComp = document.getElementById('selectComponentes').value;
             let listaComponentes = null;
-
-            // Si el usuario seleccionó algo (value no está vacío)
-            if (idComponenteSeleccionado) {
+            // Solo si tiene valor y NO está deshabilitado
+            if (idComp && !document.getElementById('selectComponentes').disabled) {
                 listaComponentes = [{
-                    idComponente: parseInt(idComponenteSeleccionado),
-                    // Opcional: Si el backend pide serial para el componente, usamos el general
-                    fmoSerial: serialGeneral || "S/N" 
+                    idComponente: parseInt(idComp),
+                    // Usamos el serial general si es un componente interno
+                    fmoSerial: document.getElementById('fmoSerial').value || "S/N"
                 }];
             }
 
-            // Helper para obtener valores seguros
+            // C. Otros
+            const valOtro = document.getElementById('otrosTxt').value;
+            // Solo enviamos si no está deshabilitado
+            const otroFinal = (!document.getElementById('otrosTxt').disabled && valOtro) ? valOtro : null;
+
             const getVal = (id) => document.getElementById(id)?.value || "";
 
-            // 4. CONSTRUIR EL PAYLOAD
+            // 3. PAYLOAD
             const payload = {
                 usuario: getVal('usuario'),
                 ficha: parseInt(getVal('ficha')) || 0,
-                nombre: getVal('usuario'), 
+                //nombre: getVal('usuario'), 
                 gerencia: getVal('gerencia'),
+                extension: getVal('ext'),
 
                 fmoEquipo: getVal('fmoAsignado') || "S/N",
                 solicitudST: getVal('solicitudST'), 
@@ -312,31 +382,29 @@
                 asignadoA: getVal('asignadoA'),
 
                 estatus: "Entregado", 
-                fecha: getVal('fecha'),
+                fecha: getVal("fecha"),
                 
                 falla: getVal('falla'),
-                otro: getVal('otrosTxt'),
-                fmoSerial: serialGeneral, // Serial general del recibo
+                // Campo SERIAL GENERAL (Para periféricos o componentes)
+                fmoSerial: getVal('fmoSerial'), 
 
-                // ARRAYS
-                // Aquí enviamos la lista creada desde el Dropdown
+                // LÓGICA DE ENVÍO MUTUO
+                otro: otroFinal,
                 componentePerifericos: listaComponentes, 
                 perifericos: listaPerifericos.length > 0 ? listaPerifericos : null
             };
 
-            console.log("Payload generado:", payload);
+            console.log("Payload:", payload);
 
-            // VALIDACIÓN: Debe haber al menos (Periférico O Componente O Texto 'Otros')
-            const tienePeriferico = payload.perifericos && payload.perifericos.length > 0;
-            const tieneComponente = payload.componentePerifericos && payload.componentePerifericos.length > 0;
-            const tieneOtro = !!payload.otro;
-
-            if (!tienePeriferico && !tieneComponente && !tieneOtro) {
-                alert("⚠️ Atención: Debes seleccionar un Periférico, un Componente o escribir en 'Otros'.");
-                return; 
+            // VALIDACIÓN FINAL ANTES DE ENVIAR
+            const hayData = (payload.perifericos || payload.componentePerifericos || payload.otro);
+            
+            if (!hayData) {
+                alert("⚠️ Error: No has seleccionado nada para ingresar (Periférico, Componente u Otro).");
+                return;
             }
 
-            // 5. ENVÍO AL BACKEND
+            // 4. ENVÍO
             const response = await fetch('http://127.0.0.1:8081/api/crearReciboPerifericos', { 
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -344,18 +412,16 @@
             });
 
             if(response.ok) {
-                const data = await response.json();
-                alert("✅ ¡Recibo Guardado Exitosamente!");
-                // window.location.reload();
+                alert("✅ ¡Guardado Exitosamente!");
+                //window.location.reload();
             } else {
-                const errorText = await response.text();
-                console.error("Error servidor:", errorText);
-                alert("❌ Error del servidor: " + errorText);
+                const txt = await response.text();
+                alert("❌ Error Backend: " + txt);
             }
 
         } catch (e) {
-            console.error("Error crítico en JS:", e);
-            alert("❌ Ocurrió un error en la aplicación: " + e.message);
+            console.error(e);
+            alert("Error JS: " + e.message);
         }
     }
 </script>

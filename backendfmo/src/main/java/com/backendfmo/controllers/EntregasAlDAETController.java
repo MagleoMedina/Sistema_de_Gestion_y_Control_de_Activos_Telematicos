@@ -1,5 +1,7 @@
 package com.backendfmo.controllers;
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.entregasdaet.RegistroDaetDTO;
-
 import com.backendfmo.services.daet.DaetService;
 
 import jakarta.validation.Valid;
@@ -34,10 +35,34 @@ public class EntregasAlDAETController {
         }
     }
 
-    @GetMapping("/buscarEntregasAlDaet/{fmoSerial}") 
+    @GetMapping("/buscarEntregasAlDaet/fmoSerial/{fmoSerial}") 
     public ResponseEntity<?> buscarPorSerial(@PathVariable String fmoSerial) {
         return ResponseEntity.ok(daetService.buscarPorSerialDaet(fmoSerial));
     }
+
+    @GetMapping("/buscarEntregasAlDaet/fmoEquipo/{fmoEquipo}")
+    public ResponseEntity<?> buscarPorFmoEquipo(@PathVariable String fmoEquipo) {
+        
+        return ResponseEntity.ok(daetService.buscarPorFmoEquipo(fmoEquipo));
+    }
+
+    @GetMapping("/buscarEntregasAlDaet") 
+    public ResponseEntity<?> listarTodoDAET() {
+        return ResponseEntity.ok(daetService.listarTodoDAET());
+    }
+
+    @GetMapping("/buscarEntregasAlDaet/fecha/{fecha}")
+    public ResponseEntity<?> buscarPorFecha(@PathVariable String fecha) {
+        
+        return ResponseEntity.ok(daetService.buscarPorFecha(fecha));
+    }
+
+    @GetMapping("/buscarEntregasAlDaet/rangoFechas/{fechaInicio}/{fechaFin}")
+    public ResponseEntity<?> buscarPorRangoDeFechas(@PathVariable String fechaInicio, @PathVariable String fechaFin) {
+        return ResponseEntity.ok(daetService.listarPorRangoDeFechas(fechaInicio, fechaFin));
+    }
+
+
     }
 
    

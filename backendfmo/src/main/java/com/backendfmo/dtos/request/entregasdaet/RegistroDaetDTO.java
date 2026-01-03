@@ -15,6 +15,7 @@ public class RegistroDaetDTO {
     private String estatus;
     private String asignadoA;
     private String recibidoPor;
+    private Integer ficha;
 
     // Lista Principal
     private List<EntregaItemDTO> entregas;

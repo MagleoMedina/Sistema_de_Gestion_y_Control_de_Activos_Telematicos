@@ -9,8 +9,8 @@ public class RegistroPerifericosDTO {
     // Datos Usuario (Para crear uno nuevo siguiendo tu lógica)
     private String usuario;
     private Integer ficha;
-    private String nombre;
     private String gerencia;
+    private String extension;
    
 
     // Datos Encabezado
@@ -23,6 +23,7 @@ public class RegistroPerifericosDTO {
     private String estatus;
     private String fecha;
     private String falla;
+    
     
 
     // La lista de Componentes 

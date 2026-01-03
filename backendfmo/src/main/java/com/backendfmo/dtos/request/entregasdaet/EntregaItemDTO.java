@@ -14,4 +14,7 @@ public class EntregaItemDTO {
     
     // Lista Secundaria (Lo que lleva adentro ese periférico)
     private List<ComponenteDaetDTO> componentesInternos;
+
+    //Lista del componente unico
+    private List<ComponenteDaetDTO> componenteUnico;
 }

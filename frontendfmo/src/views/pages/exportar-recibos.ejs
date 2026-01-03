@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Exportar Reportes</title>
+    <style>
+        /* Estilos necesarios para los formularios (copiados de tus vistas anteriores) */
+        .paper-form { background: #fff; border: 2px solid #000; font-family: 'Courier New'; max-width: 800px; margin: 0 auto; }
+        .cell-border { border: 1px solid #000; padding: 2px 5px; display: flex; align-items: center; }
+        .input-line { border: none; width: 100%; font-weight: bold; color: #000080; }
+        .label-text { font-weight: bold; font-size: 0.75rem; }
+        /* ... Asegúrate de tener todos los estilos base aquí o en un CSS global ... */
+
+        /* Estilos del contenedor de Templates (OCULTO A LA VISTA) */
+        #templates-container {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            visibility: hidden;
+        }
+
+        /* Estilo para el contenedor de impresión (lo que se convertirá en PDF) */
+        #print-staging-area {
+            background: white;
+            padding: 20px;
+        }
+        
+        /* Salto de página para el PDF */
+        .page-break {
+            page-break-after: always;
+            margin-bottom: 20px;
+            display: block;
+            border-bottom: 2px dashed #ccc; /* Visual en staging */
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <%- include('../partials/sidebar') %>
+        <div id="content" class="w-100 bg-light p-4">
+            
+            <h4 class="mb-4 fw-bold">📤 Exportación Masiva de Registros</h4>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Tipo de Registro:</label>
+                            <select class="form-select" id="selTipo">
+                                <option value="equipos">Recibo de Equipos</option>
+                                <option value="perifericos">Recibo de Periféricos</option>
+                                <option value="daet">Entregas al DAET</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Formato:</label>
+                            <select class="form-select" id="selFormato" onchange="toggleFormato()">
+                                <option value="pdf">PDF (Documentos)</option>
+                                <option value="csv">CSV (Excel)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2 date-group">
+                            <label class="form-label fw-bold">Desde:</label>
+                            <input type="date" class="form-control" id="fechaInicio">
+                        </div>
+                        <div class="col-md-2 date-group">
+                            <label class="form-label fw-bold">Hasta:</label>
+                            <input type="date" class="form-control" id="fechaFin">
+                        </div>
+
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" onclick="procesarExportacion()">
+                                🚀 Generar Exportación
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="statusArea" class="mt-3"></div>
+
+        </div>
+    </div>
+
+    <div id="templates-container">
+        
+        <div id="template-equipos-wrapper">
+            <%- include('../partials/forms/template-equipos') %>
+        </div>
+
+        <div id="template-perifericos-wrapper">
+            <%- include('../partials/forms/template-perifericos') %>
+        </div>
+
+        <div id="template-daet-wrapper">
+            <%- include('../partials/forms/template-daet') %>
+        </div>
+
+    </div>
+
+    <div id="print-staging-area" style="display:none;"></div>
+
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/html2pdf.bundle.min.js"></script>
+    
+    <script src="/js/mappings.js"></script> 
+    <script src="/js/pdf.js"></script>
+
+    <script>
+        function toggleFormato() {
+            // Lógica simple por si quieres ocultar fechas en CSV
+            const fmt = document.getElementById('selFormato').value;
+            // Opcional: mostrar u ocultar inputs
+        }
+
+        async function procesarExportacion() {
+            const tipo = document.getElementById('selTipo').value;
+            const formato = document.getElementById('selFormato').value;
+            const inicio = document.getElementById('fechaInicio').value;
+            const fin = document.getElementById('fechaFin').value;
+
+            if (formato === 'pdf') {
+                if(!inicio || !fin) return alert("Seleccione el rango de fechas");
+                
+                // 1. Fetch a tu API de rango (Ajusta tus rutas)
+                // Ej: /api/recibo-equipos/rango?inicio=...&fin=...
+                let url = '';
+                if(tipo === 'equipos') url = `/api/buscarReciboEquipos/rango?inicio=${inicio}&fin=${fin}`;
+                else if(tipo === 'perifericos') url = `/api/buscarReciboPerifericos/rango?inicio=${inicio}&fin=${fin}`;
+                else if(tipo === 'daet') url = `/api/buscarEntregasAlDaet/rango?inicio=${inicio}&fin=${fin}`;
+
+                try {
+                    document.getElementById('statusArea').innerHTML = '<div class="alert alert-info">Cargando datos...</div>';
+                    
+                    // const res = await fetch(url); 
+                    // const data = await res.json();
+                    
+                    // --- DATA MOCK (PARA PROBAR SIN BACKEND AÚN) ---
+                    // Borrar esto cuando tengas el endpoint
+                    const data = []; // Aquí vendría tu array de objetos
+                    
+                    if(data.length === 0) {
+                        document.getElementById('statusArea').innerHTML = '<div class="alert alert-warning">No hay registros en ese rango.</div>';
+                        return;
+                    }
+
+                    // LLAMADA A LA NUEVA FUNCIÓN EN PDF.JS
+                    document.getElementById('statusArea').innerHTML = '<div class="alert alert-warning">Generando PDF masivo, por favor espere...</div>';
+                    
+                    await generarPDFMasivo(data, tipo);
+                    
+                    document.getElementById('statusArea').innerHTML = '<div class="alert alert-success">PDF Generado.</div>';
+
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al exportar");
+                }
+            } else {
+                alert("Lógica CSV pendiente");
+            }
+        }
+    </script>
+</body>
+</html>

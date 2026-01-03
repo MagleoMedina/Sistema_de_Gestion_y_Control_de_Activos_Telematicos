@@ -34,8 +34,26 @@ app.get('/daet', (req, res) => {
 });
 
 // 5. Pantalla de Búsquedas (Trazabilidad)
+// Ruta del Hub Principal
 app.get('/busqueda', (req, res) => {
-    res.render('pages/busqueda', { title: 'Búsqueda y Reportes' });
+    res.render('pages/busqueda-hub', { title: 'Búsqueda' });
+});
+
+// Rutas de los Módulos
+app.get('/busqueda/daet', (req, res) => {
+    res.render('pages/busqueda-daet', { title: 'Búsqueda DAET' });
+});
+
+app.get('/busqueda/equipos', (req, res) => {
+    res.render('pages/busqueda-equipos', { title: 'Búsqueda Equipos' });
+});
+
+app.get('/busqueda/perifericos', (req, res) => {
+    res.render('pages/busqueda-perifericos', { title: 'Búsqueda Periféricos' });
+});
+
+app.get('/exportar', (req, res) => {
+    res.render('pages/exportar-recibos', { title: 'Exportar Recibos' });
 });
 
 // Iniciar servidor

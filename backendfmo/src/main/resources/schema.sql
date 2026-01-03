@@ -75,16 +75,18 @@ CREATE TABLE IF NOT EXISTS perifericos (
 	nombre TEXT
 );
 CREATE TABLE IF NOT EXISTS entregas_al_daet (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	encabezado_recibo INTEGER,
-	actividad TEXT,
-	perifericos INTEGER,
-	fmo_serial TEXT,
-	estado TEXT,
-	identifique TEXT,
+	id	INTEGER,
+	encabezado_recibo	INTEGER,
+	actividad	TEXT,
+	perifericos	TEXT,
+	fmo_serial	TEXT,
+	estado	TEXT,
+	identifique	TEXT,
+	componentes	INTEGER,
+	PRIMARY KEY(id AUTOINCREMENT),
+	FOREIGN KEY(componentes) REFERENCES componentes_computadora_internos(id) ON UPDATE CASCADE,
 	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE,
-	FOREIGN KEY(perifericos)REFERENCES perifericos(id) ON UPDATE CASCADE
-
+	FOREIGN KEY(perifericos) REFERENCES perifericos(id) ON UPDATE CASCADE
 );
 CREATE TABLE IF NOT EXISTS recibo_de_equipos(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,

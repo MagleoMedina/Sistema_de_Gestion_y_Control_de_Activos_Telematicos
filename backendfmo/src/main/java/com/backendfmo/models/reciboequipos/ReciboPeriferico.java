@@ -28,11 +28,6 @@ public class ReciboPeriferico {
     @JsonBackReference
     private ReciboDeEquipos equipoRelacion;
 
-    // Relación con el Encabezado Principal (Padre)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "encabezado_recibo")
-    private EncabezadoRecibo encabezadoRelacion;
-
     // Relación con el Catálogo (Periférico)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "perifericos")

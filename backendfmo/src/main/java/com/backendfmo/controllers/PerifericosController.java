@@ -39,4 +39,33 @@ public class PerifericosController {
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
+
+    @GetMapping("/buscarReciboPerifericos")
+    public ResponseEntity<?> buscarReciboDePeriferico() {
+        try {
+            return ResponseEntity.ok(perifericosService.listarTodoReciboPerifericos());
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/buscarReciboPerifericos/fecha/{fecha}")
+    public ResponseEntity<?> buscarReciboDePerifericosFecha(@PathVariable String fecha) {
+        try {
+            return ResponseEntity.ok(perifericosService.buscarPorFecha(fecha));
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/buscarReciboPerifericos/rangoFechas/{fechaInicio}/{fechaFin}")
+    public ResponseEntity<?> buscarReciboDePerifericosRangoFechas(@PathVariable String fechaInicio, @PathVariable String fechaFin) {
+        try {
+            return ResponseEntity.ok(perifericosService.listarPorRangoDeFechas(fechaInicio, fechaFin));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
 }

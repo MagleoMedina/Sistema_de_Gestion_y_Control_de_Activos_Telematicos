@@ -104,13 +104,15 @@ public class EncabezadoRecibo {
         entrega.setEncabezadoRelacion(this);
     }
 
-    // NUEVA LISTA: Para el formulario de Periféricos Sueltos
-    @OneToMany(mappedBy = "encabezadoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReciboPeriferico> listaPerifericos = new ArrayList<>();
+// Lista para Periféricos Sueltos (Usa la NUEVA entidad)
+    @OneToMany(mappedBy = "encabezadoRelacion", cascade = CascadeType.ALL)
+    private List<ReciboDePerifericos> listaPerifericosSueltos;
 
-    // Helper
-    public void agregarReciboPeriferico(ReciboPeriferico item) {
-        listaPerifericos.add(item);
+    // Helper para agregar periféricos sueltos
+    public void agregarPerifericoSuelto(ReciboDePerifericos item) {
+        if (listaPerifericosSueltos == null) listaPerifericosSueltos = new ArrayList<>();
+        listaPerifericosSueltos.add(item);
         item.setEncabezadoRelacion(this);
     }
+
 }

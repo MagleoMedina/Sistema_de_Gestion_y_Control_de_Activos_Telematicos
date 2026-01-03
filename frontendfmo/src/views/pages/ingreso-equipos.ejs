@@ -110,7 +110,7 @@
                         </div>
                         <div class="col-md-6 cell-border">
                             <span class="label-text me-2">CLAVE:</span>
-                            <input type="password" class="input-line" id="clave">
+                            <input type="text" class="input-line" id="clave">
                         </div>
                     </div>
 
@@ -321,11 +321,11 @@
                     <div class="row row-compact">
                         <div class="col-6 cell-border cell-block" style="height: 50px;">
                             <span class="label-text">ENTREGADO POR:</span>
-                            <input type="text" class="input-line mt-2" id="entregadoPor">
+                            <input type="text" class="input-line" id="entregadoPor">
                         </div>
                         <div class="col-6 cell-border cell-block" style="height: 50px;">
                             <span class="label-text">RECIBIDO POR:</span>
-                            <input type="text" class="input-line mt-2" id="recibidoPor">
+                            <input type="text" class="input-line" id="recibidoPor">
                         </div>
                     </div>
                     <%- include('../pages/recibo-equipos2') %>
@@ -335,7 +335,7 @@
         </div>
     </div>
 
-    <script src="/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     
     <script src="/js/api.js"></script> 
     
@@ -541,7 +541,6 @@
             if(input.value) seriales.push({ idTipoComponente: 4, marca: hddsMarcas[i].value, serial: input.value, capacidad: hddsCaps[i].value });
         });
 
-
         // --- 6. CONSTRUCCIÓN DEL PAYLOAD FINAL ---
         const payload = {
             clave: clave,
@@ -574,7 +573,7 @@
                     ],
                     estatus: document.getElementById('estatus').value,
                     falla: document.getElementById('falla').value,
-                    fecha: document.getElementById('fecha').value,
+                    fecha: document.getElementById("fecha").value,
                     fmoEquipo: document.getElementById('fmoEquipo').value,
                     observacion: document.getElementById('observacion').value,
                     recibidoPor: document.getElementById('recibidoPor').value,

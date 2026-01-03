@@ -1,0 +1,16 @@
+meta {
+  name: listarPorRangoDeFechas
+  type: http
+  seq: 5
+}
+
+get {
+  url: 127.0.0.1:8081/api/buscarReciboPerifericos/rangoFechas/2025-12-01/2026-01-03
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

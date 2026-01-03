@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.reciboequipos.RegistroTotalDTO;
-import com.backendfmo.services.reciboequipos.IReciboEquiposService;
-
+import com.backendfmo.services.reciboequipos.ReciboEquiposService;
 
 import jakarta.validation.Valid;
 
@@ -20,7 +19,7 @@ import jakarta.validation.Valid;
 public class ReciboEquiposController {
 
     @Autowired
-    private IReciboEquiposService service;
+    private ReciboEquiposService service;
 
 
     @PostMapping("/crearReciboEquipos")
@@ -30,8 +29,27 @@ public class ReciboEquiposController {
     }
 
     @GetMapping("/buscarReciboEquipos/{fmo}")
-    public ResponseEntity<?> obtenerDatosPorFmo(@Valid @PathVariable String fmo) {
+    public ResponseEntity<?> obtenerDatosPorFmo(@PathVariable String fmo) {
         
         return ResponseEntity.ok(service.buscarPorFmo(fmo));
     }
+
+    @GetMapping("/buscarReciboEquipos")
+    public ResponseEntity<?> listarReciboDeEquipos() {
+        
+        return ResponseEntity.ok(service.listarTodoReciboDeEquipos());
+    }
+
+    @GetMapping("/buscarReciboEquipos/fecha/{fecha}")
+    public ResponseEntity<?> listarReciboDeEquiposPorFecha(@PathVariable String fecha) {
+        
+        return ResponseEntity.ok(service.listarReciboDeEquiposPorFecha(fecha));
+    }
+
+    @GetMapping("/buscarReciboEquipos/rangoFechas/{fechaInicio}/{fechaFin}")
+    public ResponseEntity<?> listarReciboDeEquiposPorRangoFechas(@PathVariable String fechaInicio, @PathVariable String fechaFin) {
+        
+        return ResponseEntity.ok(service.listarReciboDeEquiposPorRangoFechas(fechaInicio, fechaFin));
+    }
+
 }

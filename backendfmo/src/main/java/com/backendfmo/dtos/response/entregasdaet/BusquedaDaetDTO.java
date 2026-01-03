@@ -17,10 +17,15 @@ public class BusquedaDaetDTO {
     // --- Datos del Encabezado (Padre) ---
     private String fmoEquipoLote; // El código del lote/encabezado
     private String solicitudDAET;
-    private String estatusEncabezado;
+    private String solicitudST;
+    private String estatus;
     private String fecha;
     private String observacion;
-
+    private String recibidoPor;
+    private String asignadoA;
+    private Integer ficha;
     // --- Lista de Componentes Internos (Hijos) ---
     private List<ComponenteInternoResumenDTO> componentesInternos;
+
+    private List<ComponenteInternoResumenDTO> componenteUnico;
 }

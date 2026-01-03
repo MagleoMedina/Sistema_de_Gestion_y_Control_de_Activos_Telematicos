@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Centro de Búsqueda</title>
+    <style>
+        /* Estilos para las tarjetas de menú */
+        .menu-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none; /* Quitar subrayado del link */
+            color: inherit; /* Mantener color de texto */
+            background-color: #fff;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: #0d6efd; /* Color primario Bootstrap */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin: 0;
+        }
+        
+        /* Enlace que cubre toda la card */
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <%- include('../partials/sidebar') %>
+        
+        <div id="content" class="w-100 bg-light">
+            
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1">📂 Centro de Búsqueda y Reportes</span>
+                </div>
+            </nav>
+
+            <div class="container-fluid p-5">
+                
+                <h4 class="mb-4 text-secondary">Seleccione el módulo a consultar:</h4>
+
+                <div class="row g-4">
+                      <div class="col-md-4">
+                        <a href="/busqueda/equipos" class="card-link">
+                            <div class="menu-card">
+                                <div class="card-icon">🖥️</div>
+                                <h5 class="card-title">Recibo de Equipos</h5>
+                                <p class="text-muted text-center mt-2 small">Equipos completos, ingresos, egresos</p>
+                            </div>
+                        </a>
+                    </div>
+                        <div class="col-md-4">
+                        <a href="/busqueda/perifericos" class="card-link">
+                            <div class="menu-card">
+                                <div class="card-icon">⌨️</div>
+                                <h5 class="card-title">Recibo de Periféricos</h5>
+                                <p class="text-muted text-center mt-2 small">Monitores, mouse, piezas sueltas</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/busqueda/daet" class="card-link">
+                            <div class="menu-card">
+                                <div class="card-icon">🚚</div>
+                                <h5 class="card-title">Entregas al DAET</h5>
+                                <p class="text-muted text-center mt-2 small">Consultar envíos y reemplazos</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>

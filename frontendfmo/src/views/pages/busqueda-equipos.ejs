@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head') %>
+    <title>Búsqueda Equipos</title>
+    <style>
+        /* ESTILOS DEL FORMULARIO PAPEL */
+        .paper-form {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .cell-border {
+            border: 1px solid #000;
+            padding: 2px 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .cell-block {
+            display: block;
+        }
+
+        .input-line {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-weight: bold;
+            color: #000080;
+            height: 20px;
+            font-size: 13px;
+            padding: 0 5px;
+        }
+
+        .input-line:focus {
+            outline: none;
+        }
+
+        .label-text {
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .form-check {
+            min-height: auto;
+            margin-bottom: 0;
+            margin-right: 10px;
+        }
+
+        .form-check-input {
+            border: 1px solid #000;
+            width: 13px;
+            height: 13px;
+            margin-top: 3px;
+        }
+
+        .row-compact {
+            --bs-gutter-x: 0;
+        }
+
+        .tag-badge {
+            background-color: #000080;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 4px;
+            font-size: 11px;
+        }
+        
+        /* Estilos para el scroll de la tabla */
+        .table-scroll-wrapper {
+            max-height: 55vh;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .table-scroll-wrapper thead th {
+            position: sticky;
+            top: 0;
+            background-color: #e9ecef;
+            z-index: 2;
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('../partials/sidebar') %>
+        <div id="content" class="w-100 bg-light p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
+                <h5 class="m-0 fw-bold">🖥️ Historial de Recibo de Equipos</h5>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <div class="row g-2 align-items-center mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
+                                <option value="todo">Listar Todo</option>
+                                <option value="fmo">FMO / Serial</option>
+                                <option value="fecha">Fecha</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-7" id="containerInputTexto" style="display: none;">
+                            <label class="form-label small fw-bold">Ingrese FMO o Serial:</label>
+                            <input type="text" class="form-control" id="inputBusquedaFmo"
+                                placeholder="Ej: 119000 o Serial...">
+                        </div>
+
+                        <div class="col-md-7" id="containerInputFecha" style="display: none;">
+                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <input type="date" class="form-control" id="inputBusquedaFecha">
+                        </div>
+
+                        <div class="col-md-7" id="containerVacio"></div>
+
+                        <div class="col-md-2 text-end">
+                            <label class="form-label d-block">&nbsp;</label>
+                            <button class="btn btn-primary w-100" onclick="buscarEquipos()">🔍 Buscar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive table-scroll-wrapper">
+                        <table class="table table-hover table-bordered align-middle mb-0">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th>FMO / Equipo</th>
+                                    <th>Fecha Ingreso</th>
+                                    <th>Usuario</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResultados" class="text-center">
+                                <tr>
+                                    <td colspan="5" class="text-muted py-5">Seleccione un filtro y busque para ver resultados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVerEquipo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header bg-light py-2">
+                    <h6 class="modal-title fw-bold">📄 Detalle del Recibo</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-secondary bg-opacity-10">
+
+                    <div class="paper-form container p-0" id="formularioPapel">
+
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light"
+                                style="padding: 4px;">
+                                <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="text" class="input-line" id="modal_fecha" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">USUARIO:</span>
+                                <input type="text" class="input-line" id="modal_usuario" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">FICHA:</span>
+                                <input type="text" class="input-line" id="modal_ficha" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">CLAVE:</span>
+                                <input type="text" class="input-line" id="modal_clave" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">NOMBRE:</span>
+                                <input type="text" class="input-line" id="modal_nombre" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-5 cell-border">
+                                <span class="label-text me-2">EXT./TLF.:</span>
+                                <input type="text" class="input-line" id="modal_extension" readonly>
+                            </div>
+                            <div class="col-md-7 cell-border justify-content-between">
+                                <span class="label-text me-3">RESPALDO:</span>
+                                <span class="input-line fw-bold" id="modal_respaldo"></span>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text">GCIA./DPTO.:</span>
+                                <input type="text" class="input-line ms-2" id="modal_gerencia" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">SOLIC. DAET:</span>
+                                <input type="text" class="input-line" id="modal_solicitudDAET" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">SOLIC. S.T.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudST" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">CPU FMO:</span>
+                                <input type="text" class="input-line" id="modal_fmoEquipo" readonly>
+                            </div>
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">MARCA:</span>
+                                <input type="text" class="input-line" id="modal_marca" readonly>
+                            </div>
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">FALLA:</span>
+                                <input type="text" class="input-line" id="modal_falla" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border flex-wrap bg-light">
+                                <span class="label-text w-100 text-center">COMPONENTES DETECTADOS</span>
+                            </div>
+                            <div class="col-12 cell-border p-2">
+                                <div id="modal_lista_componentes" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-2 cell-border bg-light justify-content-center">
+                                <span class="label-text">INCLUYE:</span>
+                            </div>
+                            <div class="col-10 cell-border p-2">
+                                <div id="modal_lista_perifericos" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-2 cell-border bg-light justify-content-center">
+                                <span class="label-text">APPS:</span>
+                            </div>
+                            <div class="col-10 cell-border p-2">
+                                <div id="modal_lista_apps" class="d-flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-12 cell-border">
+                                <span class="label-text me-2">CARPETA RED:</span>
+                                <div id="modal_lista_carpetas" class="d-flex flex-wrap gap-1 p-1"></div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border cell-block">
+                                <span class="label-text">OBSERVACIÓN GENERAL:</span>
+                                <textarea class="input-line" rows="1" id="modal_observacion" readonly
+                                    style="resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">ASIGNADO A:</span>
+                                <input type="text" class="input-line" id="modal_asignadoA" readonly>
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">ESTATUS:</span>
+                                <input type="text" class="input-line" id="modal_estatus" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-6 cell-border cell-block" style="height: 50px;">
+                                <span class="label-text">ENTREGADO POR:</span>
+                                <input type="text" class="input-line" id="modal_entregadoPor" readonly>
+                            </div>
+                            <div class="col-6 cell-border cell-block" style="height: 50px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line" id="modal_recibidoPor" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact mt-3">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light"
+                                style="padding: 4px;">
+                                <h6 class="m-0 fw-bold">SERIALES COMPONENTES:</h6>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border bg-light justify-content-center"><span
+                                    class="label-text">DESCRIPCIÓN</span></div>
+                            <div class="col-4 cell-border bg-light justify-content-center"><span
+                                    class="label-text">MARCA</span></div>
+                            <div class="col-4 cell-border bg-light justify-content-center"><span
+                                    class="label-text">SERIAL</span></div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">TARJETA MADRE</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_marcaMadre" readonly></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_serialMadre" readonly></div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">FUENTE DE PODER</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_marcaFuente" readonly></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_serialFuente" readonly></div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">TARJETA DE VIDEO</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_marcaVideo" readonly></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_serialVideo" readonly></div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">TARJETA DE RED</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_marcaRed" readonly></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="modal_serialRed" readonly></div>
+                        </div>
+
+                        <div class="row row-compact mt-1 border-top border-dark">
+                            <div class="col-3 cell-border d-flex align-items-center justify-content-center bg-light">
+                                <span class="label-text">MEMORIA RAM</span>
+                            </div>
+                            <div class="col-9 p-0">
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">MARCA</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">SERIAL</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">CAPACIDAD</span></div>
+                                </div>
+                                <div id="container_ram_seriales">
+                                    <div class="row row-compact">
+                                        <div class="col-12 cell-border text-center text-muted">Sin datos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact mt-1 border-top border-dark">
+                            <div class="col-3 cell-border d-flex align-items-center justify-content-center bg-light">
+                                <span class="label-text">DISCO DURO</span>
+                            </div>
+                            <div class="col-9 p-0">
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">MARCA</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">SERIAL</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">CAPACIDAD</span></div>
+                                </div>
+                                <div id="container_hdd_seriales">
+                                    <div class="row row-compact">
+                                        <div class="col-12 cell-border text-center text-muted">Sin datos</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact mt-1">
+                            <div class="col-12 cell-border cell-block" style="min-height: 40px;">
+                                <span class="label-text">OBSERVACIÓN (SERIALES):</span>
+                                <textarea class="input-line" rows="1" id="modal_observacionSeriales" readonly
+                                    style="resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" onclick="generarPDFRecibo()">🖨️ Descargar PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <script src="/js/html2pdf.bundle.min.js"></script>
+
+    <script src="/js/pdf.js"></script>
+
+    <script>
+        // --- 1. FILTROS ---
+        function cambiarFiltro() {
+            const filtro = document.getElementById('filtroSelect').value;
+            const divTexto = document.getElementById('containerInputTexto');
+            const divFecha = document.getElementById('containerInputFecha');
+            const divVacio = document.getElementById('containerVacio');
+
+            divTexto.style.display = 'none';
+            divFecha.style.display = 'none';
+            divVacio.style.display = 'none';
+
+            if (filtro === 'fmo') divTexto.style.display = 'block';
+            else if (filtro === 'fecha') divFecha.style.display = 'block';
+            else divVacio.style.display = 'block';
+        }
+
+        // --- 2. BÚSQUEDA ---
+        async function buscarEquipos() {
+
+            const filtro = document.getElementById('filtroSelect').value;
+            let url = 'http://127.0.0.1:8081/api/buscarReciboEquipos'; // Default: Listar Todo
+            // Construir URL según filtro
+            if (filtro === 'fmo') {
+                const val = document.getElementById('inputBusquedaFmo').value;
+                if (!val) return alert("Ingrese un FMO o Serial");
+                url = `http://127.0.0.1:8081/api/buscarReciboEquipos/${val}`;
+            }
+            else if (filtro === 'fecha') {
+                const val = document.getElementById('inputBusquedaFecha').value;
+                if (!val) return alert("Seleccione una fecha");
+
+                url = `http://127.0.0.1:8081/api/buscarReciboEquipos/fecha/${val}`;
+            }
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("No se encontraron resultados o error de servidor.");
+                const data = await response.json();
+                renderizarTabla(data);
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-danger">${error.message}</td></tr>`;
+            }
+        }
+
+        function renderizarTabla(data) {
+            const tbody = document.getElementById('tablaResultados');
+            tbody.innerHTML = '';
+            const lista = Array.isArray(data) ? data : [data];
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No hay registros.</td></tr>';
+                return;
+            }
+
+            lista.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${index + 1}</td>
+                    <td class="text-primary fw-bold">${item.fmoEquipo || "N/A"}</td>
+                    <td>${item.fecha || "N/A"}</td>
+                    <td>${item.usuarioNombre || "N/A"}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>👁️ Ver</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- 3. VISUALIZACIÓN (MODAL) ---
+        function abrirModalVer(data) {
+            // A. Datos Generales
+            setVal('modal_fecha', data.fecha);
+            setVal('modal_usuario', data.usuarioNombre);
+            setVal('modal_ficha', data.usuarioFicha);
+            setVal('modal_nombre', data.usuarioNombre);
+            setVal('modal_extension', data.extension);
+            setVal('modal_gerencia', data.usuarioGerencia);
+            setVal('modal_solicitudDAET', data.solicitudDAET);
+            setVal('modal_solicitudST', data.solicitudST);
+            setVal('modal_fmoEquipo', data.fmoEquipo);
+            setVal('modal_falla', data.falla);
+            setVal('modal_observacion', data.observacion);
+            setVal('modal_asignadoA', data.asignadoA);
+            setVal('modal_estatus', data.estatus);
+            setVal('modal_entregadoPor', data.entregadoPor);
+            setVal('modal_recibidoPor', data.recibidoPor);
+            setVal("modal_clave", data.clave);
+
+            // B. Datos del Equipo
+            if (data.equipos && data.equipos.length > 0) {
+                const equipo = data.equipos[0];
+                setVal('modal_marca', equipo.marca);
+                document.getElementById('modal_respaldo').textContent = equipo.respaldo || "NO";
+                setVal('modal_observacionSeriales', equipo.observacionSeriales);
+
+                // Listas Visuales (Tags)
+                llenarTags('modal_lista_componentes', equipo.componentesGenericos, 'nombreComponente');
+                llenarTags('modal_lista_perifericos', equipo.perifericos);
+                llenarTags('modal_lista_apps', equipo.aplicaciones);
+                llenarTags('modal_lista_carpetas', equipo.carpetas);
+
+                // ============================================
+                // C. LLENADO DE TABLA SERIALES
+                // ============================================
+
+                // Limpiar campos únicos primero
+                setVal('modal_marcaMadre', '');
+                setVal('modal_serialMadre', '');
+                setVal('modal_marcaFuente', ''); setVal('modal_serialFuente', '');
+                setVal('modal_marcaVideo', ''); setVal('modal_serialVideo', '');
+                setVal('modal_marcaRed', ''); setVal('modal_serialRed', '');
+                // Arrays temporales para RAM y HDD
+                const rams = [];
+                const hdds = [];
+
+                if (equipo.componentesConSerial) {
+                    equipo.componentesConSerial.forEach(ser => {
+                        const tipo = (ser.tipoComponente || "").toUpperCase();
+
+                        // 1. Campos Únicos
+                        if (tipo.includes("MADRE")) {
+                            setVal('modal_marcaMadre', ser.marca);
+                            setVal('modal_serialMadre', ser.serial);
+                        }
+                        else if (tipo.includes("FUENTE")) {
+                            setVal('modal_marcaFuente', ser.marca);
+                            setVal('modal_serialFuente', ser.serial);
+                        }
+                        else if (tipo.includes("VIDEO")) {
+                            setVal('modal_marcaVideo', ser.marca);
+                            setVal('modal_serialVideo', ser.serial);
+                        }
+                        else if (tipo.includes("RED")) {
+                            setVal('modal_marcaRed', ser.marca);
+                            setVal('modal_serialRed', ser.serial);
+                        }
+                        // 2. Acumular RAMs
+                        else if (tipo.includes("RAM") || tipo.includes("MEMORIA")) {
+                            rams.push(ser);
+                        }
+                        // 3. Acumular Discos
+                        else if (tipo.includes("DISCO") || tipo.includes("DURO")) {
+                            hdds.push(ser);
+                        }
+                    });
+                }
+
+                // Renderizar RAMs
+                renderSerialRows('container_ram_seriales', rams, 4);
+                // 4 filas máximo por estética
+                // Renderizar HDDs
+                renderSerialRows('container_hdd_seriales', hdds, 2);
+            }
+
+            const myModal = new bootstrap.Modal(document.getElementById('modalVerEquipo'));
+            myModal.show();
+        }
+
+        // Helpers
+        function setVal(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.value = val || "";
+        }
+
+        function llenarTags(containerId, dataArray, keyName = null) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (!dataArray || dataArray.length === 0) {
+                container.innerHTML = '<span class="text-muted small">Ninguno</span>';
+                return;
+            }
+            dataArray.forEach(item => {
+                let texto = keyName ? item[keyName] : item;
+                if (keyName === 'nombreComponente' && item.cantidad) {
+                    const nombreUpper = String(texto).toUpperCase();
+                    if (nombreUpper.includes("RAM") || nombreUpper.includes("MEMORIA")) {
+                        texto = `${texto} (${item.cantidad})`;
+                    }
+                }
+                const span = document.createElement('span');
+                span.className = 'tag-badge';
+                span.textContent = texto;
+                container.appendChild(span);
+            });
+        }
+
+        // Función para dibujar filas de seriales (RAM/HDD)
+        function renderSerialRows(containerId, dataList, minRows = 1) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            // Dibujar datos existentes
+            dataList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'row row-compact';
+                div.innerHTML = `
+                    <div class="col-4 cell-border"><input type="text" class="input-line text-center" value="${item.marca || ''}" readonly></div>
+                    <div class="col-4 cell-border"><input type="text" class="input-line text-center" value="${item.serial || ''}" readonly></div>
+                    <div class="col-4 cell-border"><input type="text" class="input-line text-center" value="${item.capacidad || ''}" readonly></div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Rellenar filas vacías si hay pocas (para mantener estética de la hoja)
+            const filasRestantes = minRows - dataList.length;
+            for (let i = 0; i < filasRestantes; i++) {
+                const div = document.createElement('div');
+                div.className = 'row row-compact';
+                div.innerHTML = `
+                    <div class="col-4 cell-border"><input type="text" class="input-line text-center" readonly></div>
+                    <div class="col-4 cell-border"><input type="text" class="input-line text-center" readonly></div>
+                    <div class="col-4 cell-border"><input type="text" class="input-line text-center" readonly></div>
+                `;
+                container.appendChild(div);
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -15,4 +15,14 @@ public interface EncabezadoReciboRepository extends JpaRepository<EncabezadoReci
     // Esto evita que Hibernate haga una segunda consulta para buscar al usuario.
     @Query("SELECT e FROM EncabezadoRecibo e JOIN FETCH e.usuarioRelacion WHERE e.fmoEquipo = :fmo")
     List<EncabezadoRecibo> buscarPorFmoConUsuario(@Param("fmo") String fmoEquipo);
+
+    List<EncabezadoRecibo> findByFmoEquipo(String fmoEquipo);
+
+    List<EncabezadoRecibo> findByFecha(String fecha);
+    
+    @Query("SELECT e FROM EncabezadoRecibo e WHERE e.fecha BETWEEN :fechaInicio AND :fechaFin")
+    List<EncabezadoRecibo> findByFechaBetween(String fechaInicio, String fechaFin);
+
+
 }
+

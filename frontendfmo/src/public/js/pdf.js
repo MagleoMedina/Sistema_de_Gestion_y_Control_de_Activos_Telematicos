@@ -64,7 +64,7 @@ function generarPDFRecibo() {
 
     // 3. Configuración de html2pdf
     const opciones = {
-        margin:       5, // Margen en mm (ajustar si se corta)
+        margin:       3, // Margen en mm (ajustar si se corta)
         filename:     nombreArchivo,
         image:        { type: 'jpeg', quality: 0.98 }, // Calidad de imagen
         html2canvas:  { 
@@ -88,13 +88,10 @@ function generarPDFRecibo() {
     });
 }
 /**
- * Genera un PDF multipágina usando SUSTITUCIÓN VISUAL ESTRICTA.
+ * NUEVA LÓGICA ITERATIVA (Página por Página)
+ * Soluciona el problema de PDF en blanco con muchos registros.
  */
 async function generarPDFMasivo(datos, tipo) {
-    // --- CONFIGURACIÓN ---
-    const MODO_DEPURACION = false; // CAMBIA A TRUE SI QUIERES VER LOS FORMULARIOS EN PANTALLA
-    // ---------------------
-
     // 1. Validar Templates
     let templateId = '';
     if (tipo === 'equipos') templateId = 'template-equipos-wrapper';
@@ -106,111 +103,107 @@ async function generarPDFMasivo(datos, tipo) {
         return alert("Error crítico: No se encontraron los templates HTML.");
     }
 
-    // 2. Ocultar la APP y Mostrar Telón
-    const appContent = document.querySelector('.wrapper');
-    if (appContent) appContent.style.display = 'none';
+    // 2. Configurar jsPDF
+    const { jsPDF } = window.jspdf; // Accedemos a la librería global
+    const pdf = new jsPDF('p', 'mm', 'letter'); // Portrait, milímetros, Carta
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    // Creamos/Mostramos el telón para que el usuario no vea el salto
+    // 3. Telón de Carga
     let telon = document.getElementById('pdf-loading-overlay');
     if (!telon) {
         telon = document.createElement('div');
         telon.id = 'pdf-loading-overlay';
-        // z-index altísimo para tapar el staging area mientras se monta
         telon.style.cssText = "position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index: 99999; display:flex; justify-content:center; align-items:center; flex-direction:column;";
+        document.body.appendChild(telon);
+    }
+    const updateTelon = (msg) => {
         telon.innerHTML = `
             <div class="spinner-border text-primary mb-3" role="status"></div>
             <h4 style="color:#333;">Generando PDF...</h4>
-            <div style="color:#666;">Procesando ${datos.length} registros...</div>
+            <div style="color:#666;">${msg}</div>
         `;
-        document.body.appendChild(telon);
-    }
-    if (!MODO_DEPURACION) telon.style.display = 'flex';
+    };
+    updateTelon(`Iniciando... (0/${datos.length})`);
+    telon.style.display = 'flex';
 
-    // 3. Preparar ÁREA DE MONTAJE (Staging Area)
+    // 4. Staging Area (Un solo contenedor visible)
     const stagingArea = document.getElementById('print-staging-area');
     stagingArea.innerHTML = '';
     
-    // CONFIGURACIÓN ESTRICTA:
-    // Lo hacemos visible y parte del flujo normal (static) para que tenga altura real.
-    // Al ocultar .wrapper, esto será lo único en el body.
+    // Lo posicionamos absoluto fuera de la vista pero VISIBLE al renderizador
+    stagingArea.style.position = 'absolute';
+    stagingArea.style.top = '0';
+    stagingArea.style.left = '0'; // En pantalla (tapado por telón)
+    stagingArea.style.width = '816px'; // Ancho fijo carta (aprox)
+    stagingArea.style.zIndex = '10000'; // Debajo del telón (99999)
+    stagingArea.style.background = '#ffffff';
     stagingArea.style.display = 'block';
-    stagingArea.style.position = 'static'; // Importante para que crezca hacia abajo
-    stagingArea.style.width = '816px'; // Ancho Carta
-    stagingArea.style.margin = '0 auto'; // Centrado
-    stagingArea.style.background = 'white';
-    stagingArea.style.padding = '20px';
 
-    // 4. RESETEAR SCROLL (CRUCIAL PARA EVITAR PÁGINAS EN BLANCO)
-    window.scrollTo(0, 0);
-
-    // 5. Bucle de Clonación
-    datos.forEach((registro, index) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'pdf-compacto'; 
-        wrapper.style.padding = "3px";
-        wrapper.style.backgroundColor = "white"; 
-        wrapper.style.marginBottom = "3px";
-
-        const clone = templateSource.firstElementChild.cloneNode(true);
-        // Asegurar visibilidad
-        clone.style.display = 'block';
-        clone.removeAttribute('hidden');
-        
-        if (tipo === 'equipos') mapearDatosEquipos(clone, registro); 
-        else if (tipo === 'perifericos') mapearDatosPerifericos(clone, registro);
-        else if (tipo === 'daet') mapearDatosDaet(clone, registro);
-
-        wrapper.appendChild(clone);
-        stagingArea.appendChild(wrapper);
-
-        // Salto de página
-        if (index < datos.length - 1) {
-            const pageBreak = document.createElement('div');
-            pageBreak.className = 'html2pdf__page-break';
-            pageBreak.style.height = "0px";
-            stagingArea.appendChild(pageBreak);
-        }
-    });
-
-    // 6. ESPERA DE RENDERIZADO
-    // Damos tiempo al navegador para calcular layout
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // 7. Generar PDF
-    const opciones = {
-        margin:       5,
-        filename:     `Reporte_${tipo}_${new Date().toISOString().slice(0,10)}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-            scale: 2, 
-            logging: true, 
-            useCORS: true,
-            // Eliminamos windowWidth forzado para evitar conflictos de recorte
-            scrollY: 0,
-            backgroundColor: '#ffffff'
-        },
-        jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
-    };
-
-    if (MODO_DEPURACION) {
-        alert("Modo Depuración: Mira la pantalla. ¿Ves los formularios? Si sí, el PDF debería salir bien.");
-        // No generamos ni ocultamos nada para que puedas inspeccionar
-        return;
-    }
+    window.scrollTo(0,0); // Reset scroll
 
     try {
-        await html2pdf().set(opciones).from(stagingArea).save();
+        // --- BUCLE PRINCIPAL ---
+        for (let i = 0; i < datos.length; i++) {
+            const registro = datos[i];
+            
+            // Actualizar mensaje de carga
+            updateTelon(`Procesando registro ${i + 1} de ${datos.length}`);
+
+            // A. Limpiar y Montar UN SOLO formulario
+            stagingArea.innerHTML = ''; 
+            const wrapper = document.createElement('div');
+            // Usamos estilos simples inline para asegurar limpieza
+            wrapper.style.padding = "10px";
+            wrapper.style.background = "white";
+            wrapper.style.width = "100%"; 
+
+            const clone = templateSource.firstElementChild.cloneNode(true);
+            clone.style.display = 'block';
+            
+            if (tipo === 'equipos') mapearDatosEquipos(clone, registro); 
+            else if (tipo === 'perifericos') mapearDatosPerifericos(clone, registro);
+            else if (tipo === 'daet') mapearDatosDaet(clone, registro);
+
+            wrapper.appendChild(clone);
+            stagingArea.appendChild(wrapper);
+
+            // B. Espera técnica (necesaria para renderizado de fuentes/imágenes)
+            await new Promise(r => setTimeout(r, 100)); // 100ms es suficiente por registro
+
+            // C. Tomar foto (Canvas)
+            const canvas = await html2canvas(stagingArea, {
+                scale: 2, // Calidad alta
+                logging: false,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                windowWidth: 816 // Forzar ancho
+            });
+
+            // D. Agregar al PDF
+            const imgData = canvas.toDataURL('image/jpeg', 0.98);
+            // Calcular altura proporcional para que ajuste al ancho del PDF
+            const imgProps = pdf.getImageProperties(imgData);
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            // Si no es la primera página, añadir nueva
+            if (i > 0) pdf.addPage();
+
+            // Pegar imagen (Margen superior 10mm)
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight);
+        }
+
+        // 5. Guardar
+        const fechaStr = new Date().toISOString().slice(0,10);
+        pdf.save(`Reporte_${tipo}_${fechaStr}.pdf`);
+
     } catch (e) {
-        console.error("Error html2pdf:", e);
+        console.error(e);
         alert("Error generando PDF: " + e.message);
     } finally {
-        // 8. RESTAURAR VISIBILIDAD
-        if (!MODO_DEPURACION) {
-            stagingArea.innerHTML = ''; 
-            stagingArea.style.display = 'none'; 
-            
-            if (appContent) appContent.style.display = 'flex'; 
-            telon.style.display = 'none'; 
-        }
+        // 6. Restaurar
+        stagingArea.innerHTML = '';
+        stagingArea.style.display = 'none';
+        telon.style.display = 'none';
     }
 }

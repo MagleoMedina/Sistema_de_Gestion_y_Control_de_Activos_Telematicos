@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- RUTAS DE NAVEGACIÓN (Renderizan el HTML) ---
 
 // 1. Inicio
-app.get('/', (req, res) => {
+app.get('/dashboard', (req, res) => {
     res.render('pages/dashboard', { title: 'Inicio - FMO' });
 });
 
@@ -54,6 +54,61 @@ app.get('/busqueda/perifericos', (req, res) => {
 
 app.get('/exportar', (req, res) => {
     res.render('pages/exportar-recibos', { title: 'Exportar Recibos' });
+});
+
+app.get('/gestion', (req, res) => {
+    res.render('pages/gestion-usuarios', { title: 'Gestion Usuarios' });
+});
+
+// Ruta del Login
+app.get('/login', (req, res) => {
+    res.render('pages/login');
+});
+
+// Ruta para procesar el Login (POST)
+app.post('/auth/login', async (req, res) => {
+   // const { username, password } = req.body;
+    
+    // Aquí va tu lógica de validación contra la BD o API Java
+    // Ejemplo ficticio:
+    try {
+        // const usuario = await buscarUsuario(username, password);
+        // if (usuario) {
+        //    req.session.user = usuario;
+        //    return res.redirect('/dashboard');
+        // }
+        res.redirect('/dashboard'); // Temporal para probar
+    } catch (error) {
+        res.render('pages/login', { error: 'Credenciales inválidas' });
+    }
+});
+
+app.get('/health', async (req, res) => {
+    try {
+        // 1. Intentamos contactar al Backend Java (con un timeout corto de 2s)
+        // Nota: fetch es nativo en Node v18+. Si usas Node viejo, usa 'axios' o 'node-fetch'
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 segundos máx
+
+        const response = await fetch('http://127.0.0.1:8081/api/health', { 
+            method: 'GET',
+            signal: controller.signal 
+        });
+        clearTimeout(timeoutId);
+
+        // 2. Si Java responde 200, le decimos al navegador que todo está OK
+        if (response.ok) {
+            res.sendStatus(200);
+        } else {
+            // Java respondió pero con error (ej. 500)
+            res.sendStatus(503);
+        }
+
+    } catch (error) {
+        // 3. Si ocurre error de conexión (Java apagado), respondemos error
+        // console.error("Java Backend no responde:", error.message);
+        res.sendStatus(503); // Service Unavailable
+    }
 });
 
 // Iniciar servidor

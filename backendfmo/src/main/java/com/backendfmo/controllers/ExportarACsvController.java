@@ -1,9 +1,5 @@
 package com.backendfmo.controllers;
 
-
-
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.services.csv.CsvServiceImpl;
-
 
 
 @RestController
@@ -33,7 +28,7 @@ public class ExportarACsvController {
         return ResponseEntity.ok(service.obtenerDatosParaCsv(inicio, fin));
     }
 
-    @GetMapping("/exportarCsv/{inicio}/{fin}")
+@GetMapping("/exportarCsv/{inicio}/{fin}")
 public ResponseEntity<Resource> descargarCsv(@PathVariable String inicio, @PathVariable String fin) {
 
     String nombreArchivo = "Reporte_" + inicio + "_al_" + fin + ".csv";

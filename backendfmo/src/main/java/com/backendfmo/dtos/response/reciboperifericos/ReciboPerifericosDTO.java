@@ -10,6 +10,7 @@ public class ReciboPerifericosDTO {
     private String fmoSerial;
 
     // Datos del Encabezado (Padre)
+    private Long idEncabezado;
     private String fmoEquipo; // El código del encabezado
     private String solicitudST;
     private String estatus;

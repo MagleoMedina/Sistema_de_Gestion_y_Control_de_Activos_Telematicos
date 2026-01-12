@@ -20,24 +20,24 @@ public class ContadorServiceImpl {
     @Autowired
     private EntregasAlDAETRepository daetRepository;
 
-    private static final String ESTATUS_LISTO = "Listo";
+    private static final String ESTATUS_ENTREGADO = "Entregado";
 
     public long contarEquiposAtendidos() {
-        return equipoRepository.contarPorEstatus(ESTATUS_LISTO);
+        return equipoRepository.contarPorEstatus(ESTATUS_ENTREGADO);
     }
 
     public long contarPerifericosAtendidos(){
-        return perifericoRepository.contarPorEstatus(ESTATUS_LISTO);
+        return perifericoRepository.contarPorEstatus(ESTATUS_ENTREGADO);
     }
 
     public long contarDaetAtendidas(){
-        return daetRepository.contarPorEstatus(ESTATUS_LISTO);
+        return daetRepository.contarPorEstatus(ESTATUS_ENTREGADO);
     } 
     
     public long getTotalPendientes() {
-        long equipos = equipoRepository.contarPendientes(ESTATUS_LISTO);
-        long perifericos = perifericoRepository.contarPendientes(ESTATUS_LISTO);
-        long daet = daetRepository.contarPendientes(ESTATUS_LISTO);
+        long equipos = equipoRepository.contarPendientes(ESTATUS_ENTREGADO);
+        long perifericos = perifericoRepository.contarPendientes(ESTATUS_ENTREGADO);
+        long daet = daetRepository.contarPendientes(ESTATUS_ENTREGADO);
 
         return equipos + perifericos + daet;
     }

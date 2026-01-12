@@ -304,6 +304,18 @@ public class ReciboEquiposService implements IReciboEquiposService {
         return convertirEntidadADTO(actualizado);
     }
 
+    @Transactional // IMPORTANTE: Mantiene la operación atómica
+    public void eliminarReciboPorId(Long id) {
+        // Verificamos si existe antes de borrar
+        if (!encabezadoRepository.existsById(id)) {
+            throw new RuntimeException("El recibo con ID " + id + " no existe.");
+        }
+        
+        // Al ejecutar esto, JPA busca la lista de equipos, perifericos, etc.,
+        // y lanza los DELETE correspondientes automáticamente.
+        encabezadoRepository.deleteById(id);
+    }
+
     private BusquedaCompletaDTO convertirEntidadADTO(EncabezadoRecibo encabezado) {
         BusquedaCompletaDTO dto = new BusquedaCompletaDTO();
 

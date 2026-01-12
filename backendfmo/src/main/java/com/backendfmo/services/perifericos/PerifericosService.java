@@ -214,6 +214,7 @@ public class PerifericosService {
         }
         
         // Mapear Datos del Encabezado
+        response.setIdEncabezado(encabezado.getId());
         response.setSolicitudST(encabezado.getSolicitudST());
         response.setSolicitudDAET(encabezado.getSolicitudDAET());
         response.setEstatus(encabezado.getEstatus());

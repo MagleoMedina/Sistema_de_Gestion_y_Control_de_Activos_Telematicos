@@ -60,6 +60,7 @@ private BusquedaDaetDTO convertirEntidadADTO(EntregasAlDAET entrega) {
     // --- B. MAPEO DE DATOS DEL ENCABEZADO ---
     EncabezadoRecibo encabezado = entrega.getEncabezadoRelacion();
     if (encabezado != null) {
+        dto.setIdEncabezado(encabezado.getId());
         dto.setFmoEquipoLote(encabezado.getFmoEquipo());
         dto.setSolicitudDAET(encabezado.getSolicitudDAET());
         dto.setSolicitudST(encabezado.getSolicitudST());

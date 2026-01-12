@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backendfmo.dtos.request.usuariosistema.UsuarioSistemaDTO;
 import com.backendfmo.models.usuariosistema.UsuarioSistema;
 import com.backendfmo.services.usuarioSistema.IUsuarioSistemaService;
 
@@ -43,7 +44,7 @@ public class UsuarioSistemaController {
     }
    
     @PostMapping("/crearUsuarioSistema")
-    public ResponseEntity<?> createUsuarioSistema(@Valid @RequestBody UsuarioSistema usuarioSistema) {
+    public ResponseEntity<?> createUsuarioSistema(@Valid @RequestBody UsuarioSistemaDTO usuarioSistema) {
        try {
             service.saveUsuarioSistema(usuarioSistema);
             URI location = service.createUri("/{id}", usuarioSistema);
@@ -62,9 +63,9 @@ public class UsuarioSistemaController {
         }
     }
 
-    @DeleteMapping("/usuarioSistema/borrar/{id}")
-    public ResponseEntity<?> deleteUsuarioSistemaById(@PathVariable Integer id){
-        service.deleteUsuarioSistema(id);
+    @DeleteMapping("/usuarioSistema/borrar/{username}")
+    public ResponseEntity<?> deleteUsuarioSistemaByUsername(@PathVariable String username){
+        service.deleteUsuarioSistema(username);
         return ResponseEntity.ok().build();
     }
 

@@ -216,7 +216,7 @@
             if(!confirm(`¿Está seguro de eliminar al usuario ${nombre}?`)) return;
 
             try {
-                const res = await fetch(`http://127.0.0.1:8081/api/usuarioSistema/borrar/${id}`, {
+                const res = await fetch(`http://127.0.0.1:8081/api/usuarioSistema/borrar/${nombre}`, {
                     method: 'DELETE'
                 });
 

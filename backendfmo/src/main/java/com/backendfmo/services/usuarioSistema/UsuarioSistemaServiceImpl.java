@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.backendfmo.dtos.request.usuariosistema.UsuarioSistemaDTO;
 import com.backendfmo.models.usuariosistema.UsuarioSistema;
 import com.backendfmo.repository.UsuarioSistemaRepository;
 
@@ -24,15 +26,15 @@ public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
 
     @Override
     //Guardar un usuario de sistema en la BD
-    public UsuarioSistema saveUsuarioSistema(UsuarioSistema s) {
+    public UsuarioSistema saveUsuarioSistema(UsuarioSistemaDTO s) {
         
-          return  usuarioSistemaRepository.save(s);
-       
+        UsuarioSistema usuarioSistema = mapearEntidad(s);
+        return usuarioSistemaRepository.save(usuarioSistema);
     }
 
     //URI para la creacion del usuario del sistema
     @Override
-     public URI createUri(String path, UsuarioSistema s){
+     public URI createUri(String path, UsuarioSistemaDTO s){
 
         URI location = ServletUriComponentsBuilder.
             fromCurrentRequest().
@@ -49,8 +51,18 @@ public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
         return usuarioSistemaRepository.findById(id).orElseThrow();
     }
 
-    public void deleteUsuarioSistema(Integer id){
-        usuarioSistemaRepository.deleteById(id);
+    @Transactional
+    public void deleteUsuarioSistema(String username){
+        usuarioSistemaRepository.deleteByUsername(username);
         
     }
+
+    public UsuarioSistema mapearEntidad(UsuarioSistemaDTO dto){
+        UsuarioSistema usuarioSistema = new UsuarioSistema();
+        usuarioSistema.setUsername(dto.getUsername());
+        usuarioSistema.setClave(dto.getClave());
+        usuarioSistema.setTipo(dto.getTipo());
+        return usuarioSistema;
+    }
+
 }

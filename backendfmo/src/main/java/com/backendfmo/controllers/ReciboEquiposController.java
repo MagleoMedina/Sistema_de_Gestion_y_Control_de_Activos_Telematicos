@@ -24,7 +24,6 @@ public class ReciboEquiposController {
     @Autowired
     private ReciboEquiposService service;
 
-
     @PostMapping("/crearReciboEquipos")
     public ResponseEntity<?> crearIngreso(@Valid @RequestBody RegistroTotalDTO dto) {
         ResponseEntity.ok(service.guardarUsuariosYRecibos(dto));
@@ -33,29 +32,32 @@ public class ReciboEquiposController {
 
     @GetMapping("/buscarReciboEquipos/{fmo}")
     public ResponseEntity<?> obtenerDatosPorFmo(@PathVariable String fmo) {
-        
+
         return ResponseEntity.ok(service.buscarPorFmo(fmo));
     }
 
     @GetMapping("/buscarReciboEquipos")
     public ResponseEntity<?> listarReciboDeEquipos() {
-        
+
         return ResponseEntity.ok(service.listarTodoReciboDeEquipos());
     }
 
     @GetMapping("/buscarReciboEquipos/fecha/{fecha}")
     public ResponseEntity<?> listarReciboDeEquiposPorFecha(@PathVariable String fecha) {
-        
+
         return ResponseEntity.ok(service.listarReciboDeEquiposPorFecha(fecha));
     }
 
     @GetMapping("/buscarReciboEquipos/rangoFechas/{fechaInicio}/{fechaFin}")
-    public ResponseEntity<?> listarReciboDeEquiposPorRangoFechas(@PathVariable String fechaInicio, @PathVariable String fechaFin) {
-        
+    public ResponseEntity<?> listarReciboDeEquiposPorRangoFechas(@PathVariable String fechaInicio,
+            @PathVariable String fechaFin) {
+
         return ResponseEntity.ok(service.listarReciboDeEquiposPorRangoFechas(fechaInicio, fechaFin));
     }
+
     @PatchMapping("reciboDeEquipos/{id}/estatus")
-    public ResponseEntity<BusquedaCompletaDTO> actualizarEstatus(@PathVariable Long id,@RequestBody ActualizarEstatusDTO dto) {
+    public ResponseEntity<BusquedaCompletaDTO> actualizarEstatus(@PathVariable Long id,
+            @RequestBody ActualizarEstatusDTO dto) {
         try {
             BusquedaCompletaDTO resultado = service.actualizarEstatusRecibo(id, dto.getEstatus());
             return ResponseEntity.ok(resultado);

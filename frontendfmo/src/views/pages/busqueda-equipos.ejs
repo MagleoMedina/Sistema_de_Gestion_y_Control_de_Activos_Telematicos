@@ -145,7 +145,7 @@
                                     <th>FMO / Equipo</th>
                                     <th>Fecha Ingreso</th>
                                     <th>Usuario</th>
-                                    <th>Acciones</th>
+                                    <th>Estatus</th> <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados" class="text-center">
@@ -176,6 +176,43 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-danger" onclick="generarPDFRecibo()">🖨️ Descargar PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalActualizarEstatus" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold">⚠️ Confirmar Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3" style="font-size: 3rem;">📦</div>
+                    <p class="fs-5">¿Desea marcar este equipo como <strong>ENTREGADO</strong>?</p>
+                    <p class="text-muted small">Esta acción actualizará el estatus del recibo en el sistema.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="confirmarActualizacion()">Sí, Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white" id="headerNotificacion">
+                    <h5 class="modal-title fw-bold" id="tituloNotificacion">Notificación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div id="iconoNotificacion" class="mb-3" style="font-size: 3.5rem;"></div>
+                    <p id="mensajeNotificacion" class="fs-5 fw-medium"></p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Aceptar</button>
                 </div>
             </div>
         </div>
@@ -238,20 +275,38 @@
             const tbody = document.getElementById('tablaResultados');
             tbody.innerHTML = '';
             const lista = Array.isArray(data) ? data : [data];
+            
             if (lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No hay registros.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>'; // Ajustado colspan a 6
                 return;
             }
 
             lista.forEach((item, index) => {
+                // Verificamos si ya está entregado para deshabilitar el botón visualmente (opcional)
+                const yaEntregado = (item.estatus || "").toUpperCase() === "ENTREGADO";
+                const btnClase = yaEntregado ? "btn-outline-secondary" : "btn-warning";
+                const btnTexto = yaEntregado ? "✅ Entregado" : "📦 Estatus";
+                const btnDisabled = yaEntregado ? "disabled" : "";
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="fw-bold">${index + 1}</td>
                     <td class="text-primary fw-bold">${item.fmoEquipo || "N/A"}</td>
                     <td>${item.fecha || "N/A"}</td>
                     <td>${item.usuarioNombre || "N/A"}</td>
+                    <td><span class="badge ${yaEntregado ? 'bg-success' : 'bg-secondary'}">${item.estatus || 'Pendiente'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>👁️ Ver</button>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})' title="Ver Detalles">
+                                👁️ Ver
+                            </button>
+                            <button class="btn btn-sm ${btnClase}" 
+                                onclick="abrirModalActualizar(${item.idEncabezado})" 
+                                ${btnDisabled}
+                                title="Actualizar Estatus">
+                                ${btnTexto}
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -404,6 +459,85 @@
                     <div class="col-4 cell-border"><input type="text" class="input-line text-center" readonly></div>
                 `;
                 container.appendChild(div);
+            }
+        }
+// --- HELPER PARA MOSTRAR NOTIFICACIONES ---
+        function mostrarNotificacion(titulo, mensaje, tipo) {
+            const modalEl = document.getElementById('modalNotificacion');
+            const header = document.getElementById('headerNotificacion');
+            const tituloEl = document.getElementById('tituloNotificacion');
+            const msgEl = document.getElementById('mensajeNotificacion');
+            const iconoEl = document.getElementById('iconoNotificacion');
+
+            // 1. Configurar textos
+            tituloEl.innerText = titulo;
+            msgEl.innerText = mensaje;
+
+            // 2. Configurar estilos según tipo
+            // Reseteamos clases base
+            header.className = 'modal-header text-white'; 
+            
+            if (tipo === 'exito') {
+                header.classList.add('bg-success');
+               
+            } else if (tipo === 'error') {
+                header.classList.add('bg-danger');
+            
+            } else {
+                header.classList.add('bg-primary');
+            
+            }
+
+            // 3. Mostrar
+            new bootstrap.Modal(modalEl).show();
+        }
+
+        // --- 4. ACTUALIZAR ESTATUS (Modificado) ---
+        
+        let idParaActualizar = null;
+
+        function abrirModalActualizar(idEncabezado) {
+            idParaActualizar = idEncabezado;
+            const modal = new bootstrap.Modal(document.getElementById('modalActualizarEstatus'));
+            modal.show();
+        }
+
+        async function confirmarActualizacion() {
+            if (!idParaActualizar) return;
+
+            const url = `http://127.0.0.1:8081/api/reciboDeEquipos/${idParaActualizar}/estatus`;
+            const payload = { estatus: "Entregado" };
+
+            try {
+                const res = await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Primero cerramos el modal de confirmación
+                const modalConfirm = bootstrap.Modal.getInstance(document.getElementById('modalActualizarEstatus'));
+                modalConfirm.hide();
+
+                if (res.ok) {
+                    // REEMPLAZO DE ALERT POR MODAL DE ÉXITO
+                    mostrarNotificacion("¡Operación Exitosa!", "El estatus del equipo ha sido actualizado a ENTREGADO.", "exito");
+                    
+                    // Recargar tabla
+                    buscarEquipos(); 
+                } else {
+                    // REEMPLAZO DE ALERT POR MODAL DE ERROR
+                    mostrarNotificacion("Error", "No se pudo actualizar el estatus. Intente nuevamente.", "error");
+                }
+            } catch (error) {
+                console.error(error);
+                // Cerrar modal de confirmación si sigue abierto
+                const modalConfirm = bootstrap.Modal.getInstance(document.getElementById('modalActualizarEstatus'));
+                if(modalConfirm) modalConfirm.hide();
+
+                mostrarNotificacion("Error de Conexión", "No se pudo conectar con el servidor.", "error");
+            } finally {
+                idParaActualizar = null;
             }
         }
     </script>

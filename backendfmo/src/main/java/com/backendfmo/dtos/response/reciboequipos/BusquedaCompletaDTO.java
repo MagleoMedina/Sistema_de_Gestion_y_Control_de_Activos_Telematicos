@@ -18,6 +18,7 @@ public class BusquedaCompletaDTO {
 
 
     // Datos del Encabezado
+    private Long idEncabezado;
     private String fmoEquipo;
     private String solicitudST;
     private String fecha;

@@ -287,6 +287,23 @@ public class ReciboEquiposService implements IReciboEquiposService {
         return respuestaLista;
     }
 
+    @Transactional
+    public BusquedaCompletaDTO actualizarEstatusRecibo(Long idEncabezado, String nuevoEstatus) {
+        
+        // 1. Buscar el encabezado por ID
+        EncabezadoRecibo encabezado = encabezadoRepository.findById(idEncabezado) 
+            .orElseThrow(() -> new RuntimeException("Recibo no encontrado con ID: " + idEncabezado));
+
+        // 2. Actualizar el campo
+        encabezado.setEstatus(nuevoEstatus);
+
+        // 3. Guardar cambios
+        EncabezadoRecibo actualizado = encabezadoRepository.save(encabezado);
+
+        // 4. Retornar el DTO completo actualizado (reusando tu método privado existente)
+        return convertirEntidadADTO(actualizado);
+    }
+
     private BusquedaCompletaDTO convertirEntidadADTO(EncabezadoRecibo encabezado) {
         BusquedaCompletaDTO dto = new BusquedaCompletaDTO();
 
@@ -301,6 +318,7 @@ public class ReciboEquiposService implements IReciboEquiposService {
         }
 
         // --- Mapeo Encabezado (Padre) ---
+        dto.setIdEncabezado(encabezado.getId());
         dto.setFmoEquipo(encabezado.getFmoEquipo());
         dto.setSolicitudST(encabezado.getSolicitudST());
         dto.setFecha(encabezado.getFecha());

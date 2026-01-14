@@ -19,7 +19,7 @@ import com.backendfmo.repository.PerifericoRepository;
 import com.backendfmo.repository.UsuarioRepository;
 
 @Service
-public class ReciboEquiposService implements IReciboEquiposService {
+public class ReciboDeEquiposServiceImpl{
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -36,7 +36,6 @@ public class ReciboEquiposService implements IReciboEquiposService {
     @Autowired
     private PerifericoRepository perifericoRepository;
 
-    @Override
     @Transactional
     public Usuario guardarUsuariosYRecibos(RegistroTotalDTO dto) {
         // ... (Creación de Usuario) ...
@@ -227,7 +226,9 @@ public class ReciboEquiposService implements IReciboEquiposService {
         
         // 1. Buscamos todos
         List<EncabezadoRecibo> todos = encabezadoRepository.findAll();
-        
+        if (todos.isEmpty()) {
+            throw new RuntimeException("No se encontró ningún recibo");
+        }
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
         // 2. Reutilizamos la lógica de conversión
@@ -243,7 +244,9 @@ public class ReciboEquiposService implements IReciboEquiposService {
         
         // 1. Buscamos todos
         List<EncabezadoRecibo> todos = encabezadoRepository.findByFecha(fecha);
-        
+        if(todos.isEmpty()){
+             throw new RuntimeException("No se encontró ningún recibo con fecha " + fecha);
+        }
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
         // 2. Reutilizamos la lógica de conversión
@@ -260,6 +263,9 @@ public class ReciboEquiposService implements IReciboEquiposService {
         // 1. Buscamos todos
         List<EncabezadoRecibo> todos = encabezadoRepository.findByFechaBetween(fechaInicio, fechaFin);
         
+        if(todos.isEmpty()){
+             throw new RuntimeException("No se encontró ningún recibo con rango de fecha " + fechaInicio + " "+ fechaFin);
+        }
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
         // 2. Reutilizamos la lógica de conversión

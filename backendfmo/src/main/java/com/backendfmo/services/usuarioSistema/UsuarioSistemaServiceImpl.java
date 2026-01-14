@@ -27,6 +27,9 @@ public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
     @Override
     //Guardar un usuario de sistema en la BD
     public UsuarioSistema saveUsuarioSistema(UsuarioSistemaDTO s) {
+        if(usuarioSistemaRepository.existsByUsername(s.getUsername())) {
+            throw new IllegalArgumentException("El usuario " + s.getUsername() + " ya existe");
+        }
         
         UsuarioSistema usuarioSistema = mapearEntidad(s);
         return usuarioSistemaRepository.save(usuarioSistema);
@@ -53,6 +56,9 @@ public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
 
     @Transactional
     public void deleteUsuarioSistema(String username){
+        if(!usuarioSistemaRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("El usuario " + username + " no existe");
+        }
         usuarioSistemaRepository.deleteByUsername(username);
         
     }

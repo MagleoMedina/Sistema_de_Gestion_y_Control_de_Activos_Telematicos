@@ -8,12 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backendfmo.dtos.request.reciboperifericos.ComponenteItemDTO;
-import com.backendfmo.dtos.request.reciboperifericos.RegistroPerifericosDTO;
-import com.backendfmo.dtos.response.reciboperifericos.ComponenteItemResponseDTO;
-import com.backendfmo.dtos.response.reciboperifericos.PerifericoResponseDTO;
-import com.backendfmo.dtos.request.reciboperifericos.PerifericoDTO;
-import com.backendfmo.dtos.response.reciboperifericos.ReciboPerifericosDTO;
+import com.backendfmo.dtos.request.reciboperifericos.*;
+import com.backendfmo.dtos.response.reciboperifericos.*;
 import com.backendfmo.models.perifericos.Periferico;
 import com.backendfmo.models.perifericos.ReciboDePerifericos;
 import com.backendfmo.models.reciboequipos.ComponenteInterno;

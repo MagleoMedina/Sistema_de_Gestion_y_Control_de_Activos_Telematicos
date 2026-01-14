@@ -8,11 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backendfmo.dtos.request.entregasdaet.ComponenteDaetDTO;
-import com.backendfmo.dtos.request.entregasdaet.EntregaItemDTO;
-import com.backendfmo.dtos.request.entregasdaet.RegistroDaetDTO;
-import com.backendfmo.dtos.response.entregasdaet.BusquedaDaetDTO;
-import com.backendfmo.dtos.response.entregasdaet.ComponenteInternoResumenDTO;
+import com.backendfmo.dtos.request.entregasdaet.*;
+import com.backendfmo.dtos.response.entregasdaet.*;
 import com.backendfmo.models.daet.ComponenteInternoCpuDaet;
 import com.backendfmo.models.daet.EntregasAlDAET;
 import com.backendfmo.models.perifericos.Periferico;

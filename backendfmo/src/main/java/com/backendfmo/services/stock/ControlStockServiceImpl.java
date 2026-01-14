@@ -6,8 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backendfmo.dtos.request.stock.StockCreateDTO;
-import com.backendfmo.dtos.request.stock.StockDTO;
+import com.backendfmo.dtos.request.stock.*;
 import com.backendfmo.models.perifericos.Periferico;
 import com.backendfmo.models.reciboequipos.ComponenteInterno;
 import com.backendfmo.models.stock.ControlStock;

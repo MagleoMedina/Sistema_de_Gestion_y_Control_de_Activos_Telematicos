@@ -28,6 +28,9 @@ public class ControlStockServiceImpl {
 
     // --- 1. LISTAR TODO EL STOCK ---
     public List<StockDTO> listarStock() {
+        if (stockRepo.count() == 0) {
+            throw new RuntimeException("No hay items en el stock");
+        }
         return stockRepo.findAll().stream().map(this::convertirADTO).collect(Collectors.toList());
     }
 

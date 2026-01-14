@@ -66,6 +66,10 @@ public class UsuarioSistemaController {
     @GetMapping("/usuarioSistema/{id}")
     public ResponseEntity<?> findUsuarioSistemaById(@Valid @PathVariable Integer id) {
         try {
+            boolean exist = usuarioServicRepository.existsById(id);
+            if(!exist){
+                return ResponseEntity.status(204).body("No se encontro el id " + id);
+            }
             return ResponseEntity.status(202).body(service.findUsuarioSistemaById(id));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());
@@ -77,7 +81,7 @@ public class UsuarioSistemaController {
         try {
             boolean eliminado = usuarioServicRepository.existsByUsername(username);
             if (!eliminado) {
-                return ResponseEntity.status(404).body("El usuario " + username + " no existe");
+                return ResponseEntity.status(204).body("El usuario " + username + " no existe");
             }
             service.deleteUsuarioSistema(username);
             return ResponseEntity.status(202).body("Usuario " + username + " eliminado correctamente");

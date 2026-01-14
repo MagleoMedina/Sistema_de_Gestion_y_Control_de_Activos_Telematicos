@@ -10,13 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.usuariosistema.UsuarioSistemaDTO;
-import com.backendfmo.repository.UsuarioRepository;
 import com.backendfmo.repository.UsuarioSistemaRepository;
-import com.backendfmo.services.usuarioSistema.IUsuarioSistemaService;
+import com.backendfmo.services.usuarioSistema.UsuarioSistemaServiceImpl;
 
 import jakarta.validation.Valid;
 
@@ -25,7 +23,7 @@ import jakarta.validation.Valid;
 public class UsuarioSistemaController {
 
     @Autowired
-    private IUsuarioSistemaService service;
+    private UsuarioSistemaServiceImpl service;
 
     @Autowired
     private UsuarioSistemaRepository usuarioServicRepository;
@@ -75,7 +73,7 @@ public class UsuarioSistemaController {
     }
 
     @DeleteMapping("/usuarioSistema/borrar/{username}")
-    public ResponseEntity<?> deleteUsuarioSistemaByUsername(@PathVariable String username) {
+    public ResponseEntity<?> deleteUsuarioSistemaByUsername(@Valid @PathVariable String username) {
         try {
             boolean eliminado = usuarioServicRepository.existsByUsername(username);
             if (!eliminado) {

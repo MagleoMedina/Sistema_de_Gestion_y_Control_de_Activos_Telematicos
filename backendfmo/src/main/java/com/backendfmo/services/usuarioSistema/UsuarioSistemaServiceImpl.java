@@ -13,18 +13,20 @@ import com.backendfmo.models.usuariosistema.UsuarioSistema;
 import com.backendfmo.repository.UsuarioSistemaRepository;
 
 @Service
-public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
+public class UsuarioSistemaServiceImpl{
 
     @Autowired
     private UsuarioSistemaRepository usuarioSistemaRepository;
 
-    @Override
+
     //Obtener todos los usuarios del sistema para el logeo
     public List<UsuarioSistema> getAllUsuarioSistema() {
+        if(usuarioSistemaRepository.count() == 0) {
+            throw new IllegalStateException("No hay usuarios de sistema registrados");
+        }
         return usuarioSistemaRepository.findAll();
     }
 
-    @Override
     //Guardar un usuario de sistema en la BD
     public UsuarioSistema saveUsuarioSistema(UsuarioSistemaDTO s) {
         if(usuarioSistemaRepository.existsByUsername(s.getUsername())) {
@@ -36,7 +38,7 @@ public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
     }
 
     //URI para la creacion del usuario del sistema
-    @Override
+
      public URI createUri(String path, UsuarioSistemaDTO s){
 
         URI location = ServletUriComponentsBuilder.
@@ -48,9 +50,11 @@ public class UsuarioSistemaServiceImpl implements IUsuarioSistemaService {
         return location;
     }
 
-    @Override
+
     public UsuarioSistema findUsuarioSistemaById(Integer id){
-       
+       if (!usuarioSistemaRepository.existsById(id)) {
+            throw new IllegalArgumentException("El usuario con id " + id + " no existe");
+        }
         return usuarioSistemaRepository.findById(id).orElseThrow();
     }
 

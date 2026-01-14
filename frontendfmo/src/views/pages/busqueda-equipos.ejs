@@ -189,7 +189,7 @@
                 </div>
                 <div class="modal-body text-center p-4">
                     <div class="mb-3" style="font-size: 3rem;">📦</div>
-                    <p class="fs-5">¿Desea marcar este equipo como <strong>ENTREGADO</strong>?</p>
+                    <p class="fs-5">¿Desea marcar este equipo como <strong>LISTO</strong>?</p>
                     <p class="text-muted small">Esta acción actualizará el estatus del recibo en el sistema.</p>
                 </div>
                 <div class="modal-footer justify-content-center">
@@ -283,9 +283,9 @@
 
             lista.forEach((item, index) => {
                 // Verificamos si ya está entregado para deshabilitar el botón visualmente (opcional)
-                const yaEntregado = (item.estatus || "").toUpperCase() === "ENTREGADO";
+                const yaEntregado = (item.estatus || "").toUpperCase() === "LISTO";
                 const btnClase = yaEntregado ? "btn-outline-secondary" : "btn-warning";
-                const btnTexto = yaEntregado ? "✅ Entregado" : "📦 Estatus";
+                const btnTexto = yaEntregado ? "✅ Listo" : "📦 Estatus";
                 const btnDisabled = yaEntregado ? "disabled" : "";
 
                 const tr = document.createElement('tr');
@@ -506,7 +506,7 @@
             if (!idParaActualizar) return;
 
             const url = `http://127.0.0.1:8081/api/reciboDeEquipos/${idParaActualizar}/estatus`;
-            const payload = { estatus: "Entregado" };
+            const payload = { estatus: "Listo" };
 
             try {
                 const res = await fetch(url, {
@@ -521,7 +521,7 @@
 
                 if (res.ok) {
                     // REEMPLAZO DE ALERT POR MODAL DE ÉXITO
-                    mostrarNotificacion("¡Operación Exitosa!", "El estatus del equipo ha sido actualizado a ENTREGADO.", "exito");
+                    mostrarNotificacion("¡Operación Exitosa!", "El estatus del equipo ha sido actualizado a LISTO.", "exito");
                     
                     // Recargar tabla
                     buscarEquipos(); 

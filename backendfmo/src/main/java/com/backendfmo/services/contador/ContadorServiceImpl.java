@@ -3,7 +3,6 @@ package com.backendfmo.services.contador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.backendfmo.repository.EncabezadoReciboRepository;
 import com.backendfmo.repository.EntregasAlDAETRepository;
 import com.backendfmo.repository.ReciboDeEquiposRepository;
 import com.backendfmo.repository.ReciboDePerifericosRepository;

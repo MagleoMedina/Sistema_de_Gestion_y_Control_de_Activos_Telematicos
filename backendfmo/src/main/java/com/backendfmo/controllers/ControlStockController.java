@@ -1,6 +1,5 @@
 package com.backendfmo.controllers;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -40,14 +39,16 @@ public class ControlStockController {
     public ResponseEntity<?> listarStock() {
         try {
             return ResponseEntity.status(202).body(stockService.listarStock());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
-           return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 
     // POST /api/stock -> Crea un nuevo registro
     @PostMapping
-    public ResponseEntity<ControlStock> crearStock(@Valid @RequestBody StockCreateDTO dto) {
+    public ResponseEntity<?> crearStock(@Valid @RequestBody StockCreateDTO dto) {
         try {
             return ResponseEntity.status(201).body(stockService.guardarNuevo(dto));
         } catch (RuntimeException e) {
@@ -57,32 +58,38 @@ public class ControlStockController {
 
     // POST /api/stock/{id}/ajustar?cantidad=1 (o -1)
     @PostMapping("/{id}/ajustar")
-    public ResponseEntity<ControlStock> ajustarStock(@Valid @PathVariable Long id,@Valid @RequestParam Integer cantidad) {
+    public ResponseEntity<?> ajustarStock(@Valid @PathVariable Long id, @Valid @RequestParam Integer cantidad) {
         try {
             return ResponseEntity.status(202).body(stockService.ajustarCantidad(id, cantidad));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
-        }
-    }
-    @GetMapping("/componentes")
-    public ResponseEntity<?> listarComponentes(){
-        try {
-            return ResponseEntity.status(202).body(componenteRepository.findAll());
         } catch (Exception e) {
-            // TODO: handle exception
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
-         
     }
 
-     @GetMapping("/perifericos")
-     public ResponseEntity<?> listarPerifericos(){
+    @GetMapping("/componentes")
+    public ResponseEntity<?> listarComponentes() {
+        try {
+            return ResponseEntity.status(202).body(componenteRepository.findAll());
+        } catch (RuntimeException e) {
+            // TODO: handle exception
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
+
+    @GetMapping("/perifericos")
+    public ResponseEntity<?> listarPerifericos() {
         try {
             return ResponseEntity.status(202).body(perifericoRepository.findAll());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
         } catch (Exception e) {
-            // TODO: handle exception
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
-        
+
     }
 }

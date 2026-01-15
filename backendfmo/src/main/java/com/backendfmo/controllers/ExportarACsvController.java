@@ -1,5 +1,7 @@
 package com.backendfmo.controllers;
 
+import java.net.http.HttpResponse.ResponseInfo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.services.CsvServiceImpl;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @CrossOrigin("*")
@@ -23,9 +27,13 @@ public class ExportarACsvController {
     private CsvServiceImpl service;
 
     @GetMapping("/exportarCsvJson/{inicio}/{fin}")
-    public ResponseEntity<?> exportarACsv(@PathVariable String inicio, @PathVariable String fin){
-
-        return ResponseEntity.ok(service.obtenerDatosParaCsv(inicio, fin));
+    public ResponseEntity<?> exportarACsv(@Valid @PathVariable String inicio, @Valid @PathVariable String fin){
+        try {
+            return ResponseEntity.status(202).body(service.obtenerDatosParaCsv(inicio, fin));
+        } catch (Exception e) {
+        return ResponseEntity.internalServerError().build();
+        }
+        
     }
 
 @GetMapping("/exportarCsv/{inicio}/{fin}")

@@ -67,7 +67,7 @@ public class UsuarioSistemaController {
         try {
             boolean exist = usuarioServicRepository.existsById(id);
             if(!exist){
-                return ResponseEntity.status(204).body("No se encontro el id " + id);
+                return ResponseEntity.status(404).body("No se encontro el id " + id);
             }
             return ResponseEntity.status(202).body(service.findUsuarioSistemaById(id));
         } catch (Exception e) {

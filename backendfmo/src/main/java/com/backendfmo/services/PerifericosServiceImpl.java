@@ -21,7 +21,7 @@ import com.backendfmo.repository.ReciboDePerifericosRepository;
 import com.backendfmo.repository.UsuarioRepository;
 
 @Service
-public class PerifericosService {
+public class PerifericosServiceImpl {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -139,7 +139,8 @@ public class PerifericosService {
             .collect(Collectors.toList());
     }
 
-        public List<ReciboPerifericosDTO> buscarPorFecha(String fecha) {
+@Transactional(readOnly = true)
+    public List<ReciboPerifericosDTO> buscarPorFecha(String fecha) {
         
         // 1. Buscar TODOS los registros que coincidan con el serial
         List<ReciboDePerifericos> resultados = perifericoRepository.findByFechaEncabezado(fecha);
@@ -170,7 +171,7 @@ public class PerifericosService {
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+@Transactional(readOnly = true)
     public List<ReciboPerifericosDTO> listarPorRangoDeFechas(String fechaInicio, String fechaFinalizacion){
         
         // 1. Buscar TODOS los registros que coincidan con el serial

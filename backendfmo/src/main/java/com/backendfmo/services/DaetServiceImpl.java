@@ -23,7 +23,7 @@ import com.backendfmo.repository.UsuarioRepository;
 
 
 @Service
-public class DaetService {
+public class DaetServiceImpl {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -100,6 +100,9 @@ public List<BusquedaDaetDTO> listarTodoDAET() {
     // 1. Buscar TODOS en la BD
     List<EntregasAlDAET> todasLasEntregas = entregasRepository.findAll();
 
+    if(todasLasEntregas.isEmpty()) {
+        throw new RuntimeException("No se encontraron registros de entregas al DAET.");
+    }
     // 2. Preparar lista de respuesta
     List<BusquedaDaetDTO> respuesta = new ArrayList<>();
 
@@ -169,8 +172,7 @@ public List<BusquedaDaetDTO> buscarPorSerialDaet(String serial) {
         return respuesta;
     }
 
-    @Transactional(readOnly = true  )
-
+ @Transactional(readOnly = true  )
     public List<BusquedaDaetDTO> listarPorRangoDeFechas(String fechaInicio, String fechaFin) {
         
         // 1. Buscar en BD usando el repositorio

@@ -24,6 +24,18 @@ public class CsvServiceImpl {
  public List<CsvDTO> obtenerDatosParaCsv(String inicio, String fin) {
         // 1. Buscar registros en la BD
         List<EncabezadoRecibo> recibos = encabezadoRepository.findByFechaBetween(inicio, fin);
+        if(recibos.isEmpty()){
+            throw new RuntimeException("No se encontraron registros en el rango de fechas proporcionado.");
+        
+        }else if(inicio == null || fin == null){
+            throw new RuntimeException("Las fechas de inicio y fin no pueden ser nulas.");
+      
+        }else if(inicio.isEmpty() || fin.isEmpty()){
+            throw new RuntimeException("Las fechas de inicio y fin no pueden estar vacías.");
+        
+        }else if (inicio.compareTo(fin) > 0){
+            throw new RuntimeException("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        }
         
         // 2. Mapear a DTO
         return recibos.stream().map(this::convertirADTO).collect(Collectors.toList());

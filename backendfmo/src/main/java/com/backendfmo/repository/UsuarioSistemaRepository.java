@@ -1,5 +1,7 @@
 package com.backendfmo.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +12,5 @@ public interface UsuarioSistemaRepository extends JpaRepository<UsuarioSistema, 
 
     void deleteByUsername(String username);
     boolean existsByUsername(String username);
+    Optional<UsuarioSistema> findByUsername(String username);
 }

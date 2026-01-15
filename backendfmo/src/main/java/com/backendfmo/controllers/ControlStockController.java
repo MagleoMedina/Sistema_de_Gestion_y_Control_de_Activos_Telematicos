@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backendfmo.dtos.request.stock.StockCreateDTO;
-import com.backendfmo.models.stock.ControlStock;
 
 import jakarta.validation.Valid;
 

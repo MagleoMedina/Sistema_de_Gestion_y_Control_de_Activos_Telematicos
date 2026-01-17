@@ -129,9 +129,9 @@
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
 
-    <script src="/js/html2pdf.bundle.min.js"></script>
+    <script src="/js/utils/html2pdf.bundle.min.js"></script>
 
-    <script src="/js/pdf.js"></script>
+    <script src="/js/utils/pdf.js"></script>
 
 <script>
     // --- 1. LÓGICA DE FILTROS ---
@@ -171,6 +171,10 @@
 
         try {
             const response = await fetch(url);
+            if(response.status === 404) {
+                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
+                return;
+            }
             if(!response.ok) throw new Error("Error de servidor.");
             const data = await response.json();
             renderizarTabla(data);

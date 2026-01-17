@@ -3,73 +3,6 @@
 <head>
     <%- include('../partials/head') %>
     <title><%= title %></title>
-    <style>
-        /* --- ESTILOS COMPACTOS --- */
-        .paper-form {
-            background-color: #fff;
-            border: 2px solid #000;
-            color: #000;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px; /* Fuente más pequeña para todo el form */
-            max-width: 900px; /* Evita que se estire demasiado en monitores grandes */
-            margin: 0 auto; /* Centrar */
-        }
-        
-        /* Celdas con bordes negros y poco relleno */
-        .cell-border {
-            border: 1px solid #000;
-            padding: 2px 5px; /* Arriba/Abajo 2px, Lados 5px -> MUCHO MÁS COMPACTO */
-            display: flex; /* Ayuda a alinear verticalmente label e input */
-            align-items: center; /* Centrar verticalmente */
-        }
-
-        /* Bloques que no son flex (para los checkboxes en grid) */
-        .cell-block {
-            display: block;
-        }
-
-        /* Inputs invisibles más delgados */
-        .input-line {
-            border: none;
-            
-            background: transparent;
-            width: 100%;
-            font-weight: bold;
-            color: #000080;
-            height: 20px; /* Altura forzada pequeña */
-            font-size: 13px;
-            padding: 0 5px;
-        }
-        .input-line:focus {
-            outline: none;
-        }
-
-        /* Etiquetas */
-        .label-text {
-            font-weight: bold;
-            font-size: 0.75rem; /* Letra pequeña */
-            text-transform: uppercase;
-            white-space: nowrap; /* Evita que el texto salte de línea si es posible */
-        }
-
-        /* Ajuste de Checkboxes para que no ocupen tanto espacio vertical */
-        .form-check {
-            min-height: auto;
-            margin-bottom: 0; /* Sin margen inferior */
-            margin-right: 10px;
-        }
-        .form-check-input {
-            border: 1px solid #000;
-            width: 13px;
-            height: 13px;
-            margin-top: 3px;
-        }
-        
-        /* Utilidad para filas sin separación */
-        .row-compact {
-            --bs-gutter-x: 0; /* Quita espacio horizontal entre columnas */
-        }
-    </style>
 </head>
 <body>
 
@@ -145,9 +78,8 @@
                             <input type="text" class="input-line ms-2" id="gerencia">
 
                         
-                         </div>
+                        </div>
                     </div>
-
                     <div class="row row-compact">
                         <div class="col-md-6 cell-border">
                             <span class="label-text me-2">SOLIC. DAET:</span>
@@ -158,7 +90,6 @@
                             <input type="text" class="input-line" id="solicitudST">
                         </div>
                     </div>
-
                     <div class="row row-compact">
                         <div class="col-md-4 cell-border cell-block">
                             <span class="label-text">CPU FMO:</span>
@@ -337,9 +268,13 @@
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     
-    <script src="/js/api.js"></script> 
+    <script src="/js/utils/api.js"></script> 
     
 <script>
+        //fecha por defecto
+        const fechaInput = document.getElementById('fecha');
+        if(fechaInput) fechaInput.valueAsDate = new Date();
+        
         // --- LÓGICA DE TAGS (BURBUJAS) ---
         
         // 1. Arrays globales para almacenar los datos

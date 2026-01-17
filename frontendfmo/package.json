@@ -5,7 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder --linux --win"
   },
   "keywords": [],
   "author": "Tu Nombre <tuemail@ejemplo.com>",
@@ -23,7 +23,7 @@
       "package.json"
     ],
     "win": {
-      "target": "nsis",
+      "target": "nsis", 
       "icon": "build/icon.ico"
     },
     "linux": {
@@ -31,7 +31,12 @@
       "target": [
         "AppImage"
       ],
-      "category": "Development"
+      "category": "Development",
+      "description": "Aplicación de Gestión FMO",
+      "desktop": {
+        "Name": "FrontendFMO",
+        "Type": "Application"
+      }
     }
   },
   "dependencies": {

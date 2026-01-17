@@ -20,17 +20,17 @@ app.get('/dashboard', (req, res) => {
 
 // 2. Pantalla para ingresar Equipos (El formulario complejo)
 app.get('/ingreso-equipos', (req, res) => {
-    res.render('pages/ingreso-equipos', { title: 'Registro de Equipos' });
+    res.render('pages/recibo-equipos', { title: 'Recibo de Equipos' });
 });
 
 // 3. Pantalla para Periféricos sueltos
 app.get('/perifericos', (req, res) => {
-    res.render('pages/perifericos', { title: 'Gestión Periféricos' });
+    res.render('pages/recibo-perifericos', { title: 'Recibo de Periféricos' });
 });
 
 // 4. Pantalla para Entregas DAET
 app.get('/daet', (req, res) => {
-    res.render('pages/daet', { title: 'Entregas DAET' });
+    res.render('pages/recibo-daet', { title: 'Entregas DAET' });
 });
 
 // 5. Pantalla de Búsquedas (Trazabilidad)

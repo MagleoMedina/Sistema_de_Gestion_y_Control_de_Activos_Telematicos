@@ -3,56 +3,16 @@
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda Periféricos</title>
-    <style>
-        /* --- ESTILOS COMPACTOS (Paper Form) --- */
-        .paper-form {
-            background-color: #fff;
-            border: 2px solid #000;
-            color: #000;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        
-        .cell-border {
-            border: 1px solid #000;
-            padding: 2px 5px;
-            display: flex;
-            align-items: center;
-        }
-        .input-line {
-            border: none;
-            background: transparent;
-            width: 100%;
-            font-weight: bold;
-            color: #000080;
-            height: 20px;
-            font-size: 13px;
-            padding: 0 5px;
-        }
-        .input-line:focus { outline: none; }
-        .label-text {
-            font-weight: bold;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-        .form-check { margin-bottom: 0; margin-right: 10px; display: flex; align-items: center;}
-        .form-check-input { border: 1px solid #000; width: 14px; height: 14px; margin-top: 0; margin-right: 5px; border-radius: 0;}
-        .row-compact { --bs-gutter-x: 0; }
-    </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
-        <div id="content" class="w-100 bg-light p-4">
+        <div id="content" class="w-100 bg-light p-4 fade-in">
             
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
                 <h5 class="m-0 fw-bold">⌨️ Historial de Periféricos</h5>
             </div>
-
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     
@@ -65,25 +25,20 @@
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
-
                         <div class="col-md-7" id="containerInputSerial" style="display: none;">
                             <label class="form-label small fw-bold">Ingrese Serial o FMO:</label>
                             <input type="text" class="form-control" id="inputBusquedaSerial" placeholder="Ej: 452 o S/N...">
                         </div>
-
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">
                             <label class="form-label small fw-bold">Seleccione Fecha:</label>
                             <input type="date" class="form-control" id="inputBusquedaFecha">
                         </div>
-
                         <div class="col-md-7" id="containerVacio"></div>
-
                         <div class="col-md-2 text-end">
                             <label class="form-label d-block">&nbsp;</label>
                             <button class="btn btn-primary w-100" onclick="buscarPerifericos()">🔍 Buscar</button>
                         </div>
                     </div>
-
                     <div class="table-responsive table-scroll-wrapper">
                         <table class="table table-hover table-bordered align-middle">
                             <thead class="table-light text-center">
@@ -101,12 +56,10 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="modalVerPeriferico" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

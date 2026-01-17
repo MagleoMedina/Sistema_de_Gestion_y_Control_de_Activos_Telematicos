@@ -11,7 +11,6 @@ import com.backendfmo.dtos.request.reciboequipos.*;
 import com.backendfmo.dtos.response.reciboequipos.*;
 import com.backendfmo.models.perifericos.Periferico;
 import com.backendfmo.models.reciboequipos.*;
-import com.backendfmo.models.reciboequipos.Usuario;
 import com.backendfmo.repository.AplicacionesRepository;
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.EncabezadoReciboRepository;
@@ -37,7 +36,7 @@ public class ReciboDeEquiposServiceImpl{
     private PerifericoRepository perifericoRepository;
 
     @Transactional
-    public Usuario guardarUsuariosYRecibos(RegistroTotalDTO dto) {
+    public List<BusquedaCompletaDTO> guardarUsuariosYRecibos(RegistroTotalDTO dto) {
         // ... (Creación de Usuario) ...
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setUsuario(dto.getUsuario());
@@ -194,7 +193,18 @@ public class ReciboDeEquiposServiceImpl{
                 nuevoUsuario.agregarRecibo(encabezado);
             }
         }
-        return usuarioRepository.save(nuevoUsuario);
+        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
+
+        // --- 2. CAMBIO: CONVERSIÓN FINAL A DTO ---
+        // En lugar de devolver 'usuarioGuardado', convertimos la respuesta a DTOs planos
+        List<BusquedaCompletaDTO> respuesta = new ArrayList<>();
+        
+        if (usuarioGuardado.getRecibos() != null) {
+            for (EncabezadoRecibo recibo : usuarioGuardado.getRecibos()) {
+                respuesta.add(convertirEntidadADTO(recibo));
+            }
+        }
+        return respuesta;
     }
 
 
@@ -245,7 +255,7 @@ public class ReciboDeEquiposServiceImpl{
         // 1. Buscamos todos
         List<EncabezadoRecibo> todos = encabezadoRepository.findByFecha(fecha);
         if(todos.isEmpty()){
-             throw new RuntimeException("No se encontró ningún recibo con fecha " + fecha);
+            throw new RuntimeException("No se encontró ningún recibo con fecha " + fecha);
         }
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
@@ -264,7 +274,7 @@ public class ReciboDeEquiposServiceImpl{
         List<EncabezadoRecibo> todos = encabezadoRepository.findByFechaBetween(fechaInicio, fechaFin);
         
         if(todos.isEmpty()){
-             throw new RuntimeException("No se encontró ningún recibo con rango de fecha " + fechaInicio + " "+ fechaFin);
+            throw new RuntimeException("No se encontró ningún recibo con rango de fecha " + fechaInicio + " "+ fechaFin);
         }
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 

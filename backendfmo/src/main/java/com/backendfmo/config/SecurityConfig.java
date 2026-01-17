@@ -31,7 +31,8 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/crearUsuarioSistema", "/status").permitAll()
+                //.requestMatchers("/auth/login", "/crearUsuarioSistema", "/status").permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess

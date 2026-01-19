@@ -3,41 +3,99 @@
 <head>
     <%- include('../partials/head') %>
     <title>Exportar Reportes</title>
-    <style>
-        /* Estilos necesarios para los formularios (copiados de tus vistas anteriores) */
-        .paper-form { background: #fff; border: 2px solid #000; font-family: 'Courier New'; max-width: 800px; margin: 0 auto; }
-        .cell-border { border: 1px solid #000; padding: 2px 5px; display: flex; align-items: center; }
-        .input-line { border: none; width: 100%; font-weight: bold; color: #000080; }
-        .label-text { font-weight: bold; font-size: 0.75rem; }
-        /* ... Asegúrate de tener todos los estilos base aquí o en un CSS global ... */
+<style>
+    /* --- 1. ESTILOS ORIGINALES (Tus estilos de siempre) --- */
+        .paper-form {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            width: 85%;
+            margin: 0 auto;
+            height: 70%;
+        }
+    
 
-        /* Estilos del contenedor de Templates (OCULTO A LA VISTA) */
-        #templates-container {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-            visibility: hidden;
+        .cell-border {
+            border: 1px solid #000;
+            padding: 2px 5px;
+            display: flex;
+            align-items: center;
         }
 
-        /* Estilo para el contenedor de impresión (lo que se convertirá en PDF) */
-        #print-staging-area {
-            background: white;
-            padding: 20px;
+    .cell-block { display: block; }
+
+        .input-line {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-weight: bold;
+            color: #000080;
+            height: 20px;
+            font-size: 13px;
+            padding: 0 5px;
         }
-        
-        /* Salto de página para el PDF */
-        .page-break {
-            page-break-after: always;
-            margin-bottom: 20px;
-            display: block;
-            border-bottom: 2px dashed #ccc; /* Visual en staging */
+    .input-line:focus { outline: none; }
+
+    .label-text {
+        font-weight: bold;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .form-check {
+        min-height: auto;
+        margin-bottom: 0;
+        margin-right: 10px;
         }
-    </style>
+    .form-check-input { 
+        border: 1px solid #000 !important; /* Forzar borde en checkbox */
+        width: 13px; 
+        height: 13px; 
+        margin-top: 3px; 
+        appearance: auto; /* Ayuda a que html2canvas lo renderice mejor */
+    }
+    
+    .row-compact { --bs-gutter-x: 0; }
+    
+    .tag-badge {
+        background-color: #000080;
+        color: white;
+        padding: 1px 3px;
+        border-radius: 4px;
+        margin-right: 4px;
+        font-size: 10px;
+    }
+
+    /* --- 2. CONFIGURACIÓN TÉCNICA PARA LA EXPORTACIÓN --- */
+    
+    /* Contenedor de Templates (OCULTO) */
+    #templates-container { display: none; }
+
+    /* Estilo para el contenedor de impresión */
+    #print-staging-area {
+        background: white;
+        width: 816px; /* Ancho exacto Carta */
+        margin: 0 auto;
+    }
+    
+    /* Salto de página */
+    .html2pdf__page-break {
+        height: 20px;
+        background: white;
+        display: block;
+    }
+
+    /* Ocultar botones dentro del PDF por si acaso */
+    .paper-form button, .paper-form .btn { display: none !important; }
+</style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
-        <div id="content" class="w-100 bg-light p-4">
+        <div id="content" class="w-100 bg-light p-4 fade-in">
             
             <h4 class="mb-4 fw-bold">📤 Exportación Masiva de Registros</h4>
 
@@ -85,29 +143,18 @@
         </div>
     </div>
 
-    <div id="templates-container">
-        
-        <div id="template-equipos-wrapper">
-            <%- include('../partials/forms/template-equipos') %>
-        </div>
+<div id="templates-container" style="display:none;">
+    <div id="template-equipos-wrapper"><%- include('../partials/forms/template-equipos') %></div>
+    <div id="template-perifericos-wrapper"><%- include('../partials/forms/template-perifericos') %></div>
+    <div id="template-daet-wrapper"><%- include('../partials/forms/template-daet') %></div>
+</div>
 
-        <div id="template-perifericos-wrapper">
-            <%- include('../partials/forms/template-perifericos') %>
-        </div>
-
-        <div id="template-daet-wrapper">
-            <%- include('../partials/forms/template-daet') %>
-        </div>
-
-    </div>
-
-    <div id="print-staging-area" style="display:none;"></div>
-
-    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="/js/html2pdf.bundle.min.js"></script>
-    
-    <script src="/js/mappings.js"></script> 
-    <script src="/js/pdf.js"></script>
+<script src="/js/utils/jspdf.umd.min.js"></script>
+<script src="/js/utils/html2canvas.min.js"></script>
+<script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="/js/utils/html2pdf.bundle.min.js"></script>
+<script src="/js/utils/mappings.js"></script> 
+<script src="/js/utils/pdf.js"></script>
 
     <script>
         function toggleFormato() {
@@ -128,19 +175,16 @@
                 // 1. Fetch a tu API de rango (Ajusta tus rutas)
                 // Ej: /api/recibo-equipos/rango?inicio=...&fin=...
                 let url = '';
-                if(tipo === 'equipos') url = `/api/buscarReciboEquipos/rango?inicio=${inicio}&fin=${fin}`;
-                else if(tipo === 'perifericos') url = `/api/buscarReciboPerifericos/rango?inicio=${inicio}&fin=${fin}`;
-                else if(tipo === 'daet') url = `/api/buscarEntregasAlDaet/rango?inicio=${inicio}&fin=${fin}`;
+                if(tipo === 'equipos') url = `http://127.0.0.1:8081/api/buscarReciboEquipos/rangoFechas/${inicio}/${fin}`;
+                else if(tipo === 'perifericos') url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/rangoFechas/${inicio}/${fin}`;
+                else if(tipo === 'daet') url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/rangoFechas/${inicio}/${fin}`;
 
                 try {
                     document.getElementById('statusArea').innerHTML = '<div class="alert alert-info">Cargando datos...</div>';
                     
-                    // const res = await fetch(url); 
-                    // const data = await res.json();
-                    
-                    // --- DATA MOCK (PARA PROBAR SIN BACKEND AÚN) ---
-                    // Borrar esto cuando tengas el endpoint
-                    const data = []; // Aquí vendría tu array de objetos
+                    const res = await fetch(url); 
+                    const data = await res.json();
+                    console.log(data);
                     
                     if(data.length === 0) {
                         document.getElementById('statusArea').innerHTML = '<div class="alert alert-warning">No hay registros en ese rango.</div>';
@@ -159,9 +203,30 @@
                     alert("Error al exportar");
                 }
             } else {
-                alert("Lógica CSV pendiente");
+               // Como es una descarga directa de archivo, usamos window.location o un enlace oculto.
+        // Asumiendo que quieres un reporte general unificado o dependiendo del tipo:
+        if(!inicio || !fin) return alert("Seleccione el rango de fechas para el archivo CSV");
+
+        let url = `http://127.0.0.1:8081/api/exportarCsv/${inicio}/${fin}`;
+        
+        // Si necesitas diferenciar tipos en el CSV, deberías mandar el tipo al backend también:
+        // let url = `http://.../api/exportar/csv?tipo=${tipo}&inicio=${inicio}&fin=${fin}`;
+
+        // Truco para descargar sin cambiar de página:
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', ''); // El nombre lo pone el backend (Content-Disposition)
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        document.getElementById('statusArea').innerHTML = '<div class="alert alert-success">Descarga CSV iniciada.</div>';
             }
         }
     </script>
+<div id="print-staging-area"></div>
+
 </body>
+
+    
 </html>

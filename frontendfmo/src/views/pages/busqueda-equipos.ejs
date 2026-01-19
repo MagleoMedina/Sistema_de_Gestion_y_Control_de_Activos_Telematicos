@@ -4,109 +4,18 @@
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda Equipos</title>
-    <style>
-        /* ESTILOS DEL FORMULARIO PAPEL */
-        .paper-form {
-            background-color: #fff;
-            border: 2px solid #000;
-            color: #000;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        .cell-border {
-            border: 1px solid #000;
-            padding: 2px 5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .cell-block {
-            display: block;
-        }
-
-        .input-line {
-            border: none;
-            background: transparent;
-            width: 100%;
-            font-weight: bold;
-            color: #000080;
-            height: 20px;
-            font-size: 13px;
-            padding: 0 5px;
-        }
-
-        .input-line:focus {
-            outline: none;
-        }
-
-        .label-text {
-            font-weight: bold;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .form-check {
-            min-height: auto;
-            margin-bottom: 0;
-            margin-right: 10px;
-        }
-
-        .form-check-input {
-            border: 1px solid #000;
-            width: 13px;
-            height: 13px;
-            margin-top: 3px;
-        }
-
-        .row-compact {
-            --bs-gutter-x: 0;
-        }
-
-        .tag-badge {
-            background-color: #000080;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 4px;
-            font-size: 11px;
-        }
-        
-        /* Estilos para el scroll de la tabla */
-        .table-scroll-wrapper {
-            max-height: 55vh;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            background-color: #fff;
-        }
-
-        .table-scroll-wrapper thead th {
-            position: sticky;
-            top: 0;
-            background-color: #e9ecef;
-            z-index: 2;
-            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-        }
-    </style>
 </head>
 
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
-        <div id="content" class="w-100 bg-light p-4">
-
+        <div id="content" class="w-100 bg-light p-4 fade-in">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
                 <h5 class="m-0 fw-bold">🖥️ Historial de Recibo de Equipos</h5>
             </div>
-
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-
                     <div class="row g-2 align-items-center mb-4">
                         <div class="col-md-3">
                             <label class="form-label small fw-bold">Filtrar por:</label>
@@ -116,26 +25,21 @@
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
-
                         <div class="col-md-7" id="containerInputTexto" style="display: none;">
                             <label class="form-label small fw-bold">Ingrese FMO o Serial:</label>
                             <input type="text" class="form-control" id="inputBusquedaFmo"
-                                placeholder="Ej: 119000 o Serial...">
+                            placeholder="Ej: 119000 o Serial...">
                         </div>
-
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">
                             <label class="form-label small fw-bold">Seleccione Fecha:</label>
                             <input type="date" class="form-control" id="inputBusquedaFecha">
                         </div>
-
                         <div class="col-md-7" id="containerVacio"></div>
-
                         <div class="col-md-2 text-end">
                             <label class="form-label d-block">&nbsp;</label>
                             <button class="btn btn-primary w-100" onclick="buscarEquipos()">🔍 Buscar</button>
                         </div>
                     </div>
-
                     <div class="table-responsive table-scroll-wrapper">
                         <table class="table table-hover table-bordered align-middle mb-0">
                             <thead class="table-light text-center">
@@ -144,7 +48,7 @@
                                     <th>FMO / Equipo</th>
                                     <th>Fecha Ingreso</th>
                                     <th>Usuario</th>
-                                    <th>Acciones</th>
+                                    <th>Estatus</th> <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados" class="text-center">
@@ -154,12 +58,10 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
     <div class="modal fade" id="modalVerEquipo" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -168,248 +70,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-secondary bg-opacity-10">
-
-                    <div class="paper-form container p-0" id="formularioPapel">
-
-                        <div class="row row-compact">
-                            <div class="col-12 text-center cell-border justify-content-center bg-light"
-                                style="padding: 4px;">
-                                <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">FECHA:</span>
-                                <input type="text" class="input-line" id="modal_fecha" readonly>
-                            </div>
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">USUARIO:</span>
-                                <input type="text" class="input-line" id="modal_usuario" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">FICHA:</span>
-                                <input type="text" class="input-line" id="modal_ficha" readonly>
-                            </div>
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">CLAVE:</span>
-                                <input type="text" class="input-line" id="modal_clave" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-12 cell-border">
-                                <span class="label-text me-2">NOMBRE:</span>
-                                <input type="text" class="input-line" id="modal_nombre" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-5 cell-border">
-                                <span class="label-text me-2">EXT./TLF.:</span>
-                                <input type="text" class="input-line" id="modal_extension" readonly>
-                            </div>
-                            <div class="col-md-7 cell-border justify-content-between">
-                                <span class="label-text me-3">RESPALDO:</span>
-                                <span class="input-line fw-bold" id="modal_respaldo"></span>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-12 cell-border">
-                                <span class="label-text">GCIA./DPTO.:</span>
-                                <input type="text" class="input-line ms-2" id="modal_gerencia" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">SOLIC. DAET:</span>
-                                <input type="text" class="input-line" id="modal_solicitudDAET" readonly>
-                            </div>
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">SOLIC. S.T.:</span>
-                                <input type="text" class="input-line" id="modal_solicitudST" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-4 cell-border cell-block">
-                                <span class="label-text">CPU FMO:</span>
-                                <input type="text" class="input-line" id="modal_fmoEquipo" readonly>
-                            </div>
-                            <div class="col-md-4 cell-border cell-block">
-                                <span class="label-text">MARCA:</span>
-                                <input type="text" class="input-line" id="modal_marca" readonly>
-                            </div>
-                            <div class="col-md-4 cell-border cell-block">
-                                <span class="label-text">FALLA:</span>
-                                <input type="text" class="input-line" id="modal_falla" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-12 cell-border flex-wrap bg-light">
-                                <span class="label-text w-100 text-center">COMPONENTES DETECTADOS</span>
-                            </div>
-                            <div class="col-12 cell-border p-2">
-                                <div id="modal_lista_componentes" class="d-flex flex-wrap gap-2"></div>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-2 cell-border bg-light justify-content-center">
-                                <span class="label-text">INCLUYE:</span>
-                            </div>
-                            <div class="col-10 cell-border p-2">
-                                <div id="modal_lista_perifericos" class="d-flex flex-wrap gap-2"></div>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-2 cell-border bg-light justify-content-center">
-                                <span class="label-text">APPS:</span>
-                            </div>
-                            <div class="col-10 cell-border p-2">
-                                <div id="modal_lista_apps" class="d-flex flex-wrap gap-2"></div>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-12 cell-border">
-                                <span class="label-text me-2">CARPETA RED:</span>
-                                <div id="modal_lista_carpetas" class="d-flex flex-wrap gap-1 p-1"></div>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-12 cell-border cell-block">
-                                <span class="label-text">OBSERVACIÓN GENERAL:</span>
-                                <textarea class="input-line" rows="1" id="modal_observacion" readonly
-                                    style="resize: none;"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">ASIGNADO A:</span>
-                                <input type="text" class="input-line" id="modal_asignadoA" readonly>
-                            </div>
-                            <div class="col-md-6 cell-border">
-                                <span class="label-text me-2">ESTATUS:</span>
-                                <input type="text" class="input-line" id="modal_estatus" readonly>
-                            </div>
-                        </div>
-                        <div class="row row-compact">
-                            <div class="col-6 cell-border cell-block" style="height: 50px;">
-                                <span class="label-text">ENTREGADO POR:</span>
-                                <input type="text" class="input-line" id="modal_entregadoPor" readonly>
-                            </div>
-                            <div class="col-6 cell-border cell-block" style="height: 50px;">
-                                <span class="label-text">RECIBIDO POR:</span>
-                                <input type="text" class="input-line" id="modal_recibidoPor" readonly>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact mt-3">
-                            <div class="col-12 text-center cell-border justify-content-center bg-light"
-                                style="padding: 4px;">
-                                <h6 class="m-0 fw-bold">SERIALES COMPONENTES:</h6>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-4 cell-border bg-light justify-content-center"><span
-                                    class="label-text">DESCRIPCIÓN</span></div>
-                            <div class="col-4 cell-border bg-light justify-content-center"><span
-                                    class="label-text">MARCA</span></div>
-                            <div class="col-4 cell-border bg-light justify-content-center"><span
-                                    class="label-text">SERIAL</span></div>
-                        </div>
-
-                        <div class="row row-compact">
-                            <div class="col-4 cell-border"><span class="label-text">TARJETA MADRE</span></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_marcaMadre" readonly></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_serialMadre" readonly></div>
-                        </div>
-                        <div class="row row-compact">
-                            <div class="col-4 cell-border"><span class="label-text">FUENTE DE PODER</span></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_marcaFuente" readonly></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_serialFuente" readonly></div>
-                        </div>
-                        <div class="row row-compact">
-                            <div class="col-4 cell-border"><span class="label-text">TARJETA DE VIDEO</span></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_marcaVideo" readonly></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_serialVideo" readonly></div>
-                        </div>
-                        <div class="row row-compact">
-                            <div class="col-4 cell-border"><span class="label-text">TARJETA DE RED</span></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_marcaRed" readonly></div>
-                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
-                                    id="modal_serialRed" readonly></div>
-                        </div>
-
-                        <div class="row row-compact mt-1 border-top border-dark">
-                            <div class="col-3 cell-border d-flex align-items-center justify-content-center bg-light">
-                                <span class="label-text">MEMORIA RAM</span>
-                            </div>
-                            <div class="col-9 p-0">
-                                <div class="row row-compact">
-                                    <div class="col-4 cell-border bg-light justify-content-center"><span
-                                            class="label-text">MARCA</span></div>
-                                    <div class="col-4 cell-border bg-light justify-content-center"><span
-                                            class="label-text">SERIAL</span></div>
-                                    <div class="col-4 cell-border bg-light justify-content-center"><span
-                                            class="label-text">CAPACIDAD</span></div>
-                                </div>
-                                <div id="container_ram_seriales">
-                                    <div class="row row-compact">
-                                        <div class="col-12 cell-border text-center text-muted">Sin datos</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact mt-1 border-top border-dark">
-                            <div class="col-3 cell-border d-flex align-items-center justify-content-center bg-light">
-                                <span class="label-text">DISCO DURO</span>
-                            </div>
-                            <div class="col-9 p-0">
-                                <div class="row row-compact">
-                                    <div class="col-4 cell-border bg-light justify-content-center"><span
-                                            class="label-text">MARCA</span></div>
-                                    <div class="col-4 cell-border bg-light justify-content-center"><span
-                                            class="label-text">SERIAL</span></div>
-                                    <div class="col-4 cell-border bg-light justify-content-center"><span
-                                            class="label-text">CAPACIDAD</span></div>
-                                </div>
-                                <div id="container_hdd_seriales">
-                                    <div class="row row-compact">
-                                        <div class="col-12 cell-border text-center text-muted">Sin datos</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row row-compact mt-1">
-                            <div class="col-12 cell-border cell-block" style="min-height: 40px;">
-                                <span class="label-text">OBSERVACIÓN (SERIALES):</span>
-                                <textarea class="input-line" rows="1" id="modal_observacionSeriales" readonly
-                                    style="resize: none;"></textarea>
-                            </div>
-                        </div>
-
-                    </div>
+                <%- include('../partials/forms/template-equipos') %>
+                
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -418,12 +80,48 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="modalActualizarEstatus" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold">⚠️ Confirmar Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3" style="font-size: 3rem;">📦</div>
+                    <p class="fs-5">¿Desea marcar este equipo como <strong>LISTO</strong>?</p>
+                    <p class="text-muted small">Esta acción actualizará el estatus del recibo en el sistema.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary fw-bold" onclick="confirmarActualizacion()">Sí, Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white" id="headerNotificacion">
+                    <h5 class="modal-title fw-bold" id="tituloNotificacion">Notificación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div id="iconoNotificacion" class="mb-3" style="font-size: 3.5rem;"></div>
+                    <p id="mensajeNotificacion" class="fs-5 fw-medium"></p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
 
-    <script src="/js/html2pdf.bundle.min.js"></script>
+<script src="/js/utils/html2pdf.bundle.min.js"></script>
 
-    <script src="/js/pdf.js"></script>
+<script src="/js/utils/pdf.js"></script>
 
     <script>
         // --- 1. FILTROS ---
@@ -463,7 +161,11 @@
             tbody.innerHTML = '<tr><td colspan="5">Cargando...</td></tr>';
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error("No se encontraron resultados o error de servidor.");
+                if(response.status === 404) {
+                    tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>'; // Ajustado colspan a 6
+                    return;
+                }
+                if (!response.ok) throw new Error("error de servidor.");
                 const data = await response.json();
                 renderizarTabla(data);
             } catch (error) {
@@ -476,20 +178,38 @@
             const tbody = document.getElementById('tablaResultados');
             tbody.innerHTML = '';
             const lista = Array.isArray(data) ? data : [data];
+            
             if (lista.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5">No hay registros.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>'; // Ajustado colspan a 6
                 return;
             }
 
             lista.forEach((item, index) => {
+                // Verificamos si ya está entregado para deshabilitar el botón visualmente (opcional)
+                const yaEntregado = (item.estatus || "").toUpperCase() === "LISTO";
+                const btnClase = yaEntregado ? "btn-outline-secondary" : "btn-warning";
+                const btnTexto = yaEntregado ? "✅ Listo" : "📦 Estatus";
+                const btnDisabled = yaEntregado ? "disabled" : "";
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="fw-bold">${index + 1}</td>
                     <td class="text-primary fw-bold">${item.fmoEquipo || "N/A"}</td>
                     <td>${item.fecha || "N/A"}</td>
                     <td>${item.usuarioNombre || "N/A"}</td>
+                    <td><span class="badge ${yaEntregado ? 'bg-success' : 'bg-secondary'}">${item.estatus || 'Pendiente'}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>👁️ Ver</button>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})' title="Ver Detalles">
+                                👁️ Ver
+                            </button>
+                            <button class="btn btn-sm ${btnClase}" 
+                                onclick="abrirModalActualizar(${item.idEncabezado})" 
+                                ${btnDisabled}
+                                title="Actualizar Estatus">
+                                ${btnTexto}
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -642,6 +362,85 @@
                     <div class="col-4 cell-border"><input type="text" class="input-line text-center" readonly></div>
                 `;
                 container.appendChild(div);
+            }
+        }
+// --- HELPER PARA MOSTRAR NOTIFICACIONES ---
+        function mostrarNotificacion(titulo, mensaje, tipo) {
+            const modalEl = document.getElementById('modalNotificacion');
+            const header = document.getElementById('headerNotificacion');
+            const tituloEl = document.getElementById('tituloNotificacion');
+            const msgEl = document.getElementById('mensajeNotificacion');
+            const iconoEl = document.getElementById('iconoNotificacion');
+
+            // 1. Configurar textos
+            tituloEl.innerText = titulo;
+            msgEl.innerText = mensaje;
+
+            // 2. Configurar estilos según tipo
+            // Reseteamos clases base
+            header.className = 'modal-header text-white'; 
+            
+            if (tipo === 'exito') {
+                header.classList.add('bg-success');
+               
+            } else if (tipo === 'error') {
+                header.classList.add('bg-danger');
+            
+            } else {
+                header.classList.add('bg-primary');
+            
+            }
+
+            // 3. Mostrar
+            new bootstrap.Modal(modalEl).show();
+        }
+
+        // --- 4. ACTUALIZAR ESTATUS (Modificado) ---
+        
+        let idParaActualizar = null;
+
+        function abrirModalActualizar(idEncabezado) {
+            idParaActualizar = idEncabezado;
+            const modal = new bootstrap.Modal(document.getElementById('modalActualizarEstatus'));
+            modal.show();
+        }
+
+        async function confirmarActualizacion() {
+            if (!idParaActualizar) return;
+
+            const url = `http://127.0.0.1:8081/api/reciboDeEquipos/${idParaActualizar}/estatus`;
+            const payload = { estatus: "Listo" };
+
+            try {
+                const res = await fetch(url, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // Primero cerramos el modal de confirmación
+                const modalConfirm = bootstrap.Modal.getInstance(document.getElementById('modalActualizarEstatus'));
+                modalConfirm.hide();
+
+                if (res.ok) {
+                    // REEMPLAZO DE ALERT POR MODAL DE ÉXITO
+                    mostrarNotificacion("¡Operación Exitosa!", "El estatus del equipo ha sido actualizado a LISTO.", "exito");
+                    
+                    // Recargar tabla
+                    buscarEquipos(); 
+                } else {
+                    // REEMPLAZO DE ALERT POR MODAL DE ERROR
+                    mostrarNotificacion("Error", "No se pudo actualizar el estatus. Intente nuevamente.", "error");
+                }
+            } catch (error) {
+                console.error(error);
+                // Cerrar modal de confirmación si sigue abierto
+                const modalConfirm = bootstrap.Modal.getInstance(document.getElementById('modalActualizarEstatus'));
+                if(modalConfirm) modalConfirm.hide();
+
+                mostrarNotificacion("Error de Conexión", "No se pudo conectar con el servidor.", "error");
+            } finally {
+                idParaActualizar = null;
             }
         }
     </script>

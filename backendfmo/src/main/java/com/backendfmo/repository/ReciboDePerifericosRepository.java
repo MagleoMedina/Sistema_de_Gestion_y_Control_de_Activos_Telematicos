@@ -21,4 +21,13 @@ public interface ReciboDePerifericosRepository extends JpaRepository<ReciboDePer
 
     @Query("SELECT e FROM ReciboDePerifericos e WHERE e.encabezadoRelacion.fecha between :fechaInicio AND :fechaFin")
     List<ReciboDePerifericos> findByFechaEncabezadoBetween(@Param("fechaInicio") String fechaInicio, @Param("fechaFin") String fechaFin);
+
+    // 1. Contar Periféricos Atendidos (JOIN con Encabezado)
+    // "p.encabezado" debe coincidir con el nombre de la variable en tu entidad Java
+    @Query("SELECT COUNT(p) FROM ReciboDePerifericos p JOIN p.encabezadoRelacion e WHERE e.estatus = :estatus")
+    long contarPorEstatus(@Param("estatus") String estatus);
+
+    // 2. Contar Periféricos Pendientes
+    @Query("SELECT COUNT(p) FROM ReciboDePerifericos p JOIN p.encabezadoRelacion e WHERE e.estatus <> :estatus")
+    long contarPendientes(@Param("estatus") String estatus);
 }

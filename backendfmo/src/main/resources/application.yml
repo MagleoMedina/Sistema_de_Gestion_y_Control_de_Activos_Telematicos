@@ -7,7 +7,7 @@ spring:
     name: Backend FMO
   jpa:
     database-platform: com.backendfmo.db.dialect.SQLiteDialect
-    show-sql: true
+    show-sql: false
   datasource:
     url: jdbc:sqlite:src/main/java/com/backendfmo/db/test.db
     driver-class-name: org.sqlite.JDBC

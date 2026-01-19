@@ -15,6 +15,7 @@ public class BusquedaDaetDTO {
     private String identifique;
 
     // --- Datos del Encabezado (Padre) ---
+    private Long idEncabezado;
     private String fmoEquipoLote; // El código del lote/encabezado
     private String solicitudDAET;
     private String solicitudST;

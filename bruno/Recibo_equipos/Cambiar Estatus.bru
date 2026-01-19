@@ -1,0 +1,22 @@
+meta {
+  name: Cambiar Estatus
+  type: http
+  seq: 6
+}
+
+patch {
+  url: 127.0.0.1:8081/api/reciboDeEquipos/1/estatus
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "estatus": "Entregado"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

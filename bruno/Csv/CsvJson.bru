@@ -1,0 +1,16 @@
+meta {
+  name: CsvJson
+  type: http
+  seq: 2
+}
+
+get {
+  url: 127.0.0.1:8081/api/exportarCsvJson/2025-12-01/2026-01-03
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

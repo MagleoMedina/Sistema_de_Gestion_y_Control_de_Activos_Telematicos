@@ -1,0 +1,149 @@
+ /* Ajuste para que el sidebar ocupe toda la altura */
+    body {
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+    .wrapper {
+        display: flex;
+        width: 100%;
+        align-items: stretch;
+    }
+    #sidebar {
+        min-width: 250px;
+        max-width: 250px;
+        min-height: 100vh;
+    }
+
+    /* --- ESTILOS PARA INPUTS DE ETIQUETAS (TAGS) --- */
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    min-height: 25px;
+    background: transparent;
+    cursor: text;
+    overflow: auto;
+}
+
+/* La burbuja visual */
+.tag-badge {
+    background-color: #e0e0e0;
+    color: #000;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin: 2px 4px 2px 0;
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    border: 1px solid #999;
+}
+
+/* El botón de eliminar (x) dentro de la burbuja */
+.tag-close {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #cc0000;
+    font-weight: 900;
+}
+
+/* El input real transparente donde escribe el usuario */
+.tag-input-real {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex-grow: 1;
+    min-width: 60px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    color: #000080;
+    font-weight: bold;
+}
+
+.table-scroll-wrapper {
+            max-height: 55vh; /* Ajusta la altura visible (55% del alto de la pantalla) */
+            overflow-y: auto; /* Habilita el scroll vertical */
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        /* Hacer que la cabecera se quede fija al bajar (Sticky Header) */
+        .table-scroll-wrapper thead th {
+            position: sticky;
+            /*top: 0px; para hacer que la cabecera quede justo en la parte superior */
+            background-color: #e9ecef; /* Un gris claro para tapar el contenido que pasa por debajo */
+            z-index: 2; /* Asegura que esté por encima de las filas */
+            box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1); /* Sombra sutil para distinguir */
+        }
+
+/* Estilos de los formularios*/
+        /* --- ESTILOS COMPACTOS --- */
+        .paper-form {
+            background-color: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px; /* Fuente más pequeña para todo el form */
+            max-width: 800px; /* Evita que se estire demasiado en monitores grandes */
+            margin: 0 auto; /* Centrar */
+        }
+        
+        /* Celdas con bordes negros y poco relleno */
+        .cell-border {
+            border: 1px solid #000;
+            padding: 2px 5px; /* Arriba/Abajo 2px, Lados 5px -> MUCHO MÁS COMPACTO */
+            display: flex; /* Ayuda a alinear verticalmente label e input */
+            align-items: center; /* Centrar verticalmente */
+        }
+
+        /* Bloques que no son flex (para los checkboxes en grid) */
+        .cell-block {
+            display: block;
+        }
+
+        /* Inputs invisibles más delgados */
+        .input-line {
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-weight: bold;
+            color: #000080;
+            height: 20px; /* Altura forzada pequeña */
+            font-size: 13px;
+            padding: 0 5px;
+        }
+        .input-line:focus {
+            outline: none;
+        }
+
+        /* Etiquetas */
+        .label-text {
+            font-weight: bold;
+            font-size: 0.75rem; /* Letra pequeña */
+            text-transform: uppercase;
+            white-space: nowrap; /* Evita que el texto salte de línea si es posible */
+        }
+
+        /* Ajuste de Checkboxes para que no ocupen tanto espacio vertical */
+        .form-check {
+            min-height: auto;
+            margin-bottom: 0; /* Sin margen inferior */
+            margin-right: 10px;
+        }
+        .form-check-input {
+            border: 1px solid #000;
+            width: 13px;
+            height: 13px;
+            margin-top: 3px;
+        }
+        
+        /* Utilidad para filas sin separación */
+        .row-compact {
+            --bs-gutter-x: 0; /* Quita espacio horizontal entre columnas */
+        }
+        
+/* --- ESTILOS VISUALES Y ANIMACIONES --- */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,0 +1,322 @@
+<div class="paper-form container p-0" id="formularioPapel">
+  <div class="row row-compact">
+    <div
+      class="col-12 text-center cell-border justify-content-center bg-light"
+      style="padding: 4px"
+    >
+      <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">FECHA:</span>
+      <input type="text" class="input-line" id="modal_fecha" readonly />
+    </div>
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">USUARIO:</span>
+      <input type="text" class="input-line" id="modal_usuario" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">FICHA:</span>
+      <input type="text" class="input-line" id="modal_ficha" readonly />
+    </div>
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">CLAVE:</span>
+      <input type="text" class="input-line" id="modal_clave" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-12 cell-border">
+      <span class="label-text me-2">NOMBRE:</span>
+      <input type="text" class="input-line" id="modal_nombre" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-5 cell-border">
+      <span class="label-text me-2">EXT./TLF.:</span>
+      <input type="text" class="input-line" id="modal_extension" readonly />
+    </div>
+    <div class="col-md-7 cell-border justify-content-between">
+      <span class="label-text me-3">RESPALDO:</span>
+      <span class="input-line fw-bold" id="modal_respaldo"></span>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-12 cell-border">
+      <span class="label-text">GCIA./DPTO.:</span>
+      <input type="text" class="input-line ms-2" id="modal_gerencia" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">SOLIC. DAET:</span>
+      <input type="text" class="input-line" id="modal_solicitudDAET" readonly />
+    </div>
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">SOLIC. S.T.:</span>
+      <input type="text" class="input-line" id="modal_solicitudST" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-4 cell-border cell-block">
+      <span class="label-text">CPU FMO:</span>
+      <input type="text" class="input-line" id="modal_fmoEquipo" readonly />
+    </div>
+    <div class="col-md-4 cell-border cell-block">
+      <span class="label-text">MARCA:</span>
+      <input type="text" class="input-line" id="modal_marca" readonly />
+    </div>
+    <div class="col-md-4 cell-border cell-block">
+      <span class="label-text">FALLA:</span>
+      <input type="text" class="input-line" id="modal_falla" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-12 cell-border flex-wrap bg-light">
+      <span class="label-text w-100 text-center">COMPONENTES DETECTADOS</span>
+    </div>
+    <div class="col-12 cell-border p-2">
+      <div id="modal_lista_componentes" class="d-flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-2 cell-border bg-light justify-content-center">
+      <span class="label-text">INCLUYE:</span>
+    </div>
+    <div class="col-10 cell-border p-2">
+      <div id="modal_lista_perifericos" class="d-flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-2 cell-border bg-light justify-content-center">
+      <span class="label-text">APPS:</span>
+    </div>
+    <div class="col-10 cell-border p-2">
+      <div id="modal_lista_apps" class="d-flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-12 cell-border">
+      <span class="label-text me-2">CARPETA RED:</span>
+      <div id="modal_lista_carpetas" class="d-flex flex-wrap gap-1 p-1"></div>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-12 cell-border cell-block">
+      <span class="label-text">OBSERVACIÓN GENERAL:</span>
+      <textarea
+        class="input-line"
+        rows="1"
+        id="modal_observacion"
+        readonly
+        style="resize: none"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">ASIGNADO A:</span>
+      <input type="text" class="input-line" id="modal_asignadoA" readonly />
+    </div>
+    <div class="col-md-6 cell-border">
+      <span class="label-text me-2">ESTATUS:</span>
+      <input type="text" class="input-line" id="modal_estatus" readonly />
+    </div>
+  </div>
+  <div class="row row-compact">
+    <div class="col-6 cell-border cell-block" style="height: 50px">
+      <span class="label-text">ENTREGADO POR:</span>
+      <input type="text" class="input-line" id="modal_entregadoPor" readonly />
+    </div>
+    <div class="col-6 cell-border cell-block" style="height: 50px">
+      <span class="label-text">RECIBIDO POR:</span>
+      <input type="text" class="input-line" id="modal_recibidoPor" readonly />
+    </div>
+  </div>
+
+  <div class="row row-compact mt-3">
+    <div
+      class="col-12 text-center cell-border justify-content-center bg-light"
+      style="padding: 4px"
+    >
+      <h6 class="m-0 fw-bold">SERIALES COMPONENTES:</h6>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-4 cell-border bg-light justify-content-center">
+      <span class="label-text">DESCRIPCIÓN</span>
+    </div>
+    <div class="col-4 cell-border bg-light justify-content-center">
+      <span class="label-text">MARCA</span>
+    </div>
+    <div class="col-4 cell-border bg-light justify-content-center">
+      <span class="label-text">SERIAL</span>
+    </div>
+  </div>
+
+  <div class="row row-compact">
+    <div class="col-4 cell-border">
+      <span class="label-text">TARJETA MADRE</span>
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_marcaMadre"
+        readonly
+      />
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_serialMadre"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="row row-compact">
+    <div class="col-4 cell-border">
+      <span class="label-text">FUENTE DE PODER</span>
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_marcaFuente"
+        readonly
+      />
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_serialFuente"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="row row-compact">
+    <div class="col-4 cell-border">
+      <span class="label-text">TARJETA DE VIDEO</span>
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_marcaVideo"
+        readonly
+      />
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_serialVideo"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="row row-compact">
+    <div class="col-4 cell-border">
+      <span class="label-text">TARJETA DE RED</span>
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_marcaRed"
+        readonly
+      />
+    </div>
+    <div class="col-4 cell-border">
+      <input
+        type="text"
+        class="input-line text-center"
+        id="modal_serialRed"
+        readonly
+      />
+    </div>
+  </div>
+
+  <div class="row row-compact mt-1 border-top border-dark">
+    <div
+      class="col-3 cell-border d-flex align-items-center justify-content-center bg-light"
+    >
+      <span class="label-text">MEMORIA RAM</span>
+    </div>
+    <div class="col-9 p-0">
+      <div class="row row-compact">
+        <div class="col-4 cell-border bg-light justify-content-center">
+          <span class="label-text">MARCA</span>
+        </div>
+        <div class="col-4 cell-border bg-light justify-content-center">
+          <span class="label-text">SERIAL</span>
+        </div>
+        <div class="col-4 cell-border bg-light justify-content-center">
+          <span class="label-text">CAPACIDAD</span>
+        </div>
+      </div>
+      <div id="container_ram_seriales">
+        <div class="row row-compact">
+          <div class="col-12 cell-border text-center text-muted">Sin datos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-compact mt-1 border-top border-dark">
+    <div
+      class="col-3 cell-border d-flex align-items-center justify-content-center bg-light"
+    >
+      <span class="label-text">DISCO DURO</span>
+    </div>
+    <div class="col-9 p-0">
+      <div class="row row-compact">
+        <div class="col-4 cell-border bg-light justify-content-center">
+          <span class="label-text">MARCA</span>
+        </div>
+        <div class="col-4 cell-border bg-light justify-content-center">
+          <span class="label-text">SERIAL</span>
+        </div>
+        <div class="col-4 cell-border bg-light justify-content-center">
+          <span class="label-text">CAPACIDAD</span>
+        </div>
+      </div>
+      <div id="container_hdd_seriales">
+        <div class="row row-compact">
+          <div class="col-12 cell-border text-center text-muted">Sin datos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row row-compact mt-1">
+    <div class="col-12 cell-border cell-block" style="min-height: 40px">
+      <span class="label-text">OBSERVACIÓN (SERIALES):</span>
+      <textarea
+        class="input-line"
+        rows="1"
+        id="modal_observacionSeriales"
+        readonly
+        style="resize: none"
+      ></textarea>
+    </div>
+  </div>
+</div>

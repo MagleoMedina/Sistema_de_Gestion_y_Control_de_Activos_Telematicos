@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema | CSV Ferrominera</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- ESTILOS VISUALES Y ANIMACIONES --- */
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Efecto de fondo animado (burbujas) */
+        .bg-circles {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .bg-circles li {
+            position: absolute;
+            display: block;
+            list-style: none;
+            width: 20px; height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+        }
+        .bg-circles li:nth-child(1){ left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+        .bg-circles li:nth-child(2){ left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+        .bg-circles li:nth-child(3){ left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+        .bg-circles li:nth-child(4){ left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+        .bg-circles li:nth-child(5){ left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+        
+        @keyframes animate {
+            0%{ transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+            100%{ transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+        }
+
+        /* --- TARJETA DE LOGIN (GLASSMORPHISM) --- */
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+            animation: slideIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* --- STATUS INDICATOR --- */
+        .server-status-container {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 20;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* Estado ON */
+        .status-on .status-dot {
+            background-color: #28a745;
+            box-shadow: 0 0 0 rgba(40, 167, 69, 0.4);
+            animation: pulse-green 2s infinite;
+        }
+        .status-on .status-text { color: #28a745; }
+
+        /* Estado OFF */
+        .status-off .status-dot {
+            background-color: #dc3545;
+            box-shadow: 0 0 0 rgba(220, 53, 69, 0.4);
+            animation: pulse-red 2s infinite;
+        }
+        .status-off .status-text { color: #dc3545; }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        /* Inputs animados */
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: #2a5298;
+            font-weight: bold;
+        }
+        
+        .form-control:focus {
+            border-color: #2a5298;
+            box-shadow: 0 0 0 0.25rem rgba(42, 82, 152, 0.25);
+        }
+
+        .btn-login {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            border: none;
+            padding: 12px;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+        }
+        .btn-login:hover {
+            transform: scale(1.02);
+            background: linear-gradient(to right, #2a5298, #1e3c72);
+        }
+
+    </style>
+</head>
+<body>
+
+    <ul class="bg-circles">
+        <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+    </ul>
+
+    <div class="login-card">
+        
+<div id="statusContainer" class="server-status-container status-checking" style="border: 1px solid #ccc;">
+    <span class="status-dot"></span>
+    <span id="statusText" class="status-text">CONECTANDO...</span>
+</div>
+
+        <div class="text-center mb-4 mt-3">
+            <h3 class="fw-bold" style="color: #1e3c72;">Bienvenido</h3>
+            <p class="text-muted small">Sistema de Gestión Telemática</p>
+        </div>
+
+        <form action="/auth/login" method="POST" id="loginForm">
+            
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required>
+                <label for="username">Nombre de Usuario</label>
+            </div>
+
+            <div class="form-floating mb-4">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" required>
+                <label for="password">Contraseña</label>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-login text-white fw-bold rounded-pill">
+                    Iniciar Sesión
+                </button>
+            </div>
+
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">© 2026 Ing. Magleo Medina</small>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        // --- LÓGICA DE ESTATUS DEL SERVIDOR (Heartbeat Pasivo) ---
+        
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+
+        function setServerStatus(isOnline) {
+            if (isOnline) {
+                statusContainer.classList.remove('status-off');
+                statusContainer.classList.add('status-on');
+                statusText.innerText = "SERVIDOR: ONLINE";
+            } else {
+                statusContainer.classList.remove('status-on');
+                statusContainer.classList.add('status-off');
+                statusText.innerText = "SERVIDOR: OFFLINE";
+            }
+        }
+
+        /**
+         * ESTRATEGIA: "Heartbeat Perezoso"
+         * 1. Al cargar, asumimos ON (porque el servidor entregó la página).
+         * 2. Solo verificamos si la conexión se pierde.
+         * 3. Hacemos un ping ligero cada 60 segundos (muy bajo consumo).
+         * 4. Verificamos también eventos del navegador (offline/online).
+         */
+
+        // 1. Check de API ligero (Endpoint que crearemos en backend)
+        async function checkServerHealth() {
+            try {
+                // Timeout corto: si no responde en 3s, asumimos caído
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+                const response = await fetch('/health', { 
+                    method: 'HEAD', // HEAD es más ligero que GET, solo pide cabeceras
+                    signal: controller.signal 
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) setServerStatus(true);
+                else setServerStatus(false);
+
+            } catch (error) {
+                console.error("Server check failed", error);
+                setServerStatus(false);
+            }
+        }
+
+        // 2. Intervalo largo (Cada 60 segundos)
+        // Esto no satura la red pero te avisa si el servidor murió hace rato.
+        setInterval(checkServerHealth, 5000);
+
+        // 3. Eventos del Navegador (Instantáneo si se cae el cable de red)
+        window.addEventListener('offline', () => setServerStatus(false));
+        window.addEventListener('online', () => checkServerHealth()); // Al volver, verificamos con el server real
+
+    // Ejecutar verificación inmediata al cargar para saber el estado real de Java
+    document.addEventListener('DOMContentLoaded', checkServerHealth);
+    </script>
+</body>
+</html>

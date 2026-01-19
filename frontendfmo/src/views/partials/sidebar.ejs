@@ -1,11 +1,11 @@
 <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
-    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <a href="/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <span class="fs-4 fw-bold">🛠️ Soporte FMO</span>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="/" class="nav-link text-white <%= title === 'Inicio - FMO' ? 'active' : '' %>">
+            <a href="/dashboard" class="nav-link text-white <%= title === 'Inicio - FMO' ? 'active' : '' %>">
                 🏠 Inicio
             </a>
         </li>
@@ -31,7 +31,23 @@
         </li>
             <li>
             <a href="/exportar" class="nav-link text-white <%= title === 'Exportar Recibos' ? 'active' : '' %>">
-                👤 Exportar Recibos
+                🧾 Exportar Recibos
+            </a>
+        </li>
+            </li>
+            <li>
+            <a href="/gestion" class="nav-link text-white <%= title === 'Gestion De Usuarios' ? 'active' : '' %>">
+                👤 Gestion de Usuarios
+            </a>
+        </li>
+            <li>
+            <a href="/stock" class="nav-link text-white <%= title === 'Gestion De Usuarios' ? 'active' : '' %>">
+                📊 Stock
+            </a>
+        </li>
+        <li>
+            <a href="/eliminar" class="nav-link text-white <%= title === 'Eliminar Registros' ? 'active' : '' %>">
+                🗑️ Eliminar Registros
             </a>
         </li>
     </ul>

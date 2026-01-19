@@ -1,0 +1,182 @@
+<div class="paper-form container p-0" id="formDaetModal">
+                        
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-between bg-light p-2">
+                                <div style="width: 30px;"></div> <span class="header-title">ENTREGAS AL DAET</span>
+                                <span style="font-size: 20px;">📦</span> </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="text" class="input-line" id="modal_fecha" readonly style="max-width: 150px;">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">SOLICITUD DAET.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudDAET" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">SOLICITUD S.T.:</span>
+                                <input type="text" class="input-line" id="modal_solicitudST" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">ANALISTA:</span>
+                                <input type="text" class="input-line" id="modal_analista" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border justify-content-center bg-light">
+                                <span class="label-text">ACTIVIDAD:</span>
+                            </div>
+                            <div class="col-12 cell-border justify-content-center">
+                                <div class="form-check form-check-inline me-5">
+                                    <input class="form-check-input modal-radio" type="radio" name="actividad_modal" id="modal_act_reemplazo" disabled>
+                                    <label class="label-text">REEMPLAZO</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input modal-radio" type="radio" name="actividad_modal" id="modal_act_entrega" disabled>
+                                    <label class="label-text">ENTREGA</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-3">ESTADO:</span>
+                                <div class="form-check form-check-inline me-4">
+                                    <input class="form-check-input modal-radio" type="radio" name="estado_modal" id="modal_est_bueno" disabled>
+                                    <label class="label-text">BUENO</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input modal-radio" type="radio" name="estado_modal" id="modal_est_danado" disabled>
+                                    <label class="label-text">DAÑADO</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">EQUIPO:</span>
+                                <input type="text" class="input-line" id="modal_nombreEquipo" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">COMPONENTES:</span>
+                                <input type="text" class="input-line" id="modal_componentesTexto" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">PERIFÉRICOS:</span>
+                                <input type="text" class="input-line" id="modal_perifericosTexto" readonly>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO/SERIAL:</span>
+                                <input type="text" class="input-line" id="modal_fmoSerial" readonly>
+                            </div>
+                        </div>
+
+                        <div id="wrapperEntregaCpu">
+                            <div class="row row-compact">
+                                <div class="col-12 cell-border bg-light">
+                                    <span class="label-text">ENTREGA DE CPU (Detalles):</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row row-compact">
+                                <div class="col-6 cell-border cell-block">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_disco" disabled>
+                                        <label class="label-text">DISCO DURO</label>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_ram" disabled>
+                                        <label class="label-text me-1">MEMORIAS RAM</label>
+                                        <span style="font-size:10px;">--</span>
+                                        <span class="label-text ms-1 me-1">CANT:</span>
+                                        <input type="text" class="input-line text-center" id="modal_cantRam" style="width: 30px;" readonly>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_madre" disabled>
+                                        <label class="label-text">TARJETA MADRE</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_procesador" disabled>
+                                        <label class="label-text">PROCESADOR</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_fan" disabled>
+                                        <label class="label-text">FAN COOLER</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 cell-border cell-block">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_video" disabled>
+                                        <label class="label-text">TARJETA DE VIDEO</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_fuente" disabled>
+                                        <label class="label-text">FUENTE DE PODER</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_pila" disabled>
+                                        <label class="label-text">PILA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input modal-cpu-check" type="checkbox" id="chk_red" disabled>
+                                        <label class="label-text">TARJETA DE RED</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border bg-light justify-content-center">
+                                <span class="label-text">SE RECIBE REEMPLAZO</span>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border align-items-center">
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input modal-radio" type="radio" name="reemplazo_modal" id="modal_reemplazoSi" disabled>
+                                    <label class="label-text">SI</label>
+                                </div>
+                                <div class="form-check form-check-inline me-4">
+                                    <input class="form-check-input modal-radio" type="radio" name="reemplazo_modal" id="modal_reemplazoNo" disabled>
+                                    <label class="label-text">NO</label>
+                                </div>
+                                <span class="label-text me-2 border-start border-dark ps-2">IDENTIFIQUE:</span>
+                                <input type="text" class="input-line" id="modal_identifique" readonly>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border cell-block">
+                                <span class="label-text">(OBSERVACIÓN):</span>
+                                <textarea class="input-line" rows="2" id="modal_observacion" style="resize: none;" readonly></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-8 cell-border" style="height: 50px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line" id="modal_recibidoPor" readonly>
+                            </div>
+                            <div class="col-4 cell-border" style="height: 50px;">
+                                <span class="label-text">FICHA:</span>
+                                <input type="text" class="input-line" id="modal_fichaRecibido" readonly>
+                            </div>
+                        </div>
+
+                    </div>

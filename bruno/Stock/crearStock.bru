@@ -1,0 +1,27 @@
+meta {
+  name: crearStock
+  type: http
+  seq: 9
+}
+
+post {
+  url: 127.0.0.1:8081/api/stock
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "categoria": "COMPONENTE",
+      "idReferencia": 3,
+      "marca": "Kingston",
+      "caracteristicas": "DDR4 3200MHz 8GB",
+      "cantidad": 10,
+      "minimoAlerta": 5
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

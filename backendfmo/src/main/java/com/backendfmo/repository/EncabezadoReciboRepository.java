@@ -21,8 +21,14 @@ public interface EncabezadoReciboRepository extends JpaRepository<EncabezadoReci
     List<EncabezadoRecibo> findByFecha(String fecha);
     
     @Query("SELECT e FROM EncabezadoRecibo e WHERE e.fecha BETWEEN :fechaInicio AND :fechaFin")
-    List<EncabezadoRecibo> findByFechaBetween(String fechaInicio, String fechaFin);
+    List<EncabezadoRecibo> findByFechaBetween(String fechaInicio , String fechaFin);
 
+    // 1. Contar Equipos Atendidos (Igual a 'Listo')
+    @Query("SELECT COUNT(e) FROM EncabezadoRecibo e WHERE e.estatus = :estatus")
+    long contarPorEstatus(@Param("estatus") String estatus);
 
+    // 2. Contar Equipos Pendientes (Distinto a 'Listo')
+    @Query("SELECT COUNT(e) FROM EncabezadoRecibo e WHERE e.estatus != :estatus")
+    long contarPendientes(@Param("estatus") String estatus);
 }
 

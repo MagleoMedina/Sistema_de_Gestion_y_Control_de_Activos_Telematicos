@@ -1,0 +1,23 @@
+meta {
+  name: status
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "username":"magleo20033",
+    "clave":"fmofmo"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

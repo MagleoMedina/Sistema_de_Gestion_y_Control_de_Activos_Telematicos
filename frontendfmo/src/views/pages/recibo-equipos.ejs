@@ -1,546 +1,421 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('../partials/head') %>
-    <title><%= title %></title>
+        <title>
+            <%= title %>
+        </title>
 </head>
+
 <body>
 
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
 
-        <div id="content" class="w-100 bg-light p-2 fade-in" style="overflow-y: auto;">
-            
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="text-dark m-0">📝 Ingreso de Equipos</h5>
-                    <button class="btn btn-sm btn-primary" onclick="guardarRecibo()">💾 Guardar</button>
-                </div>
+            <div id="content" class="w-100 bg-light p-2 fade-in" style="overflow-y: auto;">
 
-                <div class="paper-form container p-0" id="formularioPapel">
-                    
-                    <div class="row row-compact">
-                        <div class="col-12 text-center cell-border justify-content-center bg-light" style="padding: 4px;">
-                            <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
-                        </div>
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="text-dark m-0">📝 Ingreso de Equipos</h5>
+                        <button class="btn btn-sm btn-primary" onclick="guardarRecibo()">💾 Guardar</button>
                     </div>
 
-                    <div class="row row-compact">
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">FECHA:</span>
-                            <input type="date" class="input-line" id="fecha" required style="max-width: 130px;">
-                        </div>
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">USUARIO:</span>
-                            <input type="text" class="input-line" id="usuario">
-                        </div>
-                    </div>
+                    <div class="paper-form container p-0" id="formularioPapel">
 
-                    <div class="row row-compact">
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">FICHA:</span>
-                            <input type="number" class="input-line" id="ficha">
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light"
+                                style="padding: 4px;">
+                                <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
+                            </div>
                         </div>
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">CLAVE:</span>
-                            <input type="text" class="input-line" id="clave">
-                        </div>
-                    </div>
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">NOMBRE:</span>
-                            <input type="text" class="input-line" id="nombre">
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="date" class="input-line" id="fecha" required style="max-width: 130px;">
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">USUARIO:</span>
+                                <input type="text" class="input-line" id="usuario">
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row row-compact">
-                        <div class="col-md-5 cell-border">
-                            <span class="label-text me-2">EXT./TLF.:</span>
-                            <input type="text" class="input-line" id="extension">
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">FICHA:</span>
+                                <input type="number" class="input-line" id="ficha">
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">CLAVE:</span>
+                                <input type="text" class="input-line" id="clave">
+                            </div>
                         </div>
-                        <div class="col-md-7 cell-border justify-content-between">
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">NOMBRE:</span>
+                                <input type="text" class="input-line" id="nombre">
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-5 cell-border">
+                                <span class="label-text me-2">EXT./TLF.:</span>
+                                <input type="text" class="input-line" id="extension">
+                            </div>
+                            <div class="col-md-7 cell-border justify-content-between">
                                 <span class="label-text me-3">RESPALDO:</span>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="respaldo" id="respaldoSi" value="Si">
-                                <label class="form-check-label label-text" for="respaldoSi">SI</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="respaldo" id="respaldoSi"
+                                        value="Si">
+                                    <label class="form-check-label label-text" for="respaldoSi">SI</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="respaldo" id="respaldoNo"
+                                        value="No">
+                                    <label class="form-check-label label-text" for="respaldoNo">NO</label>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="respaldo" id="respaldoNo" value="No">
-                                <label class="form-check-label label-text" for="respaldoNo">NO</label>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text">GCIA./DPTO.:</span>
+                                <input type="text" class="input-line ms-2" id="gerencia">
+
+
                             </div>
                         </div>
-                    </div>
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">SOLIC. DAET:</span>
+                                <input type="text" class="input-line" id="solicitudDAET">
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">SOLIC. S.T.:</span>
+                                <input type="text" class="input-line" id="solicitudST">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">CPU FMO:</span>
+                                <input type="text" class="input-line" id="fmoEquipo">
+                            </div>
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">MARCA:</span>
+                                <input type="text" class="input-line" id="marca">
+                            </div>
+                            <div class="col-md-4 cell-border cell-block">
+                                <span class="label-text">FALLA:</span>
+                                <input type="text" class="input-line" id="falla">
+                            </div>
+                        </div>
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text">GCIA./DPTO.:</span>
-                            <input type="text" class="input-line ms-2" id="gerencia">
-
-                        
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">SOLIC. DAET:</span>
-                            <input type="text" class="input-line" id="solicitudDAET">
-                        </div>
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">SOLIC. S.T.:</span>
-                            <input type="text" class="input-line" id="solicitudST">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-md-4 cell-border cell-block">
-                            <span class="label-text">CPU FMO:</span>
-                            <input type="text" class="input-line" id="fmoEquipo">
-                        </div>
-                        <div class="col-md-4 cell-border cell-block">
-                            <span class="label-text">MARCA:</span>
-                            <input type="text" class="input-line" id="marca">
-                        </div>
-                        <div class="col-md-4 cell-border cell-block">
-                            <span class="label-text">FALLA:</span>
-                            <input type="text" class="input-line" id="falla">
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-md-4 cell-border cell-block py-1">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="row row-compact">
+                            <div class="col-md-4 cell-border cell-block py-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input componente-check" type="checkbox" id="checkRam">
+                                        <label class="form-check-label label-text" for="checkRam">MEM. RAM</label>
+                                    </div>
+                                    <div class="d-flex align-items-center" style="width: 80px;">
+                                        <span class="label-text me-1" style="font-size: 9px;">CANT:</span>
+                                        <input type="number" class="input-line text-center p-0" id="cantRam" value="1"
+                                            style="height: 18px;">
+                                    </div>
+                                </div>
                                 <div class="form-check">
-                                    <input class="form-check-input componente-check" type="checkbox" id="checkRam">
-                                    <label class="form-check-label label-text" for="checkRam">MEM. RAM</label>
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkDisco">
+                                    <label class="form-check-label label-text" for="checkDisco">DISCO DURO</label>
                                 </div>
-                                <div class="d-flex align-items-center" style="width: 80px;">
-                                    <span class="label-text me-1" style="font-size: 9px;">CANT:</span>
-                                    <input type="number" class="input-line text-center p-0" id="cantRam" value="1" style="height: 18px;">
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkVideo">
+                                    <label class="form-check-label label-text" for="checkVideo">TARJ. VIDEO</label>
                                 </div>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkDisco">
-                                <label class="form-check-label label-text" for="checkDisco">DISCO DURO</label>
+
+                            <div class="col-md-4 cell-border cell-block py-1">
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkProc">
+                                    <label class="form-check-label label-text" for="checkProc">PROCESADOR</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkFan">
+                                    <label class="form-check-label label-text" for="checkFan">FAN COOLER</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkPila">
+                                    <label class="form-check-label label-text" for="checkPila">PILA</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkFuente">
+                                    <label class="form-check-label label-text" for="checkFuente">FUENTE PODER</label>
+                                </div>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkVideo">
-                                <label class="form-check-label label-text" for="checkVideo">TARJ. VIDEO</label>
+
+                            <div class="col-md-4 cell-border cell-block py-1">
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkCanaima">
+                                    <label class="form-check-label label-text" for="checkCanaima">CANAIMA</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkWindows">
+                                    <label class="form-check-label label-text" for="checkWindows">WINDOWS</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkMadre">
+                                    <label class="form-check-label label-text" for="checkMadre">TARJ. MADRE</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input componente-check" type="checkbox" id="checkRed">
+                                    <label class="form-check-label label-text" for="checkRed">TARJ. RED</label>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-4 cell-border cell-block py-1">
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkProc">
-                                <label class="form-check-label label-text" for="checkProc">PROCESADOR</label>
+                        <div class="row row-compact">
+                            <div class="col-2 cell-border bg-light justify-content-center">
+                                <span class="label-text">INCLUYE:</span>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkFan">
-                                <label class="form-check-label label-text" for="checkFan">FAN COOLER</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkPila">
-                                <label class="form-check-label label-text" for="checkPila">PILA</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkFuente">
-                                <label class="form-check-label label-text" for="checkFuente">FUENTE PODER</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 cell-border cell-block py-1">
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkCanaima">
-                                <label class="form-check-label label-text" for="checkCanaima">CANAIMA</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkWindows">
-                                <label class="form-check-label label-text" for="checkWindows">WINDOWS</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkMadre">
-                                <label class="form-check-label label-text" for="checkMadre">TARJ. MADRE</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input componente-check" type="checkbox" id="checkRed">
-                                <label class="form-check-label label-text" for="checkRed">TARJ. RED</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-2 cell-border bg-light justify-content-center">
-                            <span class="label-text">INCLUYE:</span>
-                        </div>
-                        <div class="col-10 cell-border flex-wrap">
-                            <div class="form-check">
-                                <input class="form-check-input periferico-check" type="checkbox" value="Monitor" id="checkMonitor">
-                                <label class="form-check-label label-text" for="checkMonitor">MONITOR</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input periferico-check" type="checkbox" value="Mouse" id="checkMouse">
-                                <label class="form-check-label label-text" for="checkMouse">MOUSE</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input periferico-check" type="checkbox" value="Teclado" id="checkTeclado">
-                                <label class="form-check-label label-text" for="checkTeclado">TECLADO</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input periferico-check" type="checkbox" value="Regulador" id="checkRegulador">
-                                <label class="form-check-label label-text" for="checkRegulador">REGULADOR</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-2 cell-border bg-light justify-content-center">
-                            <span class="label-text">APPS:</span>
-                        </div>
-                        <div class="col-10 cell-border flex-wrap">
-                            <div class="form-check">
-                                <input class="form-check-input app-check" type="checkbox" value="Siquel">
-                                <label class="label-text">SIQUEL</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input app-check" type="checkbox" value="SAP">
-                                <label class="label-text">SAP</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input app-check" type="checkbox" value="Autocad">
-                                <label class="label-text">AUTOCAD</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input app-check" type="checkbox" value="Project">
-                                <label class="label-text">PROJECT</label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row row-compact">
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">OTRA APP:</span>
-                            <div class="tag-container" onclick="document.getElementById('inputOtraApp').focus()">
-                                <div id="tagsAppsContainer" class="d-flex flex-wrap"></div>
-                                <input type="text" class="tag-input-real" id="inputOtraApp">
+                            <div class="col-10 cell-border flex-wrap">
+                                <div class="form-check">
+                                    <input class="form-check-input periferico-check" type="checkbox" value="Monitor"
+                                        id="checkMonitor">
+                                    <label class="form-check-label label-text" for="checkMonitor">MONITOR</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input periferico-check" type="checkbox" value="Mouse"
+                                        id="checkMouse">
+                                    <label class="form-check-label label-text" for="checkMouse">MOUSE</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input periferico-check" type="checkbox" value="Teclado"
+                                        id="checkTeclado">
+                                    <label class="form-check-label label-text" for="checkTeclado">TECLADO</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input periferico-check" type="checkbox" value="Regulador"
+                                        id="checkRegulador">
+                                    <label class="form-check-label label-text" for="checkRegulador">REGULADOR</label>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">CARPETA RED:</span>
-                            <div class="tag-container" onclick="document.getElementById('inputCarpetaRed').focus()">
-                                <div id="tagsCarpetasContainer" class="d-flex flex-wrap"></div>
-                                <input type="text" class="tag-input-real" id="inputCarpetaRed">
+                        <div class="row row-compact">
+                            <div class="col-2 cell-border bg-light justify-content-center">
+                                <span class="label-text">APPS:</span>
+                            </div>
+                            <div class="col-10 cell-border flex-wrap">
+                                <div class="form-check">
+                                    <input class="form-check-input app-check" type="checkbox" value="Siquel">
+                                    <label class="label-text">SIQUEL</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input app-check" type="checkbox" value="SAP">
+                                    <label class="label-text">SAP</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input app-check" type="checkbox" value="Autocad">
+                                    <label class="label-text">AUTOCAD</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input app-check" type="checkbox" value="Project">
+                                    <label class="label-text">PROJECT</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">OTRA APP:</span>
+                                <div class="tag-container" onclick="document.getElementById('inputOtraApp').focus()">
+                                    <div id="tagsAppsContainer" class="d-flex flex-wrap"></div>
+                                    <input type="text" class="tag-input-real" id="inputOtraApp">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">CARPETA RED:</span>
+                                <div class="tag-container" onclick="document.getElementById('inputCarpetaRed').focus()">
+                                    <div id="tagsCarpetasContainer" class="d-flex flex-wrap"></div>
+                                    <input type="text" class="tag-input-real" id="inputCarpetaRed">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border cell-block">
+                                <span class="label-text">OBSERVACIÓN:</span>
+                                <textarea class="input-line" rows="1" id="observacion" style="resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">ASIGNADO A:</span>
+                                <input type="text" class="input-line" id="asignadoA">
+                            </div>
+                            <div class="col-md-6 cell-border">
+                                <span class="label-text me-2">ESTATUS:</span>
+                                <input type="text" class="input-line" id="estatus">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-6 cell-border cell-block" style="height: 50px;">
+                                <span class="label-text">ENTREGADO POR:</span>
+                                <input type="text" class="input-line" id="entregadoPor">
+                            </div>
+                            <div class="col-6 cell-border cell-block" style="height: 50px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line" id="recibidoPor">
+                            </div>
+                        </div>
+                        <div class="row row-compact mt-2">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light"
+                                style="padding: 4px;">
+                                <h6 class="m-0 fw-bold">SERIALES COMPONENTES:</h6>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border bg-light justify-content-center"><span
+                                    class="label-text">DESCRIPCIÓN</span></div>
+                            <div class="col-4 cell-border bg-light justify-content-center"><span
+                                    class="label-text">MARCA</span></div>
+                            <div class="col-4 cell-border bg-light justify-content-center"><span
+                                    class="label-text">SERIAL</span></div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">TARJETA MADRE</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="marcaMadre"></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="serialMadre"></div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">FUENTE DE PODER</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="marcaFuente"></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="serialFuente"></div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">TARJETA DE VIDEO</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="marcaVideo"></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="serialVideo"></div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-4 cell-border"><span class="label-text">TARJETA DE RED</span></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="marcaRed"></div>
+                            <div class="col-4 cell-border"><input type="text" class="input-line text-center"
+                                    id="serialRed"></div>
+                        </div>
+
+                        <div class="row row-compact mt-1 border-top border-dark">
+                            <div class="col-3 cell-border d-flex align-items-center justify-content-center bg-light">
+                                <span class="label-text">MEMORIA RAM</span>
+                            </div>
+
+                            <div class="col-9 p-0">
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">MARCA</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">SERIAL</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">CAPACIDAD</span></div>
+                                </div>
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-marca"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-serial"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-capacidad"></div>
+                                </div>
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-marca"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-serial"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-capacidad"></div>
+                                </div>
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-marca"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-serial"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-capacidad"></div>
+                                </div>
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-marca"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-serial"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center ram-capacidad"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact mt-1 border-top border-dark">
+                            <div class="col-3 cell-border d-flex align-items-center justify-content-center bg-light">
+                                <span class="label-text">DISCO DURO</span>
+                            </div>
+
+                            <div class="col-9 p-0">
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">MARCA</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">SERIAL</span></div>
+                                    <div class="col-4 cell-border bg-light justify-content-center"><span
+                                            class="label-text">CAPACIDAD</span></div>
+                                </div>
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center hdd-marca"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center hdd-serial"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center hdd-capacidad"></div>
+                                </div>
+                                <div class="row row-compact">
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center hdd-marca"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center hdd-serial"></div>
+                                    <div class="col-4 cell-border"><input type="text"
+                                            class="input-line text-center hdd-capacidad"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact mt-1">
+                            <div class="col-12 cell-border cell-block" style="min-height: 40px;">
+                                <span class="label-text">OBSERVACIÓN (SERIALES):</span>
+                                <textarea class="input-line" rows="1" id="observacionSeriales"
+                                    style="resize: none;"></textarea>
                             </div>
                         </div>
                     </div>
-
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border cell-block">
-                            <span class="label-text">OBSERVACIÓN:</span>
-                            <textarea class="input-line" rows="1" id="observacion" style="resize: none;"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">ASIGNADO A:</span>
-                            <input type="text" class="input-line" id="asignadoA">
-                        </div>
-                        <div class="col-md-6 cell-border">
-                            <span class="label-text me-2">ESTATUS:</span>
-                            <input type="text" class="input-line" id="estatus">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-6 cell-border cell-block" style="height: 50px;">
-                            <span class="label-text">ENTREGADO POR:</span>
-                            <input type="text" class="input-line" id="entregadoPor">
-                        </div>
-                        <div class="col-6 cell-border cell-block" style="height: 50px;">
-                            <span class="label-text">RECIBIDO POR:</span>
-                            <input type="text" class="input-line" id="recibidoPor">
-                        </div>
-                    </div>
-                    <%- include('../pages/recibo-equipos2') %>
+                    <br>
                 </div>
-                <br>
             </div>
-        </div>
     </div>
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-    
-    <script src="/js/utils/api.js"></script> 
-    
-<script>
-        //fecha por defecto
-        const fechaInput = document.getElementById('fecha');
-        if(fechaInput) fechaInput.valueAsDate = new Date();
-        
-        // --- LÓGICA DE TAGS (BURBUJAS) ---
-        
-        // 1. Arrays globales para almacenar los datos
-        let tagsAplicaciones = [];
-        let tagsCarpetas = [];
 
-        // 2. Función genérica para configurar un input de tags
-        function setupTagInput(inputId, containerId, storageArray) {
-            const inputElement = document.getElementById(inputId);
-            const containerElement = document.getElementById(containerId);
+    <script src="/js/utils/api.js"></script>
 
-            // Escuchar teclas
-            inputElement.addEventListener('keydown', function(e) {
-                // Detectar Espacio o Enter
-                if (e.key === ' ' || e.key === 'Enter') {
-                    e.preventDefault(); // Evitar que escriba el espacio real
-                    
-                    const valor = inputElement.value.trim();
-                    if (valor && !storageArray.includes(valor)) {
-                        storageArray.push(valor);
-                        renderTags(containerId, storageArray, inputId); // Redibujar
-                        inputElement.value = ''; // Limpiar input
-                    }
-                }
-                // Detectar Backspace para borrar el último si el input está vacío
-                else if (e.key === 'Backspace' && inputElement.value === '' && storageArray.length > 0) {
-                    storageArray.pop();
-                    renderTags(containerId, storageArray, inputId);
-                }
-            });
-        }
-
-        // 3. Función para dibujar las burbujas visualmente
-        function renderTags(containerId, storageArray, inputId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = ''; // Limpiar visualmente para redibujar
-
-            storageArray.forEach((tag, index) => {
-                // Crear la burbuja
-                const badge = document.createElement('span');
-                badge.className = 'tag-badge';
-                badge.innerHTML = `${tag} <span class="tag-close">&times;</span>`;
-                
-                // Función eliminar al hacer click en la X
-                badge.querySelector('.tag-close').onclick = function() {
-                    // Remover del array original dependiendo de cual sea
-                    if (inputId === 'inputOtraApp') tagsAplicaciones.splice(index, 1);
-                    if (inputId === 'inputCarpetaRed') tagsCarpetas.splice(index, 1);
-                    
-                    renderTags(containerId, storageArray, inputId); // Redibujar
-                };
-
-                container.appendChild(badge);
-            });
-        }
-
-        // 4. Inicializar los dos campos
-        document.addEventListener('DOMContentLoaded', () => {
-            setupTagInput('inputOtraApp', 'tagsAppsContainer', tagsAplicaciones);
-            setupTagInput('inputCarpetaRed', 'tagsCarpetasContainer', tagsCarpetas);
-        });
-
-
-        // --- TU FUNCIÓN DE GUARDADO ACTUALIZADA ---
-        async function guardarRecibo() {
-        console.log("Generando Payload con estructura solicitada...");
-
-        // --- 1. DATOS DE USUARIO (Raíz del JSON) ---
-        const usuario = document.getElementById('usuario').value;
-        const clave = document.getElementById('clave').value;
-        const ficha = parseInt(document.getElementById('ficha').value) || 0;
-        const nombre = document.getElementById('nombre').value;
-        const extension = document.getElementById('extension').value;
-        const gerencia = document.getElementById('gerencia').value;
-
-        // --- 2. LÓGICA DE APLICACIONES (IDs y Extras) ---
-        
-        // A. IDs de Aplicaciones (Checkboxes fijos)
-        // Debes definir qué ID de base de datos corresponde a cada valor del checkbox
-        const mapAppIds = {
-            'Siquel': 1,
-            'SAP': 2,
-            'Autocad': 3,
-            'Project': 4
-        };
-        
-        const idsAplicaciones = [];
-        document.querySelectorAll('.app-check:checked').forEach(chk => {
-            if (mapAppIds[chk.value]) {
-                idsAplicaciones.push(mapAppIds[chk.value]);
-            }
-        });
-
-        // B. Aplicaciones Extra (Lo que escribiste en las burbujas)
-        // Si el array está vacío, mandamos null o array vacío según prefieras.
-        // El ejemplo pedía null si no hay datos, pero es más seguro mandar array vacío [].
-        // Aquí usaré el array de tags que creamos en el paso anterior.
-        const aplicacionesExtra = tagsAplicaciones.length > 0 ? tagsAplicaciones : null;
-
-
-        // --- 3. CARPETAS DE RED ---
-        // Usamos el array de burbujas global 'tagsCarpetas'
-        const nombresCarpetas = tagsCarpetas.length > 0 ? tagsCarpetas : [];
-
-
-        // --- 4. COMPONENTES (Cantidades) ---
-        const componentes = [];
-        // RAM
-        if(document.getElementById('checkRam').checked) {
-            componentes.push({
-                idComponente: 3, 
-                cantidad: parseInt(document.getElementById('cantRam').value) || 1
-            });
-        }
-        // B. Lógica para los OTROS checkboxes usando MAPA
-        // CLAVE: El 'id' del checkbox en el HTML
-        // VALOR: El 'id' real en tu tabla 'componentes_computadora_internos' de la BD
-        const mapComponentesIds = {
-            'checkDisco': 4,
-            'checkMadre': 5,
-            'checkProc': 6,
-            'checkVideo': 7,
-            'checkFuente': 8,
-            'checkRed': 9,
-            'checkFan': 10,
-            'checkPila': 11,
-            'checkWindows': 12,
-            'checkCanaima': 13
-        };
-
-        // Seleccionamos todos los marcados que NO sean la RAM
-        const otrosChecks = document.querySelectorAll('.componente-check:checked:not(#checkRam)');
-        
-        otrosChecks.forEach((check) => {
-            // Buscamos el ID de la BD usando el ID del checkbox (check.id)
-            const idBD = mapComponentesIds[check.id]; 
-
-            if (idBD) {
-                componentes.push({
-                    idComponente: idBD,
-                    cantidad: 1 // Asumimos 1 para estos componentes
-                });
-            }
-        });
-        // --- 4.5. PERIFÉRICOS (Mapeo de Checkboxes) ---
-        const idsPerifericos = [];
-
-        // CLAVE: El 'id' del checkbox en el HTML
-        // VALOR: El 'id' real en tu tabla 'perifericos' de la BD
-        const mapPerifericosIds = {
-            'checkMonitor': 1,
-            'checkTeclado': 2,
-            'checkMouse': 3,
-            'checkRegulador': 4
-        };
-
-        // Seleccionamos los checkboxes marcados de la clase .periferico-check
-        document.querySelectorAll('.periferico-check:checked').forEach((check) => {
-            const idBD = mapPerifericosIds[check.id];
-            if (idBD) {
-                idsPerifericos.push(idBD);
-            }
-        });
-
-        // --- 5. SERIALES ---
-        const seriales = [];
-        // Helper para agregar
-        const addSerial = (idTipo, marcaId, serialId, capId = null) => {
-            const serialVal = document.getElementById(serialId)?.value;
-            if(serialVal) {
-                seriales.push({
-                    idTipoComponente: idTipo,
-                    marca: document.getElementById(marcaId).value || "Genérico",
-                    serial: serialVal,
-                    capacidad: capId ? document.getElementById(capId).value : "N/A"
-                });
-            }
-        };
-
-        // Seriales Únicos
-        addSerial(5, 'marcaMadre', 'serialMadre'); 
-        addSerial(8, 'marcaFuente', 'serialFuente');
-        addSerial(7, 'marcaVideo', 'serialVideo');
-        addSerial(9, 'marcaRed', 'serialRed');
-
-        // Seriales RAM (Múltiples)
-        const ramsMarcas = document.querySelectorAll('.ram-marca');
-        const ramsSeriales = document.querySelectorAll('.ram-serial');
-        const ramsCaps = document.querySelectorAll('.ram-capacidad');
-        ramsSeriales.forEach((input, i) => {
-            if(input.value) seriales.push({ idTipoComponente: 3, marca: ramsMarcas[i].value, serial: input.value, capacidad: ramsCaps[i].value });
-        });
-
-        // Seriales HDD (Múltiples)
-        const hddsMarcas = document.querySelectorAll('.hdd-marca');
-        const hddsSeriales = document.querySelectorAll('.hdd-serial');
-        const hddsCaps = document.querySelectorAll('.hdd-capacidad');
-        hddsSeriales.forEach((input, i) => {
-            if(input.value) seriales.push({ idTipoComponente: 4, marca: hddsMarcas[i].value, serial: input.value, capacidad: hddsCaps[i].value });
-        });
-
-        // --- 6. CONSTRUCCIÓN DEL PAYLOAD FINAL ---
-        const payload = {
-            clave: clave,
-            extension: extension,
-            ficha: ficha,
-            gerencia: gerencia,
-            nombre: nombre,
-            recibos: [
-                {
-                    asignadoA: document.getElementById('asignadoA').value,
-                    entregadoPor: document.getElementById('entregadoPor').value,
-                    equipos: [
-                        {
-                            marca: document.getElementById('marca').value,
-                            respaldo: document.querySelector('input[name="respaldo"]:checked')?.value || 'NO',
-                            
-                            // Arrays y Listas
-                            nombresCarpetas: nombresCarpetas,
-                            componentes: componentes,
-                            seriales: seriales,
-
-                            // NUEVO CAMPO AGREGADO AQUÍ:
-                            idsPerifericos: idsPerifericos.length > 0 ? idsPerifericos : null,
-                            
-                            // Campos nuevos/modificados
-                            observacionSeriales: document.getElementById('observacionSeriales') ? document.getElementById('observacionSeriales').value : "",
-                            idsAplicaciones: idsAplicaciones.length > 0 ? idsAplicaciones : null,
-                            aplicacionesExtra: aplicacionesExtra
-                        }
-                    ],
-                    estatus: document.getElementById('estatus').value,
-                    falla: document.getElementById('falla').value,
-                    fecha: document.getElementById("fecha").value,
-                    fmoEquipo: document.getElementById('fmoEquipo').value,
-                    observacion: document.getElementById('observacion').value,
-                    recibidoPor: document.getElementById('recibidoPor').value,
-                    solicitudDAET: document.getElementById('solicitudDAET').value,
-                    solicitudST: document.getElementById('solicitudST').value
-                }
-            ],
-            usuario: usuario
-        };
-
-        console.log("Payload Final:", JSON.stringify(payload, null, 2));
-
-        // --- 7. ENVÍO ---
-        try {
-            const response = await fetch('http://127.0.0.1:8081/api/crearReciboEquipos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) throw new Error(`Error: ${response.error || response.statusText}`);
-            
-            const data = await response.json();
-            alert("¡Guardado Exitosamente!");
-            console.log("Payload Final:", JSON.stringify(payload, null, 2));
-            //window.location.reload(); 
-
-        } catch (error) {
-            console.log("Error al enviar:", error);
-            alert("Error: " + error);
-        }
-    }
-    </script>
+    <script src="/js/scripts/reciboEquipos.js"></script>
 </body>
+
 </html>

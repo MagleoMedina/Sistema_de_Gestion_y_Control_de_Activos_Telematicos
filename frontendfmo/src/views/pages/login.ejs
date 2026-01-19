@@ -162,7 +162,7 @@
             <p class="text-muted small">Sistema de Gestión Telemática</p>
         </div>
 
-        <form action="/auth/login" method="POST" id="loginForm">
+        <form id="loginForm">
             
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="username" name="username" placeholder="Usuario" required>
@@ -175,8 +175,8 @@
             </div>
 
             <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-login text-white fw-bold rounded-pill">
-                    Iniciar Sesión
+                <button type="submit" class="btn btn-primary btn-login text-white fw-bold rounded-pill" id="btnLogin">
+                   Iniciar Sesión
                 </button>
             </div>
 
@@ -186,6 +186,7 @@
             <small class="text-muted">© 2026 Ing. Magleo Medina</small>
         </div>
     </div>
+    <script src="/js/utils/api.js"></script>
     <script src="/js/scripts/login.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
 </body>

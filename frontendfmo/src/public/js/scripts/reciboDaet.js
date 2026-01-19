@@ -1,4 +1,6 @@
-    document.addEventListener('DOMContentLoaded', () => {
+
+
+document.addEventListener('DOMContentLoaded', () => {
         const fechaInput = document.getElementById('fecha');
         if(fechaInput) fechaInput.valueAsDate = new Date();
         initValidations(); // Inicializar exclusividad de campos

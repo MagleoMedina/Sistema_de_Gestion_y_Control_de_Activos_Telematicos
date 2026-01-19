@@ -1,4 +1,5 @@
-       // --- 1. LÓGICA DE FILTROS ---
+
+ // --- 1. LÓGICA DE FILTROS ---
         function cambiarFiltro() {
             const filtro = document.getElementById('filtroSelect').value;
             const divSerial = document.getElementById('containerInputSerial');

@@ -1,79 +1,104 @@
-// src/public/js/api.js
-
-const API_BASE_URL = 'http://127.0.0.1:8081/api';
-
 /**
- * Objeto centralizado para manejar todas las peticiones al Backend
+ * api.js
+ * Módulo centralizado para la comunicación con el Backend Spring Boot
  */
+
+const API_CONFIG = {
+    BASE_URL: 'http://127.0.0.1:8081/api', // Tu Backend Java
+    AUTH_ENDPOINT: '/auth/login',
+    TOKEN_KEY: 'jwt_token' // Nombre de la llave en sessionStorage
+};
+
 const ApiService = {
+    
+    // --- 1. AUTENTICACIÓN ---
 
-    // --- Módulo de Ingresos (MegaRegistro) ---
-    ingresos: {
-        async crear(data) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/ingresos/crear-todo`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) throw new Error('Error al guardar ingreso');
-                return await response.json();
-            } catch (error) {
-                console.error('Error API Ingresos:', error);
-                throw error; // Re-lanzamos el error para manejarlo en la vista
+    /**
+     * Realiza el login y devuelve el token
+     */
+    async login(username, clave) {
+        try {
+            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.AUTH_ENDPOINT}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, clave })
+            });
+
+            if (!response.ok) {
+                if (response.status === 403 || response.status === 401) {
+                    throw new Error("Credenciales incorrectas");
+                }
+                throw new Error(`Error del servidor: ${response.status}`);
             }
-        },
-        // Aquí podrías agregar buscarPorFmo(fmo) ...
-        async buscarPorFmo(fmo) {
-             const response = await fetch(`${API_BASE_URL}/consultas/buscar?fmo=${fmo}`);
-             if (!response.ok) throw new Error('No encontrado');
-             return await response.json();
+
+            // El backend devuelve el token como texto plano (String)
+            const token = await response.text();
+            return token;
+
+        } catch (error) {
+            console.error("Login Error:", error);
+            throw error;
         }
     },
 
-    // --- Módulo de Periféricos ---
-    perifericos: {
-        async crear(data) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/perifericos/crear`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) throw new Error('Error al guardar periféricos');
-                return await response.json();
-            } catch (error) {
-                console.error('Error API Periféricos:', error);
-                throw error;
-            }
-        },
-        async buscarPorSerial(serial) {
-            const response = await fetch(`${API_BASE_URL}/perifericos/buscar?serial=${serial}`);
-            if (!response.ok) throw new Error('Periférico no encontrado');
-            return await response.json();
-        }
+    /**
+     * Cierra la sesión eliminando el token
+     */
+    logout() {
+        sessionStorage.removeItem(API_CONFIG.TOKEN_KEY);
+        window.location.href = '/';
     },
 
-    // --- Módulo DAET ---
-    daet: {
-        async crear(data) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/daet/entregas`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                if (!response.ok) throw new Error('Error al guardar entrega DAET');
-                return await response.json();
-            } catch (error) {
-                console.error('Error API DAET:', error);
-                throw error;
+    // --- 2. PETICIONES GENÉRICAS PROTEGIDAS ---
+
+    /**
+     * Wrapper para fetch que inyecta automáticamente el Token JWT
+     * @param {string} endpoint - Ej: '/api/stock'
+     * @param {object} options - Opciones estándar de fetch (method, body, etc.)
+     */
+    async fetchAutenticado(endpoint, options = {}) {
+        const token = sessionStorage.getItem(API_CONFIG.TOKEN_KEY);
+
+        // Si no hay token, forzamos salida (Seguridad Frontend)
+        if (!token) {
+            console.warn("No hay token, redirigiendo al login...");
+            window.location.href = '/';
+            return;
+        }
+
+        // Configurar Headers por defecto
+        const defaultHeaders = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        // Combinar headers personalizados si existen
+        const config = {
+            ...options,
+            headers: {
+                ...defaultHeaders,
+                ...options.headers
             }
-        },
-        async buscarPorSerial(serial) {
-            const response = await fetch(`${API_BASE_URL}/daet/buscar?serial=${serial}`);
-            if (!response.ok) throw new Error('Entrega DAET no encontrada');
-            return await response.json();
+        };
+
+        try {
+            const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, config);
+
+            // Si el token expiró o es inválido (403 Forbidden)
+            if (response.status === 403) {
+                alert("Su sesión ha expirado. Por favor ingrese nuevamente.");
+                this.logout();
+                return null;
+            }
+
+            return response;
+
+        } catch (error) {
+            console.error("Error en petición autenticada:", error);
+            throw error;
         }
     }
 };
+
+// Exponer globalmente para que otros scripts lo usen
+window.ApiService = ApiService;

@@ -1,69 +1,80 @@
-    // Lógica para cargar los números desde el Backend
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarEstadisticas();
+document.addEventListener('DOMContentLoaded', () => {
+    cargarEstadisticas();
+});
+
+async function cargarEstadisticas() {
+    // Animación de carga inicial (opcional)
+    const elementos = ['numEquipos', 'numPerifericos', 'numDaet', 'numPendientes'];
+    elementos.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.innerText = '-';
+    });
+
+    try {
+        // --- 1. Equipos ---
+        // Usamos endpoint relativo porque ApiService ya tiene la BASE_URL
+        const resEquipos = await ApiService.fetchAutenticado('/contador/reciboDeEquipos');
+        if (resEquipos) {
+            const dataEquipos = await resEquipos.json();
+            animarNumero('numEquipos', dataEquipos);
+        }
+
+        // --- 2. Periféricos ---
+        const resPeri = await ApiService.fetchAutenticado('/contador/reciboDePerifericos');
+        if (resPeri) {
+            const dataPeri = await resPeri.json();
+            animarNumero('numPerifericos', dataPeri);
+        }
+
+        // --- 3. DAET ---
+        const resDaet = await ApiService.fetchAutenticado('/contador/entregasAlDaet');
+        if (resDaet) {
+            const dataDaet = await resDaet.json();
+            animarNumero('numDaet', dataDaet);
+        }
+
+        // --- 4. Pendientes ---
+        const resPend = await ApiService.fetchAutenticado('/contador/pendientes');
+        if (resPend) {
+            const dataPend = await resPend.json();
+            animarNumero('numPendientes', dataPend);
+        }
+
+    } catch (error) {
+        console.error("Error cargando estadísticas:", error);
+        // Si falla, ponemos 0
+        elementos.forEach(id => {
+            const el = document.getElementById(id);
+            if(el && el.innerText === '-') el.innerText = '0';
         });
+    }
+}
 
-        async function cargarEstadisticas() {
-            // Animación de carga inicial (opcional)
-            const elementos = ['numEquipos', 'numPerifericos', 'numDaet', 'numPendientes'];
-            elementos.forEach(id => document.getElementById(id).innerText = '-');
+// Función para animar el conteo (Efecto visual de 0 a N) - SE MANTIENE IGUAL
+function animarNumero(idElemento, valorFinal) {
+    const elemento = document.getElementById(idElemento);
+    if (!elemento) return;
 
-            try {
-                // AQUÍ SE CONSUMEN TUS ENDPOINTS
-                // Asumimos que tienes un controlador en Spring Boot que devuelve estos números
-                // Puedes hacer 1 llamada que devuelva todo el objeto o 4 llamadas separadas.
-                // Ejemplo con 4 llamadas separadas:
+    const valor = parseInt(valorFinal) || 0;
+    let inicio = 0;
+    const duracion = 1000; // 1 segundo
+    
+    // Evitar división por cero si la duración es muy corta o valor es pequeño
+    const pasos = duracion / 16; // Aprox 60 FPS
+    const incremento = Math.ceil(valor / pasos); 
 
-                // 1. Equipos
-                const resEquipos = await fetch('http://127.0.0.1:8081/api/contador/reciboDeEquipos');
-                const dataEquipos = await resEquipos.json(); // Se asume devuelve un entero, ej: 45
-                animarNumero('numEquipos', dataEquipos);
+    if (valor === 0) {
+        elemento.innerText = 0;
+        return;
+    }
 
-                // 2. Periféricos
-                const resPeri = await fetch('http://127.0.0.1:8081/api/contador/reciboDePerifericos');
-                const dataPeri = await resPeri.json();
-                animarNumero('numPerifericos', dataPeri);
-
-                // 3. DAET
-                const resDaet = await fetch('http://127.0.0.1:8081/api/contador/entregasAlDaet');
-                const dataDaet = await resDaet.json();
-                console.log(dataDaet);
-                animarNumero('numDaet', dataDaet);
-
-                // 4. Pendientes
-                const resPend = await fetch('http://127.0.0.1:8081/api/contador/pendientes');
-                const dataPend = await resPend.json();
-                animarNumero('numPendientes', dataPend);
-
-            } catch (error) {
-                console.error("Error cargando estadísticas:", error);
-                // Si falla, ponemos 0 o un mensaje de error
-                elementos.forEach(id => {
-                    if(document.getElementById(id).innerText === '-') document.getElementById(id).innerText = '0';
-                });
-            }
+    const timer = setInterval(() => {
+        inicio += incremento;
+        if (inicio >= valor) {
+            elemento.innerText = valor;
+            clearInterval(timer);
+        } else {
+            elemento.innerText = inicio;
         }
-
-        // Función para animar el conteo (Efecto visual de 0 a N)
-        function animarNumero(idElemento, valorFinal) {
-            const elemento = document.getElementById(idElemento);
-            const valor = parseInt(valorFinal) || 0;
-            let inicio = 0;
-            const duracion = 1000; // 1 segundo
-            const incremento = Math.ceil(valor / (duracion / 16)); // 60 FPS
-
-            if (valor === 0) {
-                elemento.innerText = 0;
-                return;
-            }
-
-            const timer = setInterval(() => {
-                inicio += incremento;
-                if (inicio >= valor) {
-                    elemento.innerText = valor;
-                    clearInterval(timer);
-                } else {
-                    elemento.innerText = inicio;
-                }
-            }, 16);
-        }
+    }, 16);
+}

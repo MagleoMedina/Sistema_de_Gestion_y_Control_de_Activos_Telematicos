@@ -162,9 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Payload generado:", JSON.stringify(payload, null, 2));
 
         try {
-            const response = await fetch('http://127.0.0.1:8081/api/crearEntregasAlDaet', { 
+            const response = await ApiService.fetchAutenticado('/crearEntregasAlDaet', { 
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
 

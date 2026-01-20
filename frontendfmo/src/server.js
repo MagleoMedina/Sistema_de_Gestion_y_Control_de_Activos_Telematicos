@@ -66,23 +66,9 @@ app.get('/', (req, res) => {
 });
 
 // Ruta para procesar el Login (POST)
-app.post('/auth/login', async (req, res) => {
-   // const { username, password } = req.body;
-    
-    // Aquí va tu lógica de validación contra la BD o API Java
-    // Ejemplo ficticio:
-    try {
-        // const usuario = await buscarUsuario(username, password);
-        // if (usuario) {
-        //    req.session.user = usuario;
-        //    return res.redirect('/dashboard');
-        // }
-        res.redirect('/dashboard'); // Temporal para probar
-    } catch (error) {
-        res.render('pages/login', { error: 'Credenciales inválidas' });
-    }
+app.get('/auth/login', async (req, res) => {
+    res.render('/dashboard'); // Temporal para probar
 });
-
 app.get('/health', async (req, res) => {
     try {
         // 1. Intentamos contactar al Backend Java (con un timeout corto de 2s)

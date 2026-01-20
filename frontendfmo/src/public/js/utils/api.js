@@ -10,9 +10,7 @@ const API_CONFIG = {
 };
 
 const ApiService = {
-    
     // --- 1. AUTENTICACIÓN ---
-
     /**
      * Realiza el login y devuelve el token
      */
@@ -23,24 +21,20 @@ const ApiService = {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, clave })
             });
-
             if (!response.ok) {
                 if (response.status === 403 || response.status === 401) {
                     throw new Error("Credenciales incorrectas");
                 }
                 throw new Error(`Error del servidor: ${response.status}`);
             }
-
             // El backend devuelve el token como texto plano (String)
             const token = await response.text();
             return token;
-
         } catch (error) {
             console.error("Login Error:", error);
             throw error;
         }
     },
-
     /**
      * Cierra la sesión eliminando el token
      */
@@ -48,9 +42,7 @@ const ApiService = {
         sessionStorage.removeItem(API_CONFIG.TOKEN_KEY);
         window.location.href = '/';
     },
-
     // --- 2. PETICIONES GENÉRICAS PROTEGIDAS ---
-
     /**
      * Wrapper para fetch que inyecta automáticamente el Token JWT
      * @param {string} endpoint - Ej: '/api/stock'
@@ -58,6 +50,7 @@ const ApiService = {
      */
     async fetchAutenticado(endpoint, options = {}) {
         const token = sessionStorage.getItem(API_CONFIG.TOKEN_KEY);
+        console.log("Usando token:", token);
 
         // Si no hay token, forzamos salida (Seguridad Frontend)
         if (!token) {
@@ -80,19 +73,16 @@ const ApiService = {
                 ...options.headers
             }
         };
-
+        console.log("Configuración de la petición:", config);
         try {
             const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, config);
-
             // Si el token expiró o es inválido (403 Forbidden)
             if (response.status === 403) {
                 alert("Su sesión ha expirado. Por favor ingrese nuevamente.");
                 this.logout();
                 return null;
             }
-
             return response;
-
         } catch (error) {
             console.error("Error en petición autenticada:", error);
             throw error;

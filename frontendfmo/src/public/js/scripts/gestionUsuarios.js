@@ -38,7 +38,7 @@
         async function listarUsuarios() {
             const tbody = document.getElementById('tablaUsuarios');
             try {
-                const res = await fetch("http://127.0.0.1:8081/api/usuarioSistema");
+                const res = await ApiService.fetchAutenticado('/usuarioSistema');
                 if(!res.ok) throw new Error("Error al obtener usuarios");
                 const usuarios = await res.json();
 
@@ -83,9 +83,8 @@
             const nuevoUsuario = { username, clave, tipo };
 
             try {
-                const res = await fetch("http://127.0.0.1:8081/api/crearUsuarioSistema", {
+                const res = await ApiService.fetchAutenticado("/crearUsuarioSistema", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(nuevoUsuario)
                 });
 
@@ -115,7 +114,7 @@
             if(!confirm(`¿Está seguro de eliminar al usuario ${nombre}?`)) return;
 
             try {
-                const res = await fetch(`http://127.0.0.1:8081/api/usuarioSistema/borrar/${nombre}`, {
+                const res = await ApiService.fetchAutenticado(`/usuarioSistema/borrar/${nombre}`, {
                     method: 'DELETE'
                 });
 

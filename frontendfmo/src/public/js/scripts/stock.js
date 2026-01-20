@@ -1,5 +1,3 @@
-    // URL Base de tu API Spring Boot
-    const API_URL = 'http://127.0.0.1:8081/api/stock';
 
     // Almacenes temporales para los selectores del modal
     let listaComponentesDB = [];
@@ -15,10 +13,8 @@
     async function cargarCatalogos() {
         try {
             // Hacemos las dos peticiones en paralelo para ser más rápidos
-            const [resComp, resPeri] = await Promise.all([
-                fetch(`${API_URL}/componentes`),
-                fetch(`${API_URL}/perifericos`) // Asumiendo que creaste este endpoint similar al de componentes
-            ]);
+            const resComp = await ApiService.fetchAutenticado('/stock/componentes');
+            const resPeri = await ApiService.fetchAutenticado('/stock/perifericos');
 
             if (resComp.ok) listaComponentesDB = await resComp.json();
             if (resPeri.ok) listaPerifericosDB = await resPeri.json();
@@ -85,9 +81,8 @@
         }
 
         try {
-            const res = await fetch(API_URL, {
+            const res = await ApiService.fetchAutenticado('/stock', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
 
@@ -115,7 +110,7 @@
         tbodyPeri.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
 
         try {
-            const res = await fetch(API_URL);
+            const res = await ApiService.fetchAutenticado('/stock');
             if(!res.ok) throw new Error("Fallo al obtener stock");
 
             const data = await res.json(); // Array de StockDTO
@@ -193,7 +188,7 @@
     async function modificarStock(id, cantidad) {
         try {
             // Usamos el endpoint específico de ajuste
-            const res = await fetch(`${API_URL}/${id}/ajustar?cantidad=${cantidad}`, {
+            const res = await ApiService.fetchAutenticado(`/stock/${id}/ajustar?cantidad=${cantidad}`, {
                 method: 'POST'
             });
 

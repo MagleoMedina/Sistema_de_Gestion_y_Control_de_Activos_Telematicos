@@ -17,24 +17,24 @@
     // --- 2. LÓGICA DE BÚSQUEDA ---
     async function buscarPerifericos() {
         const filtro = document.getElementById('filtroSelect').value;
-        let url = 'http://127.0.0.1:8081/api/buscarReciboPerifericos'; 
+        let url = '/buscarReciboPerifericos'; 
 
         if (filtro === 'serial') {
             const val = document.getElementById('inputBusquedaSerial').value;
             if(!val) return alert("Ingrese Serial");
-            url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/${val}`;
+            url = `/buscarReciboPerifericos/${val}`;
         } 
         else if (filtro === 'fecha') {
             const val = document.getElementById('inputBusquedaFecha').value;
             if(!val) return alert("Seleccione Fecha");
-            url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/fecha/${val}`;
+            url = `/buscarReciboPerifericos/fecha/${val}`;
         }
 
         const tbody = document.getElementById('tablaResultados');
         tbody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
 
         try {
-            const response = await fetch(url);
+            const response = await ApiService.fetchAutenticado(url);
             if(response.status === 404) {
                 tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
                 return;

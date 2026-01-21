@@ -21,29 +21,29 @@
         // --- 2. LÓGICA DE BÚSQUEDA ---
         async function buscarDaet() {
             const filtro = document.getElementById('filtroSelect').value;
-            let url = 'http://127.0.0.1:8081/api/buscarEntregasAlDaet'; 
+            let url = '/buscarEntregasAlDaet'; 
 
             if (filtro === 'fmoSerial') {
                 const val = document.getElementById('inputBusquedaSerial').value;
                 if(!val) return alert("Ingrese el Serial");
-                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fmoSerial/${val}`;
+                url = `/buscarEntregasAlDaet/fmoSerial/${val}`;
             }
             else if (filtro === 'fmoEquipo') {
                 const val = document.getElementById('inputBusquedaLote').value;
                 if(!val) return alert("Ingrese el FMO Equipo");
-                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fmoEquipo/${val}`; 
+                url = `/buscarEntregasAlDaet/fmoEquipo/${val}`; 
             }
             else if (filtro === 'fecha') {
                 const val = document.getElementById('inputBusquedaFecha').value;
                 if(!val) return alert("Seleccione Fecha");
-                url = `http://127.0.0.1:8081/api/buscarEntregasAlDaet/fecha/${val}`;
+                url = `/buscarEntregasAlDaet/fecha/${val}`;
             }
 
             const tbody = document.getElementById('tablaResultados');
             tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
 
             try {
-                const response = await fetch(url);
+                const response = await ApiService.fetchAutenticado(url);
                 if(!response.ok) throw new Error("Sin resultados o error de conexión.");
                 const data = await response.json();
                 renderizarTabla(data);

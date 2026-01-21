@@ -1,6 +1,8 @@
 package com.backendfmo.controllers;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backendfmo.models.reciboequipos.EncabezadoRecibo;
+import com.backendfmo.repository.EncabezadoReciboRepository;
 import com.backendfmo.services.CsvServiceImpl;
 
 import jakarta.validation.Valid;
@@ -24,6 +28,8 @@ public class ExportarACsvController {
 
     @Autowired
     private CsvServiceImpl service;
+    @Autowired
+    private EncabezadoReciboRepository encabezadoRepository;
 
     @GetMapping("/exportarCsvJson/{inicio}/{fin}")
     public ResponseEntity<?> exportarACsv(@Valid @PathVariable String inicio, @Valid @PathVariable String fin){
@@ -39,8 +45,13 @@ public class ExportarACsvController {
 public ResponseEntity<Resource> descargarCsv(@PathVariable String inicio, @PathVariable String fin) {
 
     String nombreArchivo = "Reporte_" + inicio + "_al_" + fin + ".csv";
+    List<EncabezadoRecibo> recibos = encabezadoRepository.findByFechaBetween(inicio, fin);
     
-    // 1. Llamar al servicio que genera el stream
+    if (recibos.isEmpty()){
+        return ResponseEntity.noContent().build();
+    }
+    
+     // 1. Llamar al servicio que genera el stream
     InputStreamResource file = new InputStreamResource(service.generarCsvStream(inicio, fin));
 
     // 2. Retornar el archivo con las cabeceras adecuadas

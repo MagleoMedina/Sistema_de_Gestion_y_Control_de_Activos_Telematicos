@@ -7,7 +7,11 @@ meta {
 get {
   url: 127.0.0.1:8081/api/buscarEntregasAlDaet
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNYWdsZW8yMDAzIiwiaWF0IjoxNzY5MDE1MzM1LCJleHAiOjE3NjkwNTEzMzV9.fO2RXvuJKyM9CZjRN6ebtePfP44l7PjzL5qJC3rjCT8
 }
 
 settings {

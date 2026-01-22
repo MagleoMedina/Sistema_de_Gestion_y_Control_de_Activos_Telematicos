@@ -1,65 +1,243 @@
-<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark">
-    <a href="/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <span class="fs-4 fw-bold">🛠️ Soporte FMO</span>
-    </a>
+<style>
+    /* --- 1. LAYOUT GLOBAL --- */
+    .wrapper {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* --- 2. SIDEBAR --- */
+    #sidebar {
+        min-width: 260px;
+        max-width: 260px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        flex-shrink: 0;
+        z-index: 1000;
+        overflow-x: hidden;
+        white-space: nowrap;
+        background-color: #212529 !important;
+    }
+
+    .no-transition {
+        transition: none !important;
+    }
+
+    /* Estado Colapsado */
+    #sidebar.collapsed {
+        min-width: 70px;
+        max-width: 70px;
+    }
+
+    /* Ocultar textos */
+    #sidebar.collapsed .link-text,
+    #sidebar.collapsed .dropdown-toggle::after,
+    #sidebar.collapsed .sidebar-title span {
+        opacity: 0;
+        pointer-events: none;
+        display: none;
+    }
+
+    /* Centrado de iconos */
+    #sidebar.collapsed .nav-link, 
+    #sidebar.collapsed .dropdown-toggle {
+        text-align: center;
+        padding-left: 0;
+        padding-right: 0;
+        justify-content: center;
+    }
+
+    #sidebar.collapsed .icon-container {
+        margin-right: 0 !important;
+    }
+
+    #sidebar.collapsed .collapse {
+        display: none !important; 
+    }
+
+    /* --- 3. CONTENIDO --- */
+    #content {
+        flex-grow: 1;
+        width: auto !important;
+        overflow-y: auto;
+        height: 100vh;
+        transition: all 0.3s ease;
+    }
+
+    /* --- 4. EXTRAS --- */
+    .submenu-link {
+        padding-left: 2.5rem !important;
+        font-size: 0.9em;
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem; /* Icono un poco más grande */
+        cursor: pointer;
+        padding: 0 10px;
+        transition: transform 0.3s;
+        line-height: 1;
+    }
+    .toggle-btn:hover { color: #adb5bd; }
+
+    .nav-link:hover {
+        background-color: rgba(255,255,255,0.1);
+        transform: translateX(5px);
+        transition: transform 0.2s;
+    }
+    
+    /* Ajuste para los iconos de bootstrap */
+    .bi {
+        vertical-align: text-bottom;
+    }
+</style>
+
+<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark h-100 no-transition">
+    
+    <script>
+        (function() {
+            try {
+                const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+                if (isCollapsed) {
+                    document.getElementById('sidebar').classList.add('collapsed');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
+    <div class="d-flex align-items-center justify-content-between mb-3 text-white text-decoration-none w-100">
+        <a href="/dashboard" class="d-flex align-items-center text-white text-decoration-none sidebar-title overflow-hidden">
+            <i class="bi bi-tools fs-4 me-2"></i>
+            <span class="fs-4 fw-bold">Soporte FMO</span>
+        </a>
+        <button id="sidebarToggle" class="toggle-btn" title="Contraer/Expandir menú">
+            <i class="bi bi-list"></i>
+        </button>
+    </div>
+    
     <hr>
+    
     <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <a href="/dashboard" class="nav-link text-white <%= title === 'Inicio - FMO' ? 'active' : '' %>">
-                🏠 Inicio
+        
+        <% 
+            const isRecibosActive = (title === 'Registro de Equipos' || title === 'Gestión Periféricos' || title === 'Entregas DAET');
+        %>
+        <li class="nav-item mb-1">
+            <button class="nav-link text-white w-100 d-flex align-items-center justify-content-between <%= isRecibosActive ? '' : 'collapsed' %>" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#submenuRecibos" 
+                    aria-expanded="<%= isRecibosActive %>">
+                <div class="d-flex align-items-center w-100">
+                    <span class="fs-5 icon-container me-2"><i class="bi bi-clipboard-data"></i></span>
+                    <span class="link-text">Recibos</span>
+                </div>
+                <span class="dropdown-toggle ms-auto"></span> 
+            </button>
+            
+            <div class="collapse <%= isRecibosActive ? 'show' : '' %>" id="submenuRecibos">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                        <a href="/ingreso-equipos" class="nav-link text-white submenu-link <%= title === 'Registro de Equipos' ? 'active' : '' %>">
+                            <span class="icon-container me-2"><i class="bi bi-pc-display"></i></span>
+                            <span class="link-text">Equipos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/perifericos" class="nav-link text-white submenu-link <%= title === 'Gestión Periféricos' ? 'active' : '' %>">
+                            <span class="icon-container me-2"><i class="bi bi-mouse"></i></span>
+                            <span class="link-text">Periféricos</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/daet" class="nav-link text-white submenu-link <%= title === 'Entregas DAET' ? 'active' : '' %>">
+                            <span class="icon-container me-2"><i class="bi bi-truck"></i></span>
+                            <span class="link-text">Entregas DAET</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
+        <li>
+            <a href="/busqueda" class="nav-link text-white d-flex align-items-center <%= title === 'Búsqueda y Reportes' ? 'active' : '' %>">
+                <span class="fs-5 icon-container me-2"><i class="bi bi-search"></i></span>
+                <span class="link-text">Consultar Recibos</span>
             </a>
         </li>
         <li>
-            <a href="/ingreso-equipos" class="nav-link text-white <%= title === 'Registro de Equipos' ? 'active' : '' %>">
-            📥 Recibo De Equipos
+            <a href="/exportar" class="nav-link text-white d-flex align-items-center <%= title === 'Exportar Recibos' ? 'active' : '' %>">
+                <span class="fs-5 icon-container me-2"><i class="bi bi-file-earmark-arrow-down"></i></span>
+                <span class="link-text">Exportar Recibos</span>
             </a>
         </li>
         <li>
-            <a href="/perifericos" class="nav-link text-white <%= title === 'Gestión Periféricos' ? 'active' : '' %>">
-                ⌨️ Recibo de Periféricos
+            <a href="/gestion" class="nav-link text-white d-flex align-items-center <%= title === 'Gestion Usuarios' ? 'active' : '' %>">
+                <span class="fs-5 icon-container me-2"><i class="bi bi-people-fill"></i></span>
+                <span class="link-text">Gestión Usuarios</span>
             </a>
         </li>
         <li>
-            <a href="/daet" class="nav-link text-white <%= title === 'Entregas DAET' ? 'active' : '' %>">
-                🚚 Entregas al DAET
+            <a href="/stock" class="nav-link text-white d-flex align-items-center <%= title === 'Stock e Inventario' ? 'active' : '' %>">
+                <span class="fs-5 icon-container me-2"><i class="bi bi-box-seam"></i></span>
+                <span class="link-text">Stock</span>
             </a>
         </li>
         <li>
-            <a href="/busqueda" class="nav-link text-white <%= title === 'Búsqueda y Reportes' ? 'active' : '' %>">
-                🔍 Consultar Recibos
-            </a>
-        </li>
-            <li>
-            <a href="/exportar" class="nav-link text-white <%= title === 'Exportar Recibos' ? 'active' : '' %>">
-                🧾 Exportar Recibos
-            </a>
-        </li>
-            </li>
-            <li>
-            <a href="/gestion" class="nav-link text-white <%= title === 'Gestion De Usuarios' ? 'active' : '' %>">
-                👤 Gestion de Usuarios
-            </a>
-        </li>
-            <li>
-            <a href="/stock" class="nav-link text-white <%= title === 'Gestion De Usuarios' ? 'active' : '' %>">
-                📊 Stock
-            </a>
-        </li>
-        <li>
-            <a href="/eliminar" class="nav-link text-white <%= title === 'Eliminar Registros' ? 'active' : '' %>">
-                🗑️ Eliminar Registros
+            <a href="/eliminar" class="nav-link text-white d-flex align-items-center <%= title === 'Eliminar Registros' ? 'active' : '' %>">
+                <span class="fs-5 icon-container me-2"><i class="bi bi-trash3-fill"></i></span>
+                <span class="link-text">Eliminar Registros</span>
             </a>
         </li>
     </ul>
+    
     <hr>
+    
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-            <strong>👤 Usuario: Admin</strong>
+            <span class="fs-5 icon-container me-2"><i class="bi bi-person-circle"></i></span>
+            <strong class="link-text">Admin</strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
             <li><a class="dropdown-item" href="#">Perfil</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Cerrar Sesión</a></li>
+            <li><a class="dropdown-item" href="#" onclick="ApiService.logout()">Cerrar Sesión</a></li>
         </ul>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        
+        setTimeout(() => {
+            sidebar.classList.remove('no-transition');
+        }, 50);
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            const estadoActual = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebar-collapsed', estadoActual);
+
+            if(estadoActual) {
+                const submenu = document.getElementById('submenuRecibos');
+                if(submenu.classList.contains('show')) {
+                    new bootstrap.Collapse(submenu, { toggle: false }).hide();
+                }
+            }
+        });
+
+        const btnRecibos = document.querySelector('[data-bs-target="#submenuRecibos"]');
+        if(btnRecibos){
+            btnRecibos.addEventListener('click', () => {
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                    localStorage.setItem('sidebar-collapsed', 'false');
+                }
+            });
+        }
+    });
+</script>

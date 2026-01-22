@@ -31,43 +31,48 @@
         // --- LÓGICA PRINCIPAL ---
 
         document.addEventListener('DOMContentLoaded', () => {
-            listarUsuarios();
-        });
+    listarUsuarios();
+});
 
-        // 1. LISTAR
-        async function listarUsuarios() {
-            const tbody = document.getElementById('tablaUsuarios');
-            try {
-                const res = await ApiService.fetchAutenticado('/usuarioSistema');
-                if(!res.ok) throw new Error("Error al obtener usuarios");
-                const usuarios = await res.json();
+// 1. LISTAR USUARIOS
+async function listarUsuarios() {
+    const tbody = document.getElementById('tablaUsuarios');
+    try {
+        const res = await ApiService.fetchAutenticado('/usuarioSistema');
+        if(!res.ok) throw new Error("Error al obtener usuarios");
+        const usuarios = await res.json();
 
-                tbody.innerHTML = '';
-                if(usuarios.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No hay usuarios registrados.</td></tr>';
-                    return;
-                }
-
-                usuarios.forEach(u => {
-                    const tr = document.createElement('tr');
-                    const idNum = 0;
-                    tr.innerHTML = `
-                        <td class="fw-bold text-secondary">#${u.id}</td>
-                        <td class="fw-bold text-primary">${u.username}</td>
-                        <td><span class="badge bg-info text-dark">${u.tipo}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${u.id}, '${u.username}')">
-                                🗑️ Eliminar
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-danger">Error de conexión con el servidor.</td></tr>`;
-            }
+        tbody.innerHTML = '';
+        if(usuarios.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No hay usuarios registrados.</td></tr>';
+            return;
         }
+
+        // Agregamos el parámetro 'index' al forEach para obtener la posición secuencial
+        usuarios.forEach((u, index) => {
+            const tr = document.createElement('tr');
+            
+            // Calculamos el ID visual (index + 1 para que empiece en 1)
+            const idVisual = index + 1;
+
+            tr.innerHTML = `
+                <td class="fw-bold text-secondary">#${idVisual}</td>
+                <td class="fw-bold text-primary">${u.username}</td>
+                <td><span class="badge bg-info text-dark">${u.tipo}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${u.id}, '${u.username}')">
+                        <i class="bi bi-trash3-fill" style="vertical-align: bottom;"></i>
+                         Eliminar
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error(error);
+        tbody.innerHTML = `<tr><td colspan="4" class="text-danger">Error de conexión con el servidor.</td></tr>`;
+    }
+}
 
         // 2. CREAR
         async function guardarUsuario() {

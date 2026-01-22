@@ -74,7 +74,7 @@ function renderizarTabla(data) {
         // Verificamos si ya está entregado para deshabilitar el botón visualmente (opcional)
         const yaEntregado = (item.estatus || "").toUpperCase() === "LISTO";
         const btnClase = yaEntregado ? "btn-outline-secondary" : "btn-warning";
-        const btnTexto = yaEntregado ? "✅ Listo" : "📦 Estatus";
+        const btnTexto = yaEntregado ? "<i class=\"bi bi-bookmark-check-fill\" style=\"vertical-align: bottom; margin-right: 5px;\"></i>Listo" : "📦 Estatus";
         const btnDisabled = yaEntregado ? "disabled" : "";
 
         const tr = document.createElement('tr');
@@ -87,7 +87,8 @@ function renderizarTabla(data) {
             <td>
                 <div class="d-flex gap-2 justify-content-center">
                     <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})' title="Ver Detalles">
-                        👁️ Ver
+                        <i class="bi bi-eye-fill" style="vertical-align: bottom; margin-right: 5px;"></i>
+                        Ver
                     </button>
                     <button class="btn btn-sm ${btnClase}" 
                         onclick="abrirModalActualizar(${item.idEncabezado})" 

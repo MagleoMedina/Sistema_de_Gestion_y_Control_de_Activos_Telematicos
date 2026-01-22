@@ -17,8 +17,15 @@
 
                 <div class="container-fluid">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5 class="text-dark m-0">📝 Ingreso de Equipos</h5>
-                        <button class="btn btn-sm btn-primary" onclick="guardarRecibo()">💾 Guardar</button>
+                        <h5 class="text-dark m-0">
+                            <i class="bi bi-list-check" style="vertical-align: bottom;"></i>
+                            Ingreso de Equipos
+                        </h5>
+                        <button class="btn btn-sm btn-primary d-flex align-items-center gap-2"
+                            onclick="guardarRecibo()">
+                            <i class="bi bi-save-fill"></i>
+                            <span>Guardar Entrega</span>
+                        </button>
                     </div>
 
                     <div class="paper-form container p-0" id="formularioPapel">
@@ -27,6 +34,7 @@
                             <div class="col-12 text-center cell-border justify-content-center bg-light"
                                 style="padding: 4px;">
                                 <h6 class="m-0 fw-bold">RECIBO DE EQUIPOS</h6>
+                                <span style="font-size: 20px;"><i class="bi bi-list-check"></i></span>
                             </div>
                         </div>
 

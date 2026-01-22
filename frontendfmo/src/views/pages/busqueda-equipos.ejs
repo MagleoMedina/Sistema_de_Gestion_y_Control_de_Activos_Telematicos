@@ -11,8 +11,10 @@
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4 fade-in">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
-                <h5 class="m-0 fw-bold">🖥️ Historial de Recibo de Equipos</h5>
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">Volver al Menú</a>
+                <h5 class="m-0 fw-bold">
+                    <i class="bi bi-pc-display" style="vertical-align:bottom;"></i> 
+                    Historial de Recibo de Equipos</h5>
             </div>
             <div class="card shadow-sm border-0">
                 <div class="card-body">
@@ -21,14 +23,14 @@
                             <label class="form-label small fw-bold">Filtrar por:</label>
                             <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
                                 <option value="todo">Listar Todo</option>
-                                <option value="fmo">FMO / Serial</option>
+                                <option value="fmo">FMO</option>
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
                         <div class="col-md-7" id="containerInputTexto" style="display: none;">
-                            <label class="form-label small fw-bold">Ingrese FMO o Serial:</label>
+                            <label class="form-label small fw-bold">Ingrese el FMO del equipo:</label>
                             <input type="text" class="form-control" id="inputBusquedaFmo"
-                            placeholder="Ej: 119000 o Serial...">
+                            placeholder="Ej: 119000">
                         </div>
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">
                             <label class="form-label small fw-bold">Seleccione Fecha:</label>
@@ -37,7 +39,9 @@
                         <div class="col-md-7" id="containerVacio"></div>
                         <div class="col-md-2 text-end">
                             <label class="form-label d-block">&nbsp;</label>
-                            <button class="btn btn-primary w-100" onclick="buscarEquipos()">🔍 Buscar</button>
+                            <button class="btn btn-primary w-100" onclick="buscarEquipos()">
+                                <i class="bi bi-search" style="vertical-align: bottom;"></i>
+                                Buscar</button>
                         </div>
                     </div>
                     <div class="table-responsive table-scroll-wrapper">

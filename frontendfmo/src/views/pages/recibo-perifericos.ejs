@@ -1,206 +1,230 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('../partials/head') %>
-    <title><%= title %></title>
+        <title>
+            <%= title %>
+        </title>
 </head>
 <style>
-    .paper-form{
+    .paper-form {
         max-width: 600px;
     }
 </style>
+
 <body>
 
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
 
-        <div id="content" class="w-100 bg-light p-2 fade-in" style="overflow-y: auto;">
-            
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="text-dark m-0">⌨️ Recibo de Periféricos</h5>
-                    <button class="btn btn-sm btn-primary" onclick="guardarPerifericos()">💾 Guardar</button>
+            <div id="content" class="w-100 bg-light p-2 fade-in" style="overflow-y: auto;">
+
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="text-dark m-0">
+                            <i class="bi bi-keyboard-fill"></i>
+                            <span>Recibo de Periféricos</span>
+                        </h5>
+                        <button class="btn btn-sm btn-primary d-flex align-items-center gap-2"
+                            onclick="guardarPerifericos()">
+                            <i class="bi bi-save-fill"></i>
+                            <span>Guardar Entrega</span>
+                        </button>
+                    </div>
+
+                    <div class="paper-form container p-0" id="formPerifericos">
+
+                        <div class="row row-compact">
+                            <div class="col-12 text-center cell-border justify-content-center bg-light p-2">
+                                <h6 class="m-0 fw-bold" style="letter-spacing: 1px;">RECIBO DE PERIFÉRICOS Y COMPONENTES
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="date" class="input-line" id="fecha" style="max-width: 150px;">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FICHA:</span>
+                                <input type="number" class="input-line" id="ficha">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">USUARIO:</span>
+                                <input type="text" class="input-line" id="usuario">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">EXT/TLF:</span>
+                                <input type="text" class="input-line" id="ext">
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkMonitor"
+                                        value="Monitor">
+                                    <label class="label-text" for="chkMonitor" style="font-size: 11px;">MONITOR</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkTeclado"
+                                        value="Teclado">
+                                    <label class="label-text" for="chkTeclado" style="font-size: 11px;">TECLADO</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkScaner"
+                                        value="Scaner">
+                                    <label class="label-text" for="chkScaner" style="font-size: 11px;">SCANER</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkPendrives"
+                                        value="Pendrive">
+                                    <label class="label-text" for="chkPendrives"
+                                        style="font-size: 11px;">PENDRIVES</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkRegulador"
+                                        value="Regulador">
+                                    <label class="label-text" for="chkRegulador"
+                                        style="font-size: 11px;">REGULADOR</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkImpresora"
+                                        value="Impresora">
+                                    <label class="label-text" for="chkImpresora"
+                                        style="font-size: 11px;">IMPRESORA</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkMouse"
+                                        value="Mouse">
+                                    <label class="label-text" for="chkMouse" style="font-size: 11px;">MOUSE</label>
+                                </div>
+                            </div>
+                            <div class="col-3 cell-border">
+                                <div class="form-check">
+                                    <input class="form-check-input peri-check" type="checkbox" id="chkToner"
+                                        value="Toner">
+                                    <label class="label-text" for="chkToner" style="font-size: 11px;">TÓNER</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <div class="form-check p-0 m-0 w-100">
+                                    <span class="label-text me-2">COMPONENTES:</span>
+
+                                    <select class="input-line" id="selectComponentes" style="cursor: pointer;">
+                                        <option value="" selected></option>
+                                        <option value="3">MEMORIA RAM</option>
+                                        <option value="4">DISCO DURO</option>
+                                        <option value="5">TARJETA MADRE</option>
+                                        <option value="6">PROCESADOR</option>
+                                        <option value="7">TARJETA DE VIDEO</option>
+                                        <option value="8">FUENTE DE PODER</option>
+                                        <option value="9">TARJETA DE RED</option>
+                                        <option value="10">FAN COOLER</option>
+                                        <option value="11">PILA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <div class="form-check p-0 m-0 w-100">
+                                    <span class="label-text me-2">OTROS:</span>
+                                    <input type="text" class="input-line" id="otrosTxt">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO/ SERIAL:</span>
+                                <input type="text" class="input-line" id="fmoSerial">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO ASIGNADO:</span>
+                                <input type="text" class="input-line" id="fmoAsignado">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">DPTO/GCIA:</span>
+                                <input type="text" class="input-line" id="gerencia">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FALLA:</span>
+                                <input type="text" class="input-line" id="falla">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">ASIGNADO A:</span>
+                                <input type="text" class="input-line" id="asignadoA">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">N.º SOLICITUD S.T.:</span>
+                                <input type="text" class="input-line" id="solicitudST">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">N.º SOLICITUD DAET:</span>
+                                <input type="text" class="input-line" id="solicitudDaet">
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border" style="height: 45px;">
+                                <span class="label-text">ENTREGADO POR:</span>
+                                <input type="text" class="input-line" id="entregadoPor">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border" style="height: 45px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line" id="recibidoPor">
+                            </div>
+                        </div>
+
+                    </div>
+                    <br>
                 </div>
-
-                <div class="paper-form container p-0" id="formPerifericos">
-                    
-                    <div class="row row-compact">
-                        <div class="col-12 text-center cell-border justify-content-center bg-light p-2">
-                            <h6 class="m-0 fw-bold" style="letter-spacing: 1px;">RECIBO DE PERIFÉRICOS Y COMPONENTES</h6>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FECHA:</span>
-                            <input type="date" class="input-line" id="fecha" style="max-width: 150px;">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FICHA:</span>
-                            <input type="number" class="input-line" id="ficha">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">USUARIO:</span>
-                            <input type="text" class="input-line" id="usuario">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">EXT/TLF:</span>
-                            <input type="text" class="input-line" id="ext">
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkMonitor" value="Monitor">
-                                <label class="label-text" for="chkMonitor" style="font-size: 11px;">MONITOR</label>
-                            </div>
-                        </div>
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkTeclado" value="Teclado">
-                                <label class="label-text" for="chkTeclado" style="font-size: 11px;">TECLADO</label>
-                            </div>
-                        </div>
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkScaner" value="Scaner">
-                                <label class="label-text" for="chkScaner" style="font-size: 11px;">SCANER</label>
-                            </div>
-                        </div>
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkPendrives" value="Pendrive">
-                                <label class="label-text" for="chkPendrives" style="font-size: 11px;">PENDRIVES</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkRegulador" value="Regulador">
-                                <label class="label-text" for="chkRegulador" style="font-size: 11px;">REGULADOR</label>
-                            </div>
-                        </div>
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkImpresora" value="Impresora">
-                                <label class="label-text" for="chkImpresora" style="font-size: 11px;">IMPRESORA</label>
-                            </div>
-                        </div>
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkMouse" value="Mouse">
-                                <label class="label-text" for="chkMouse" style="font-size: 11px;">MOUSE</label>
-                            </div>
-                        </div>
-                        <div class="col-3 cell-border">
-                            <div class="form-check">
-                                <input class="form-check-input peri-check" type="checkbox" id="chkToner" value="Toner">
-                                <label class="label-text" for="chkToner" style="font-size: 11px;">TÓNER</label>
-                            </div>
-                        </div>
-                    </div>
-
-           <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <div class="form-check p-0 m-0 w-100">
-                                <span class="label-text me-2">COMPONENTES:</span>
-                                
-                                <select class="input-line" id="selectComponentes" style="cursor: pointer;">
-                                    <option value="" selected></option>
-                                    <option value="3">MEMORIA RAM</option>
-                                    <option value="4">DISCO DURO</option>
-                                    <option value="5">TARJETA MADRE</option>
-                                    <option value="6">PROCESADOR</option>
-                                    <option value="7">TARJETA DE VIDEO</option>
-                                    <option value="8">FUENTE DE PODER</option>
-                                    <option value="9">TARJETA DE RED</option>
-                                    <option value="10">FAN COOLER</option>
-                                    <option value="11">PILA</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <div class="form-check p-0 m-0 w-100">
-                                <span class="label-text me-2">OTROS:</span>
-                                <input type="text" class="input-line" id="otrosTxt">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FMO/ SERIAL:</span>
-                            <input type="text" class="input-line" id="fmoSerial">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FMO ASIGNADO:</span>
-                            <input type="text" class="input-line" id="fmoAsignado">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">DPTO/GCIA:</span>
-                            <input type="text" class="input-line" id="gerencia">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FALLA:</span>
-                            <input type="text" class="input-line" id="falla">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">ASIGNADO A:</span>
-                            <input type="text" class="input-line" id="asignadoA">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">N.º SOLICITUD S.T.:</span>
-                            <input type="text" class="input-line" id="solicitudST">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">N.º SOLICITUD DAET:</span>
-                            <input type="text" class="input-line" id="solicitudDaet"> 
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border" style="height: 45px;">
-                            <span class="label-text">ENTREGADO POR:</span>
-                            <input type="text" class="input-line" id="entregadoPor">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border" style="height: 45px;">
-                            <span class="label-text">RECIBIDO POR:</span>
-                            <input type="text" class="input-line" id="recibidoPor">
-                        </div>
-                    </div>
-
-                </div>
-                <br>
             </div>
-        </div>
     </div>
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src = "/js/scripts/reciboPerifericos.js"></script>
+    <script src="/js/scripts/reciboPerifericos.js"></script>
 </body>
+
 </html>

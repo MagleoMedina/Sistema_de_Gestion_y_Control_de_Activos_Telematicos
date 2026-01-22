@@ -1,253 +1,284 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('../partials/head') %>
-    <title><%= title %></title>
-    <style>
-        .header-title {
-            letter-spacing: 2px;
-            font-weight: 900;
-            text-decoration: underline;
-        }
+        <title>
+            <%= title %>
+        </title>
+        <style>
+            .header-title {
+                letter-spacing: 2px;
+                font-weight: 900;
+                text-decoration: underline;
+            }
 
-        /* Clase para deshabilitar visualmente */
-        .disabled-section {
-            opacity: 0.5;
-            pointer-events: none;
-            background-color: #f0f0f0;
-        }
-        .paper-form{
-        max-width: 660px;
-    }
-    </style>
+            /* Clase para deshabilitar visualmente */
+            .disabled-section {
+                opacity: 0.5;
+                pointer-events: none;
+                background-color: #f0f0f0;
+            }
+
+            .paper-form {
+                max-width: 660px;
+            }
+        </style>
 </head>
+
 <body>
 
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
 
-        <div id="content" class="w-100 bg-light p-2 fade-in" style="overflow-y: auto;">
-            
-            <div class="container-fluid">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="text-dark m-0">🚚 Envíos al DAET</h5>
-                    <button class="btn btn-sm btn-primary" onclick="guardarEntregaDAET()">💾 Guardar Entrega</button>
-                </div>
+            <div id="content" class="w-100 bg-light p-2 fade-in" style="overflow-y: auto;">
 
-                <div class="paper-form container p-0" id="formDaet">
-                    
-                    <div class="row row-compact">
-                        <div class="col-12 text-center cell-border justify-content-between bg-light p-2">
-                            <div style="width: 30px;"></div> <span class="header-title">ENTREGAS AL DAET</span>
-                            <span style="font-size: 20px;">📦</span> </div>
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="text-dark m-0"><i class="bi bi-truck" style="vertical-align: bottom;"></i>
+                            Envíos al DAET</h5>
+
+                        <button class="btn btn-sm btn-primary d-flex align-items-center gap-2"
+                            onclick="guardarEntregaDAET()">
+                            <i class="bi bi-save-fill"></i>
+                            <span>Guardar Entrega</span>
+                        </button>
                     </div>
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FECHA:</span>
-                            <input type="date" class="input-line" id="fecha" style="max-width: 150px;">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">SOLICITUD DAET.:</span>
-                            <input type="text" class="input-line" id="solicitudDAET">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">SOLICITUD S.T.:</span>
-                            <input type="text" class="input-line" id="solicitudST">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">ANALISTA:</span>
-                            <input type="text" class="input-line" id="analista" placeholder="Usuario Actual">
-                        </div>
-                    </div>
+                    <div class="paper-form container p-0" id="formDaet">
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border justify-content-center bg-light">
-                            <span class="label-text">ACTIVIDAD:</span>
-                        </div>
-                        <div class="col-12 cell-border justify-content-center">
-                            <div class="form-check form-check-inline me-5">
-                                <input class="form-check-input" type="radio" name="actividad" id="actReemplazo" value="Reemplazo">
-                                <label class="label-text" for="actReemplazo">REEMPLAZO</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="actividad" id="actEntrega" value="Entrega" checked>
-                                <label class="label-text" for="actEntrega">ENTREGA</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-3">ESTADO:</span>
-                            <div class="form-check form-check-inline me-4">
-                                <input class="form-check-input" type="radio" name="estado" id="estBueno" value="Bueno" checked>
-                                <label class="label-text" for="estBueno">BUENO</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="estado" id="estDanado" value="Dañado">
-                                <label class="label-text" for="estDanado">DAÑADO</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">EQUIPO:</span>
-                            <input type="text" class="input-line" id="nombreEquipo" placeholder="Escriba aquí si envía un CPU completo">
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">COMPONENTES:</span>
-                            <select class="input-line" id="selectComponentes" style="cursor: pointer;">
-                                <option value="" selected></option>
-                                <option value="3">MEMORIA RAM</option>
-                                <option value="4">DISCO DURO</option>
-                                <option value="5">TARJETA MADRE</option>
-                                <option value="6">PROCESADOR</option>
-                                <option value="7">TARJETA DE VIDEO</option>
-                                <option value="8">FUENTE DE PODER</option>
-                                <option value="9">TARJETA DE RED</option>
-                                <option value="10">FAN COOLER</option>
-                                <option value="11">PILA</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">PERIFÉRICOS:</span>
-                            <select class="input-line" id="selectPerifericos" style="cursor: pointer;">
-                                <option value="" selected></option>
-                                <option value="1">MONITOR</option>
-                                <option value="2">TECLADO</option>
-                                <option value="3">MOUSE</option>
-                                <option value="4">REGULADOR</option>
-                                <option value="5">IMPRESORA</option>
-                                <option value="6">SCANER</option>
-                                <option value="7">PENDRIVES</option>
-                                <option value="8">TONER</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border">
-                            <span class="label-text me-2">FMO/SERIAL:</span>
-                            <input type="text" class="input-line" id="fmoSerial">
-                        </div>
-                    </div>
-
-                    <div id="wrapperEntregaCpu">
                         <div class="row row-compact">
-                            <div class="col-12 cell-border bg-light">
-                                <span class="label-text">ENTREGA DE CPU (Detalles):</span>
+                            <div class="col-12 text-center cell-border justify-content-between bg-light p-2">
+                                <div style="width: 30px;"></div> <span class="header-title">ENTREGAS AL DAET</span>
+                                <span style="font-size: 20px;"><i class="bi bi-box-seam-fill"></i></span>
                             </div>
                         </div>
-                        
+
                         <div class="row row-compact">
-                            <div class="col-6 cell-border cell-block">
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkDisco" value="Disco Duro">
-                                    <label class="label-text" for="chkDisco">DISCO DURO</label>
-                                </div>
-                                
-                                <div class="d-flex align-items-center mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkRam" value="Memoria RAM">
-                                    <label class="label-text me-1" for="chkRam" style="margin-left: 6px;">MEMORIAS RAM</label>
-                                    <span style="font-size:10px;">----</span>
-                                    <span class="label-text ms-1 me-1">CANT:</span>
-                                    <input type="number" class="input-line text-center" id="cantRam" value="1" style="width: 40px; height: 20px;">
-                                </div>
-
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkMadre" value="Tarjeta Madre">
-                                    <label class="label-text" for="chkMadre">TARJETA MADRE</label>
-                                </div>
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkProc" value="Procesador">
-                                    <label class="label-text" for="chkProc">PROCESADOR</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkFan" value="Fan Cooler">
-                                    <label class="label-text" for="chkFan">FAN COOLER</label>
-                                </div>
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FECHA:</span>
+                                <input type="date" class="input-line" id="fecha" style="max-width: 150px;">
                             </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">SOLICITUD DAET.:</span>
+                                <input type="text" class="input-line" id="solicitudDAET">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">SOLICITUD S.T.:</span>
+                                <input type="text" class="input-line" id="solicitudST">
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">ANALISTA:</span>
+                                <input type="text" class="input-line" id="analista" placeholder="Usuario Actual">
+                            </div>
+                        </div>
 
-                            <div class="col-6 cell-border cell-block">
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkVideo" value="Tarjeta de Video">
-                                    <label class="label-text" for="chkVideo">TARJETA DE VIDEO</label>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border justify-content-center bg-light">
+                                <span class="label-text">ACTIVIDAD:</span>
+                            </div>
+                            <div class="col-12 cell-border justify-content-center">
+                                <div class="form-check form-check-inline me-5">
+                                    <input class="form-check-input" type="radio" name="actividad" id="actReemplazo"
+                                        value="Reemplazo">
+                                    <label class="label-text" for="actReemplazo">REEMPLAZO</label>
                                 </div>
-                                
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkFuente" value="Fuente de Poder">
-                                    <label class="label-text" for="chkFuente">FUENTE DE PODER</label>
-                                </div>
-
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkPila" value="Pila">
-                                    <label class="label-text" for="chkPila">PILA</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input daet-check" type="checkbox" id="chkRed" value="Tarjeta de Red">
-                                    <label class="label-text" for="chkRed">TARJETA DE RED</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="actividad" id="actEntrega"
+                                        value="Entrega" checked>
+                                    <label class="label-text" for="actEntrega">ENTREGA</label>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border bg-light justify-content-center">
-                            <span class="label-text">SE RECIBE REEMPLAZO</span>
-                        </div>
-                    </div>
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border align-items-center">
-                            <div class="form-check form-check-inline ms-2">
-                                <input class="form-check-input" type="radio" name="reemplazo" id="reemplazoSi" value="Si">
-                                <label class="label-text" for="reemplazoSi">SI</label>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-3">ESTADO:</span>
+                                <div class="form-check form-check-inline me-4">
+                                    <input class="form-check-input" type="radio" name="estado" id="estBueno"
+                                        value="Bueno" checked>
+                                    <label class="label-text" for="estBueno">BUENO</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="estado" id="estDanado"
+                                        value="Dañado">
+                                    <label class="label-text" for="estDanado">DAÑADO</label>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline me-4">
-                                <input class="form-check-input" type="radio" name="reemplazo" id="reemplazoNo" value="No" checked>
-                                <label class="label-text" for="reemplazoNo">NO</label>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">EQUIPO:</span>
+                                <input type="text" class="input-line" id="nombreEquipo"
+                                    placeholder="Escriba aquí si envía un CPU completo">
                             </div>
-                            
-                            <span class="label-text me-2 border-start border-dark ps-2">IDENTIFIQUE:</span>
-                            <input type="text" class="input-line" id="identifiqueReemplazo">
                         </div>
-                    </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">COMPONENTES:</span>
+                                <select class="input-line" id="selectComponentes" style="cursor: pointer;">
+                                    <option value="" selected></option>
+                                    <option value="3">MEMORIA RAM</option>
+                                    <option value="4">DISCO DURO</option>
+                                    <option value="5">TARJETA MADRE</option>
+                                    <option value="6">PROCESADOR</option>
+                                    <option value="7">TARJETA DE VIDEO</option>
+                                    <option value="8">FUENTE DE PODER</option>
+                                    <option value="9">TARJETA DE RED</option>
+                                    <option value="10">FAN COOLER</option>
+                                    <option value="11">PILA</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">PERIFÉRICOS:</span>
+                                <select class="input-line" id="selectPerifericos" style="cursor: pointer;">
+                                    <option value="" selected></option>
+                                    <option value="1">MONITOR</option>
+                                    <option value="2">TECLADO</option>
+                                    <option value="3">MOUSE</option>
+                                    <option value="4">REGULADOR</option>
+                                    <option value="5">IMPRESORA</option>
+                                    <option value="6">SCANER</option>
+                                    <option value="7">PENDRIVES</option>
+                                    <option value="8">TONER</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border">
+                                <span class="label-text me-2">FMO/SERIAL:</span>
+                                <input type="text" class="input-line" id="fmoSerial">
+                            </div>
+                        </div>
 
-                    <div class="row row-compact">
-                        <div class="col-12 cell-border cell-block">
-                            <span class="label-text">(OBSERVACIÓN):</span>
-                            <textarea class="input-line" rows="2" id="observacion" style="resize: none;"></textarea>
-                        </div>
-                    </div>
+                        <div id="wrapperEntregaCpu">
+                            <div class="row row-compact">
+                                <div class="col-12 cell-border bg-light">
+                                    <span class="label-text">ENTREGA DE CPU (Detalles):</span>
+                                </div>
+                            </div>
 
-                    <div class="row row-compact">
-                        <div class="col-8 cell-border" style="height: 50px;">
-                            <span class="label-text">RECIBIDO POR:</span>
-                            <input type="text" class="input-line mt-3" id="recibidoPor">
-                        </div>
-                        <div class="col-4 cell-border" style="height: 50px;">
-                            <span class="label-text">FICHA:</span>
-                            <input type="text" class="input-line mt-3" id="fichaRecibido">
-                        </div>
-                    </div>
+                            <div class="row row-compact">
+                                <div class="col-6 cell-border cell-block">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkDisco"
+                                            value="Disco Duro">
+                                        <label class="label-text" for="chkDisco">DISCO DURO</label>
+                                    </div>
 
+                                    <div class="d-flex align-items-center mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkRam"
+                                            value="Memoria RAM">
+                                        <label class="label-text me-1" for="chkRam" style="margin-left: 6px;">MEMORIAS
+                                            RAM</label>
+                                        <span style="font-size:10px;">----</span>
+                                        <span class="label-text ms-1 me-1">CANT:</span>
+                                        <input type="number" class="input-line text-center" id="cantRam" value="1"
+                                            style="width: 40px; height: 20px;">
+                                    </div>
+
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkMadre"
+                                            value="Tarjeta Madre">
+                                        <label class="label-text" for="chkMadre">TARJETA MADRE</label>
+                                    </div>
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkProc"
+                                            value="Procesador">
+                                        <label class="label-text" for="chkProc">PROCESADOR</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkFan"
+                                            value="Fan Cooler">
+                                        <label class="label-text" for="chkFan">FAN COOLER</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 cell-border cell-block">
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkVideo"
+                                            value="Tarjeta de Video">
+                                        <label class="label-text" for="chkVideo">TARJETA DE VIDEO</label>
+                                    </div>
+
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkFuente"
+                                            value="Fuente de Poder">
+                                        <label class="label-text" for="chkFuente">FUENTE DE PODER</label>
+                                    </div>
+
+                                    <div class="form-check mb-1">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkPila"
+                                            value="Pila">
+                                        <label class="label-text" for="chkPila">PILA</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input daet-check" type="checkbox" id="chkRed"
+                                            value="Tarjeta de Red">
+                                        <label class="label-text" for="chkRed">TARJETA DE RED</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border bg-light justify-content-center">
+                                <span class="label-text">SE RECIBE REEMPLAZO</span>
+                            </div>
+                        </div>
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border align-items-center">
+                                <div class="form-check form-check-inline ms-2">
+                                    <input class="form-check-input" type="radio" name="reemplazo" id="reemplazoSi"
+                                        value="Si">
+                                    <label class="label-text" for="reemplazoSi">SI</label>
+                                </div>
+                                <div class="form-check form-check-inline me-4">
+                                    <input class="form-check-input" type="radio" name="reemplazo" id="reemplazoNo"
+                                        value="No" checked>
+                                    <label class="label-text" for="reemplazoNo">NO</label>
+                                </div>
+
+                                <span class="label-text me-2 border-start border-dark ps-2">IDENTIFIQUE:</span>
+                                <input type="text" class="input-line" id="identifiqueReemplazo">
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-12 cell-border cell-block">
+                                <span class="label-text">(OBSERVACIÓN):</span>
+                                <textarea class="input-line" rows="2" id="observacion" style="resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="row row-compact">
+                            <div class="col-8 cell-border" style="height: 50px;">
+                                <span class="label-text">RECIBIDO POR:</span>
+                                <input type="text" class="input-line mt-3" id="recibidoPor">
+                            </div>
+                            <div class="col-4 cell-border" style="height: 50px;">
+                                <span class="label-text">FICHA:</span>
+                                <input type="text" class="input-line mt-3" id="fichaRecibido">
+                            </div>
+                        </div>
+
+                    </div>
+                    <br>
                 </div>
-                <br>
             </div>
-        </div>
     </div>
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src = "/js/scripts/reciboDaet.js"></script>
+    <script src="/js/scripts/reciboDaet.js"></script>
 </body>
+
 </html>

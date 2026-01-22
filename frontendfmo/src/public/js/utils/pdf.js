@@ -189,7 +189,7 @@ async function generarPDFMasivo(datos, tipo) {
             // Si no es la primera página, añadir nueva
             if (i > 0) pdf.addPage();
 
-            // Pegar imagen (Margen superior 10mm)
+            // Pegar imagen (Margen superior 0mm)
             pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight);
         }
 

@@ -1,9 +1,45 @@
+// Variable global para guardar las opciones originales (Equipos, Periféricos, DAET)
+let opcionesTipoOriginales = "";
+
+document.addEventListener('DOMContentLoaded', () => {
+    const selTipo = document.getElementById('selTipo');
+    // 1. Guardamos el HTML original de las opciones al cargar la página
+    if (selTipo) {
+        opcionesTipoOriginales = selTipo.innerHTML;
+    }
+    // 2. Ejecutamos la validación inicial por si el navegador recordó la selección anterior
+    toggleFormato();
+});
+
 function toggleFormato() {
-    // Lógica simple por si quieres ocultar fechas en CSV
-    const fmt = document.getElementById('selFormato').value;
+    const formato = document.getElementById('selFormato').value;
+    const selTipo = document.getElementById('selTipo');
+
+    if (formato === 'csv') {
+        // --- CASO CSV: Bloquear y poner "Todo" ---
+        
+        // 1. Cambiar el contenido a una única opción "Todo"
+        selTipo.innerHTML = '<option value="todo" selected>Todo</option>';
+        
+        // 2. Deshabilitar el input (esto aplica opacidad automáticamente en Bootstrap)
+        selTipo.disabled = true;
+
+    } else {
+        // --- CASO PDF: Restaurar opciones originales ---
+        
+        // 1. Habilitar nuevamente
+        selTipo.disabled = false;
+        
+        // 2. Restaurar las opciones que guardamos al inicio
+        if (opcionesTipoOriginales) {
+            selTipo.innerHTML = opcionesTipoOriginales;
+        }
+    }
 }
 
 async function procesarExportacion() {
+    // Nota: Aunque el select esté deshabilitado, podemos leer su valor.
+    // Para CSV valdrá "todo", para PDF valdrá lo que el usuario elija.
     const tipo = document.getElementById('selTipo').value;
     const formato = document.getElementById('selFormato').value;
     const inicio = document.getElementById('fechaInicio').value;
@@ -46,7 +82,7 @@ async function procesarExportacion() {
         }
     } 
     // ======================================================
-    // CASO 2: EXPORTAR A CSV (Lógica Backend) - CORREGIDO
+    // CASO 2: EXPORTAR A CSV (Lógica Backend)
     // ======================================================
     else {
         try {

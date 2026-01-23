@@ -5,20 +5,6 @@
     <%- include('../partials/head') %>
     <title>Eliminar Registros</title>
     <style>
-        /* Estilos necesarios para los templates de papel dentro del modal */
-        .paper-form {
-            background-color: #fff;
-            border: 2px solid #000;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 13px;
-            width: 100%;
-            margin: 0 auto;
-        }
-        .cell-border { border: 1px solid #000; padding: 2px 5px; display: flex; align-items: center; }
-        .cell-block { display: block; }
-        .input-line { border: none; background: transparent; width: 100%; font-weight: bold; color: #000080; }
-        .label-text { font-weight: bold; font-size: 0.75rem; text-transform: uppercase; }
-        .row-compact { --bs-gutter-x: 0; }
         .tag-badge { background-color: #000080; color: white; padding: 1px 3px; border-radius: 4px; margin-right: 4px; font-size: 10px; }
         
         /* Ocultar secciones de templates por defecto */
@@ -32,7 +18,7 @@
 
         <div id="content" class="w-100 bg-light p-4 fade-in">
             
-            <h4 class="mb-4 fw-bold text-danger">🗑️ Gestión y Eliminación de Registros</h4>
+            <h4 class="mb-4 fw-bold text-danger"><i class="bi bi-trash3-fill" style="vertical-align: bottom;"></i>Gestión y Eliminación de Registros</h4>
 
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-4">
@@ -41,9 +27,9 @@
                         <div class="col-md-3">
                             <label class="form-label fw-bold">Tipo de Registro:</label>
                             <select class="form-select" id="selTipo">
-                                <option value="equipos">🖥️ Recibo de Equipos</option>
-                                <option value="perifericos">⌨️ Recibo de Periféricos</option>
-                                <option value="daet">🚚 Entrega al DAET</option>
+                                    <option value="equipos">Recibo de Equipos</option>
+                                    <option value="perifericos">Recibo de Periféricos</option>
+                                <option value="daet">Entrega al DAET</option>
                             </select>
                         </div>
 
@@ -54,7 +40,7 @@
 
                         <div class="col-md-3">
                             <button class="btn btn-primary w-100" onclick="buscarRegistros()">
-                                🔍 Buscar
+                                <i class="bi bi-search" style="vertical-align: bottom; margin-right: 3px;"></i>Buscar
                             </button>
                         </div>
                     </div>
@@ -91,7 +77,7 @@
     <div class="modal fade" id="modalVerDetalle" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl"> <div class="modal-content">
                 <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title fw-bold">📄 Vista Previa del Registro</h5>
+                    <h5 class="modal-title fw-bold"> <i class="bi bi-list-check" style="vertical-align: bottom;"></i>Vista Previa del Registro</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body bg-light">
@@ -120,12 +106,12 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title fw-bold">⚠️ Confirmar Eliminación</h5>
+                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill" style="vertical-align: bottom;"></i>Confirmar Eliminación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center p-4">
-                    <div class="mb-3" style="font-size: 3rem;">🗑️</div>
-                    <p class="fs-5">Está a punto de eliminar el registro ID: <strong id="lblIdEliminar"></strong></p>
+                    <div class="mb-3" style="font-size: 3rem;"><i class="bi bi-trash3-fill" style="vertical-align: bottom;"></i></div>
+                    <p class="fs-5">Está a punto de eliminar el registro <strong id="lblIdEliminar"></strong></p>
                     <p class="text-danger fw-bold">Esta acción es irreversible. ¿Está seguro?</p>
                 </div>
                 <div class="modal-footer justify-content-center">

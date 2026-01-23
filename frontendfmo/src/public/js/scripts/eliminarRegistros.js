@@ -83,10 +83,10 @@
                     <td>
                         <div class="d-flex justify-content-center gap-2">
                             <button class="btn btn-sm btn-info text-white" onclick="verRegistro(${index})" title="Ver Detalles">
-                                👁️ Ver
+                                <i class="bi bi-eye-fill" style = "vertical-align : bottom;"></i>Ver
                             </button>
                             <button class="btn btn-sm btn-danger" onclick="confirmarEliminacion(${id})" title="Eliminar Registro">
-                                🗑️ Eliminar
+                                <i class="bi bi-trash3-fill" style = "vertical-align:bottom;"></i>Eliminar
                             </button>
                         </div>
                     </td>
@@ -127,7 +127,7 @@
         // --- 4. PREPARAR ELIMINACIÓN ---
         function confirmarEliminacion(id) {
             idParaEliminar = id;
-            document.getElementById('lblIdEliminar').innerText = id;
+            //document.getElementById('lblIdEliminar').innerText = id;
             new bootstrap.Modal(document.getElementById('modalConfirmarDelete')).show();
         }
 
@@ -176,7 +176,7 @@
             
             if (tipo === 'exito') { header.classList.add('bg-success'); iconoEl.innerHTML = '✅'; }
             else if (tipo === 'error') { header.classList.add('bg-danger'); iconoEl.innerHTML = '❌'; }
-            else { header.classList.add('bg-primary'); iconoEl.innerHTML = 'ℹ️'; }
+            else { header.classList.add('bg-primary'); iconoEl.innerHTML = '<i class="bi bi-info-circle-fill" style = "vertical-align:bottom;"></i>'; }
 
             new bootstrap.Modal(modalEl).show();
         }

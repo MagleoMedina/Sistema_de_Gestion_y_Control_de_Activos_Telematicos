@@ -74,7 +74,7 @@ function renderizarTabla(data) {
         // Verificamos si ya está entregado para deshabilitar el botón visualmente (opcional)
         const yaEntregado = (item.estatus || "").toUpperCase() === "LISTO";
         const btnClase = yaEntregado ? "btn-outline-secondary" : "btn-warning";
-        const btnTexto = yaEntregado ? "<i class=\"bi bi-bookmark-check-fill\" style=\"vertical-align: bottom; margin-right: 5px;\"></i>Listo" : "📦 Estatus";
+        const btnTexto = yaEntregado ? "<i class=\"bi bi-bookmark-check-fill\" style=\"color: green; vertical-align: bottom; margin-right: 5px;\"></i>Listo" : "<i class=\"bi bi-box-seam-fill\" style=\"color: #593F04; vertical-align: bottom; margin-right: 5px;\"></i> Estatus";
         const btnDisabled = yaEntregado ? "disabled" : "";
 
         const tr = document.createElement('tr');

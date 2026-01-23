@@ -74,7 +74,7 @@
                 <td>${item.usuario || "N/A"}</td>
                 <td>
                     <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
-                        👁️ Ver
+                        <i class="bi bi-eye-fill" style="vertical-align: bottom; margin-right: 3px;" ></i>Ver
                     </button>
                 </td>
             `;

@@ -22,7 +22,7 @@
             right: -20px;
             bottom: -20px;
             font-size: 5rem;
-            opacity: 0.1;
+            opacity: 0.2;
             transform: rotate(-15deg);
         }
 
@@ -70,11 +70,14 @@
             
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
-                    <h4 class="m-0 fw-bold text-dark">📋 Control de Stock y Repuestos</h4>
+                    <h4 class="m-0 fw-bold text-dark">
+                        <i class="bi bi-clipboard-data-fill" style="vertical-align: bottom;"></i>
+                        Control de Stock y Repuestos
+                    </h4>
                     <p class="text-muted small m-0">Gestiona las entradas y salidas de material.</p>
                 </div>
                 <button class="btn btn-primary shadow-sm" onclick="abrirModalAgregar()">
-                    <i class="fas fa-plus"></i> ➕ Agregar Nuevo Item
+                    <i class="fas fa-plus"></i> <i class="bi bi-node-plus-fill" style="vertical-align: bottom; margin-right: 5px;"></i>Agregar Nuevo Item
                 </button>
             </div>
 
@@ -86,7 +89,7 @@
                                 <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Total Items</h6>
                                 <h2 class="fw-bold text-primary mb-0" id="totalItems">0</h2>
                             </div>
-                            <div class="icon-bg text-primary">📊</div>
+                            <div class="icon-bg text-primary"><i class="bi bi-table" style = "color: #000;"></i></div>
                         </div>
                     </div>
                 </div>
@@ -97,7 +100,9 @@
                                 <h6 class="text-white-50 text-uppercase fw-bold" style="font-size: 0.8rem;">Stock Crítico</h6>
                                 <h2 class="fw-bold text-white mb-0" id="totalCritico">0</h2>
                             </div>
-                            <div class="icon-bg text-white">⚠️</div>
+                            <div class="icon-bg text-white">
+                                <i class="bi bi-exclamation-triangle-fill" style="color: yellow;"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,12 +113,13 @@
                     <ul class="nav nav-tabs card-header-tabs" id="stockTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold" id="comp-tab" data-bs-toggle="tab" data-bs-target="#tab-componentes" type="button" role="tab">
-                                🖥️ Componentes Internos
+                                <i class="bi bi-pc-display-horizontal" style = "vertical-align: bottom;"></i>
+                                Componentes Internos
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold" id="peri-tab" data-bs-toggle="tab" data-bs-target="#tab-perifericos" type="button" role="tab">
-                                ⌨️ Periféricos
+                                <i class="bi bi-keyboard" style="vertical-align: bottom; margin-right: 3px;"></i>Periféricos
                             </button>
                         </li>
                     </ul>

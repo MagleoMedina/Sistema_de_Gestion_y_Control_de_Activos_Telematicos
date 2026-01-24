@@ -23,6 +23,7 @@ function createWindow() {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: path.join(__dirname, 'build/icons/icon.ico'),
         webPreferences: {
             nodeIntegration: false, // Seguridad: False es recomendado al cargar URLs remotas/locales
             contextIsolation: true

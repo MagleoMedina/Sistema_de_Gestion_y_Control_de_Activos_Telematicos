@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const PORT = 3000;
+const HOST = '192.168.1.107';
 
 // Configurar EJS
 app.set('view engine', 'ejs');
@@ -104,8 +105,8 @@ app.get('/eliminar', (req, res) => {
     res.render('pages/eliminar-registros', { title: 'Stock e Inventario' });
 });
 // Iniciar servidor
-const server = app.listen(PORT, () => {
-    console.log(`Frontend Express corriendo en http://localhost:${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+    console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
 });
 
-module.exports = server;
+module.exports = { server, PORT, HOST };

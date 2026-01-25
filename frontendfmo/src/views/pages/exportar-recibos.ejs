@@ -4,6 +4,15 @@
     <%- include('../partials/head') %>
     <title>Exportar Reportes</title>
 <style>
+    /* --- PALETA FMO --- */
+    :root {
+        --fmo-red-dark: #dd0303;
+        --fmo-red: #d6291c;
+        --fmo-orange-red: #f25912;
+        --fmo-orange: #fa812f;
+        --fmo-yellow: #fab12f;
+    }
+
     .tag-badge {
         background-color: #000080;
         color: white;
@@ -13,7 +22,24 @@
         font-size: 10px;
     }
 
-    /* --- 2. CONFIGURACIÓN TÉCNICA PARA LA EXPORTACIÓN --- */
+    /* Títulos */
+    .text-fmo-title { color: var(--fmo-red-dark); }
+
+    /* Botón Principal (Generar) */
+    .btn-fmo {
+        background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+        border: none;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .btn-fmo:hover {
+        background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+    }
+
+    /* --- CONFIGURACIÓN TÉCNICA PARA LA EXPORTACIÓN --- */
     
     /* Contenedor de Templates (OCULTO) */
     #templates-container { display: none; }
@@ -35,18 +61,10 @@
     /* Ocultar botones dentro del PDF por si acaso */
     .paper-form button, .paper-form .btn { display: none !important; }
 
-
-    /* width espeificos*/
-    .paper-form-equipos{
-        max-width: 660px;
-    }
-
-    .paper-form-perifericos{
-        max-width: 500px;
-    }
-    .paper-form-daet{
-        max-width: 700px;
-    }
+    /* Width específicos para los formatos */
+    .paper-form-equipos { max-width: 660px; }
+    .paper-form-perifericos { max-width: 500px; }
+    .paper-form-daet { max-width: 700px; }
 </style>
 </head>
 <body>
@@ -54,16 +72,17 @@
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4 fade-in">
             
-            <h4 class="mb-4 fw-bold">
-                <i class="bi bi-folder-plus" style="vertical-align: bottom; margin-right: 5px;"></i>
-                Exportación Masiva de Registros</h4>
+            <h4 class="mb-4 fw-bold text-fmo-title">
+                <i class="bi bi-folder-plus me-2"></i>
+                Exportación Masiva de Registros
+            </h4>
 
-            <div class="card shadow-sm">
+            <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <div class="row g-3 align-items-end">
                         
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Tipo de Registro:</label>
+                            <label class="form-label fw-bold text-secondary">Tipo de Registro:</label>
                             <select class="form-select" id="selTipo">
                                 <option value="equipos">Recibo de Equipos</option>
                                 <option value="perifericos">Recibo de Periféricos</option>
@@ -72,7 +91,7 @@
                         </div>
 
                         <div class="col-md-2">
-                            <label class="form-label fw-bold">Formato:</label>
+                            <label class="form-label fw-bold text-secondary">Formato:</label>
                             <select class="form-select" id="selFormato" onchange="toggleFormato()">
                                 <option value="pdf">PDF</option>
                                 <option value="csv">CSV</option>
@@ -80,17 +99,17 @@
                         </div>
 
                         <div class="col-md-2 date-group">
-                            <label class="form-label fw-bold">Desde:</label>
+                            <label class="form-label fw-bold text-secondary">Desde:</label>
                             <input type="date" class="form-control" id="fechaInicio">
                         </div>
                         <div class="col-md-2 date-group">
-                            <label class="form-label fw-bold">Hasta:</label>
+                            <label class="form-label fw-bold text-secondary">Hasta:</label>
                             <input type="date" class="form-control" id="fechaFin">
                         </div>
 
                         <div class="col-md-3">
-                            <button class="btn btn-primary w-100" onclick="procesarExportacion()">
-                                <i class="bi bi-cloud-download-fill" style="vertical-align: bottom; margin-right: 5px;"></i>
+                            <button class="btn btn-fmo w-100" onclick="procesarExportacion()">
+                                <i class="bi bi-cloud-download-fill me-2"></i>
                                 Generar Exportación
                             </button>
                         </div>
@@ -103,27 +122,25 @@
         </div>
     </div>
 
-<div id="templates-container" style="display:none;">
-    <div id="template-equipos-wrapper"><%- include('../partials/forms/template-equipos') %></div>
-    <div id="template-perifericos-wrapper"><%- include('../partials/forms/template-perifericos') %></div>
-    <div id="template-daet-wrapper"><%- include('../partials/forms/template-daet') %></div>
-</div>
+    <div id="templates-container" style="display:none;">
+        <div id="template-equipos-wrapper"><%- include('../partials/forms/template-equipos') %></div>
+        <div id="template-perifericos-wrapper"><%- include('../partials/forms/template-perifericos') %></div>
+        <div id="template-daet-wrapper"><%- include('../partials/forms/template-daet') %></div>
+    </div>
 
-<%- include('../partials/modal') %>
+    <%- include('../partials/modal') %>
 
-<script src="/js/utils/jspdf.umd.min.js"></script>
-<script src="/js/utils/html2canvas.min.js"></script>
-<script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/js/utils/html2pdf.bundle.min.js"></script>
-<script src="/js/utils/api.js"></script>
-<script src="/js/utils/pdf.js"></script>
-<script src="/js/utils/mappings.js"></script>
+    <script src="/js/utils/jspdf.umd.min.js"></script>
+    <script src="/js/utils/html2canvas.min.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/utils/html2pdf.bundle.min.js"></script>
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/utils/pdf.js"></script>
+    <script src="/js/utils/mappings.js"></script>
 
-<script src = "/js/scripts/exportarRecibos.js"></script>
+    <script src="/js/scripts/exportarRecibos.js"></script>
 
-<div id="print-staging-area"></div>
+    <div id="print-staging-area"></div>
 
 </body>
-
-    
 </html>

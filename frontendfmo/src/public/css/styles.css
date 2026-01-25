@@ -148,3 +148,11 @@
 /* --- ESTILOS VISUALES Y ANIMACIONES --- */
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+
+            .bg-gradient-fmo-danger {
+            /* Rojo Intenso -> Naranja */
+            background: linear-gradient(135deg, #dd0303 0%, #fa812f 100%);
+            color: white;
+            border-bottom: 3px solid #b30000;
+        }

@@ -4,60 +4,116 @@
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda Equipos</title>
+    <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
+        /* Títulos */
+        .text-fmo-title { color: var(--fmo-red-dark); }
+
+        /* Botón Principal (Buscar) */
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabla Estilizada */
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, var(--fmo-orange-red) 100%);
+            color: white;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+        }
+
+        /* Modales */
+        .modal-header-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange));
+            color: white;
+        }
+        .modal-header-warning {
+            background: linear-gradient(135deg, var(--fmo-orange), var(--fmo-yellow));
+            color: #333;
+        }
+    </style>
 </head>
 
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4 fade-in">
+            
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">Volver al Menú</a>
-                <h5 class="m-0 fw-bold">
-                    <i class="bi bi-pc-display" style="vertical-align:bottom;"></i> 
-                    Historial de Recibo de Equipos</h5>
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al Menú
+                </a>
+                <h5 class="m-0 fw-bold text-fmo-title">
+                    <i class="bi bi-pc-display me-2"></i> 
+                    Historial de Recibo de Equipos
+                </h5>
             </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <div class="row g-2 align-items-center mb-4">
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <label class="form-label small fw-bold text-secondary">Filtrar por:</label>
                             <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
                                 <option value="todo">Listar Todo</option>
                                 <option value="fmo">FMO</option>
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
+                        
                         <div class="col-md-7" id="containerInputTexto" style="display: none;">
-                            <label class="form-label small fw-bold">Ingrese el FMO del equipo:</label>
-                            <input type="text" class="form-control" id="inputBusquedaFmo"
-                            placeholder="Ej: 119000">
+                            <label class="form-label small fw-bold text-fmo-title">Ingrese el FMO del equipo:</label>
+                            <input type="text" class="form-control" id="inputBusquedaFmo" placeholder="Ej: 119000">
                         </div>
+                        
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">
-                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <label class="form-label small fw-bold text-fmo-title">Seleccione Fecha:</label>
                             <input type="date" class="form-control" id="inputBusquedaFecha">
                         </div>
+                        
                         <div class="col-md-7" id="containerVacio"></div>
+                        
                         <div class="col-md-2 text-end">
                             <label class="form-label d-block">&nbsp;</label>
-                            <button class="btn btn-primary w-100" onclick="buscarEquipos()">
-                                <i class="bi bi-search" style="vertical-align: bottom;"></i>
-                                Buscar</button>
+                            <button class="btn btn-fmo w-100" onclick="buscarEquipos()">
+                                <i class="bi bi-search me-1"></i> Buscar
+                            </button>
                         </div>
                     </div>
+
                     <div class="table-responsive table-scroll-wrapper">
-                        <table class="table table-hover table-bordered align-middle mb-0">
-                            <thead class="table-light text-center">
+                        <table class="table table-custom table-hover table-bordered align-middle mb-0">
+                            <thead class="text-center">
                                 <tr>
                                     <th width="5%">#</th>
                                     <th>FMO / Equipo</th>
                                     <th>Fecha Ingreso</th>
                                     <th>Usuario</th>
-                                    <th>Estatus</th> <th>Acciones</th>
+                                    <th>Estatus</th> 
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados" class="text-center">
                                 <tr>
-                                    <td colspan="5" class="text-muted py-5">Seleccione un filtro y busque para ver resultados.</td>
+                                    <td colspan="6" class="text-muted py-5">Seleccione un filtro y busque para ver resultados.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -66,68 +122,59 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="modalVerEquipo" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header bg-light py-2">
-                    <h6 class="modal-title fw-bold"><i class="bi bi-clipboard-data-fill" style="vertical-align: bottom;"></i>Detalle del Recibo</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header modal-header-fmo py-2">
+                    <h6 class="modal-title fw-bold"><i class="bi bi-clipboard-data-fill me-2"></i>Detalle del Recibo</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-secondary bg-opacity-10">
-                <%- include('../partials/forms/template-equipos') %>
-                
+                    <%- include('../partials/forms/template-equipos') %>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-danger" onclick="generarPDFRecibo()"><i class="bi bi-printer-fill" style="vertical-align: bottom;"></i> Descargar PDF</button>
+                    <button type="button" class="btn btn-danger" style="background-color: var(--fmo-red);" onclick="generarPDFRecibo()">
+                        <i class="bi bi-printer-fill me-1"></i> Descargar PDF
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="modalActualizarEstatus" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill" style="vertical-align: bottom; color: rgba(255, 255, 0, 0.555); margin-right: 3px;"></i>Confirmar Entrega</h5>
+                <div class="modal-header modal-header-warning">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Entrega
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center p-4">
-                    <div class="mb-3" style="font-size: 3rem;"><i class="bi bi-box2-fill" style="vertical-align: bottom; color: #6E610B;"></i></div>
+                    <div class="mb-3" style="font-size: 3rem; color: var(--fmo-orange-red);">
+                        <i class="bi bi-box2-fill"></i>
+                    </div>
                     <p class="fs-5">¿Desea marcar este equipo como <strong>LISTO</strong>?</p>
                     <p class="text-muted small">Esta acción actualizará el estatus del recibo en el sistema.</p>
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary fw-bold" onclick="confirmarActualizacion()">Sí, Actualizar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header text-white" id="headerNotificacion">
-                    <h5 class="modal-title fw-bold" id="tituloNotificacion">Notificación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <div id="iconoNotificacion" class="mb-3" style="font-size: 3.5rem;"></div>
-                    <p id="mensajeNotificacion" class="fs-5 fw-medium"></p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Aceptar</button>
+                    <button type="button" class="btn btn-fmo fw-bold" onclick="confirmarActualizacion()">Sí, Actualizar</button>
                 </div>
             </div>
         </div>
     </div>
 
-<script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="/js/utils/html2pdf.bundle.min.js"></script>
-<script src="/js/utils/pdf.js"></script>
-<script src="/js/utils/mappings.js"></script>
-<script src="/js/utils/api.js"></script>
-<script src="/js/scripts/busquedaEquipos.js"></script>
+    <%- include('../partials/modal') %>
+
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/utils/html2pdf.bundle.min.js"></script>
+    <script src="/js/utils/pdf.js"></script>
+    <script src="/js/utils/mappings.js"></script>
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/scripts/busquedaEquipos.js"></script>
 
 </body>
-
 </html>

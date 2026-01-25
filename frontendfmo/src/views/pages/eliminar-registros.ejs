@@ -5,10 +5,69 @@
     <%- include('../partials/head') %>
     <title>Eliminar Registros</title>
     <style>
-        .tag-badge { background-color: #000080; color: white; padding: 1px 3px; border-radius: 4px; margin-right: 4px; font-size: 10px; }
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
+        .tag-badge { 
+            background-color: #000080; 
+            color: white; 
+            padding: 1px 3px; 
+            border-radius: 4px; 
+            margin-right: 4px; 
+            font-size: 10px; 
+        }
         
         /* Ocultar secciones de templates por defecto */
         .template-section { display: none; }
+
+        /* Textos */
+        .text-fmo-red { color: var(--fmo-red) !important; }
+
+        /* Botón Principal (Buscar) */
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabla Estilizada */
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, var(--fmo-orange-red) 100%);
+            color: white;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #fff5f5;
+        }
+
+        /* Modal de Peligro (Eliminación) */
+        .bg-gradient-fmo-danger {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, #b30000 100%);
+            color: white;
+            border-bottom: 3px solid #8a0a0a;
+        }
+        
+        /* Botón de Eliminación */
+        .btn-danger-fmo {
+            background-color: var(--fmo-red);
+            border-color: var(--fmo-red);
+            font-weight: bold;
+        }
+        .btn-danger-fmo:hover {
+            background-color: var(--fmo-red-dark);
+            border-color: var(--fmo-red-dark);
+        }
     </style>
 </head>
 
@@ -18,29 +77,32 @@
 
         <div id="content" class="w-100 bg-light p-4 fade-in">
             
-            <h4 class="mb-4 fw-bold text-danger"><i class="bi bi-trash3-fill" style="vertical-align: bottom;"></i>Gestión y Eliminación de Registros</h4>
+            <h4 class="mb-4 fw-bold text-fmo-red">
+                <i class="bi bi-trash3-fill me-2" style="vertical-align: bottom;"></i>
+                Gestión y Eliminación de Registros
+            </h4>
 
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-4">
                     <div class="row g-3 align-items-end">
                         
                         <div class="col-md-3">
-                            <label class="form-label fw-bold">Tipo de Registro:</label>
+                            <label class="form-label fw-bold text-secondary">Tipo de Registro:</label>
                             <select class="form-select" id="selTipo">
-                                    <option value="equipos">Recibo de Equipos</option>
-                                    <option value="perifericos">Recibo de Periféricos</option>
+                                <option value="equipos">Recibo de Equipos</option>
+                                <option value="perifericos">Recibo de Periféricos</option>
                                 <option value="daet">Entrega al DAET</option>
                             </select>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">Buscar por:</label>
+                            <label class="form-label fw-bold text-secondary">Buscar por:</label>
                             <input type="text" class="form-control" id="inputBusqueda" placeholder="Ej: 119000, Solicitud ST...">
                         </div>
 
                         <div class="col-md-3">
-                            <button class="btn btn-primary w-100" onclick="buscarRegistros()">
-                                <i class="bi bi-search" style="vertical-align: bottom; margin-right: 3px;"></i>Buscar
+                            <button class="btn btn-fmo w-100" onclick="buscarRegistros()">
+                                <i class="bi bi-search me-1" style="vertical-align: bottom;"></i>Buscar
                             </button>
                         </div>
                     </div>
@@ -50,8 +112,8 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-center">
+                        <table class="table table-custom table-hover align-middle mb-0">
+                            <thead class="text-center">
                                 <tr>
                                     <th>#</th>
                                     <th>Identificador</th>
@@ -75,9 +137,10 @@
     </div>
 
     <div class="modal fade" id="modalVerDetalle" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl"> <div class="modal-content">
+        <div class="modal-dialog modal-xl"> 
+            <div class="modal-content">
                 <div class="modal-header bg-info text-white">
-                    <h5 class="modal-title fw-bold"> <i class="bi bi-list-check" style="vertical-align: bottom;"></i>Vista Previa del Registro</h5>
+                    <h5 class="modal-title fw-bold"> <i class="bi bi-list-check me-2"></i>Vista Previa del Registro</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body bg-light">
@@ -105,40 +168,29 @@
     <div class="modal fade" id="modalConfirmarDelete" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill" style="vertical-align: bottom;"></i>Confirmar Eliminación</h5>
+                <div class="modal-header bg-gradient-fmo-danger">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center p-4">
-                    <div class="mb-3" style="font-size: 3rem;"><i class="bi bi-trash3-fill" style="vertical-align: bottom;"></i></div>
+                    <div class="mb-3" style="font-size: 3rem; color: var(--fmo-red-dark);">
+                        <i class="bi bi-trash3-fill"></i>
+                    </div>
                     <p class="fs-5">Está a punto de eliminar el registro <strong id="lblIdEliminar"></strong></p>
                     <p class="text-danger fw-bold">Esta acción es irreversible. ¿Está seguro?</p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger fw-bold" onclick="ejecutarEliminacion()">Sí, Eliminar</button>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger-fmo px-4" style="color:white" onclick="ejecutarEliminacion()">Sí, Eliminar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header text-white" id="headerNotificacion">
-                    <h5 class="modal-title fw-bold" id="tituloNotificacion">Notificación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center p-4">
-                    <div id="iconoNotificacion" class="mb-3" style="font-size: 3.5rem;"></div>
-                    <p id="mensajeNotificacion" class="fs-5 fw-medium"></p>
-                </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Aceptar</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <%- include('../partials/modal') %>
 
     <script src="/js/scripts/eliminarRegistros.js"></script>
     <script src="/js/utils/api.js"></script>

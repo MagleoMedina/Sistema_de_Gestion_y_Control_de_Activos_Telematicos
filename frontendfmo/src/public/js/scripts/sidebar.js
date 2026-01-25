@@ -1,82 +1,114 @@
-   document.addEventListener('DOMContentLoaded', () => {
-        const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('sidebarToggle');
-        
-        setTimeout(() => {
-            sidebar.classList.remove('no-transition');
-        }, 50);
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    
+    // 1. Reactivar animaciones tras la carga
+    setTimeout(() => {
+        sidebar.classList.remove('no-transition');
+    }, 50);
 
-        toggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            const estadoActual = sidebar.classList.contains('collapsed');
-            localStorage.setItem('sidebar-collapsed', estadoActual);
+    // 2. Toggle Sidebar (Colapsar/Expandir)
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        const estadoActual = sidebar.classList.contains('collapsed');
+        localStorage.setItem('sidebar-collapsed', estadoActual);
 
-            if(estadoActual) {
-                const submenu = document.getElementById('submenuRecibos');
-                if(submenu.classList.contains('show')) {
-                    new bootstrap.Collapse(submenu, { toggle: false }).hide();
-                }
+        if(estadoActual) {
+            // Cerrar submenú si se colapsa la barra
+            const submenu = document.getElementById('submenuRecibos');
+            if(submenu && submenu.classList.contains('show')) {
+                new bootstrap.Collapse(submenu, { toggle: false }).hide();
             }
-        });
-
-        const btnRecibos = document.querySelector('[data-bs-target="#submenuRecibos"]');
-        if(btnRecibos){
-            btnRecibos.addEventListener('click', () => {
-                if (sidebar.classList.contains('collapsed')) {
-                    sidebar.classList.remove('collapsed');
-                    localStorage.setItem('sidebar-collapsed', 'false');
-                }
-            });
         }
     });
 
-    // 4. NUEVO: Auto-Expandir al hacer clic en "Perfil"
-        const btnPerfil = document.getElementById('dropdownUser1');
-        if(btnPerfil){
-            btnPerfil.addEventListener('click', () => {
-                // Solo expandimos si ACTUALMENTE está colapsado
-                if (sidebar.classList.contains('collapsed')) {
-                    sidebar.classList.remove('collapsed');
-                    localStorage.setItem('sidebar-collapsed', 'false');
-                }
-                // Si ya estaba expandido, no entra al IF y solo abre el dropdown (comportamiento normal)
-            });
+    // 3. Funciones de Auto-Expandir al hacer clic
+    const btnRecibos = document.getElementById('btnGrupoRecibos');
+    const btnPerfil = document.getElementById('dropdownUser1');
+
+    if(btnRecibos) {
+        btnRecibos.addEventListener('click', () => {
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                localStorage.setItem('sidebar-collapsed', 'false');
+            }
+        });
+    }
+    if(btnPerfil){
+        btnPerfil.addEventListener('click', () => {
+            if (sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                localStorage.setItem('sidebar-collapsed', 'false');
+            }
+        });
+    }
+
+    // 4. LÓGICA DE DATOS DE USUARIO (ROL Y NOMBRE)
+    if (typeof ApiService !== 'undefined') {
+        
+        // A. Obtener Rol y Nombre
+        // Nota: Asumimos que ApiService tiene estos métodos. Si no, usamos el fallback del token.
+        const rolUsuario = ApiService.obtenerRol();
+        let nombreUsuario = "Usuario";
+
+        if (typeof ApiService.obtenerUsuario === 'function') {
+            nombreUsuario = ApiService.obtenerUsuario();
+        } else {
+            // Fallback: Decodificar token manualmente si el método no existe en ApiService
+            const token = sessionStorage.getItem('jwt_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    nombreUsuario = payload.sub || payload.username || "Usuario";
+                } catch (e) { console.error("Error leyendo token", e); }
+            }
         }
 
-const rolUsuario = ApiService.obtenerRol(); // Leemos el rol
-       // Validamos si es ADMIN
-        if (rolUsuario !== 'ADMIN') {
-            // Si NO es admin, ocultamos todos los elementos con clase .admin-only
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.classList.add('d-none-role'); // O usar el.remove() para borrarlos del DOM
-            });
+        // B. Aplicar Nombre al Sidebar
+        const lblUser = document.getElementById('lblUsuarioSidebar');
+        if (lblUser && nombreUsuario) {
+            lblUser.textContent = nombreUsuario;
         }
-        // --- LÓGICA DE ROLES SIN PARPADEO ---
-    if (typeof ApiService !== 'undefined') {
-        const rolUsuario = ApiService.obtenerRol(); 
-        
-        // CAMBIO CLAVE: Solo si es ADMIN quitamos el 'display: none'
+
+        // C. Aplicar Permisos de Admin
         if (rolUsuario === 'ADMIN') {
             document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = 'block'; // O el.classList.remove('admin-only') si prefieres
-                // Nota: usamos style.display explícito para sobreescribir el !important del CSS
                 el.style.setProperty('display', 'block', 'important');
             });
         }
     }
-        // Opcional: Poner el nombre del usuario en el sidebar si viene en el token (campo "sub" usualmente)
-        const token = sessionStorage.getItem('jwt_token');
-        if(token) {
-           const payload = JSON.parse(atob(token.split('.')[1]));
-           document.getElementById('lblUsuarioSidebar').innerText = payload.sub || "Usuario";
-        }
 
-        // Restaurar estado del sidebar desde localStorage
-            (function() {
-            try {
-                const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
-                if (isCollapsed) {
-                    document.getElementById('sidebar').classList.add('collapsed');
+    // 5. ACTIVACIÓN INTELIGENTE DEL MENÚ POR URL
+    activarLinkPorUrl();
+});
+
+/**
+ * Busca qué link coincide con la URL actual y lo activa.
+ */
+function activarLinkPorUrl() {
+    const currentPath = window.location.pathname; 
+    
+    const links = document.querySelectorAll('#sidebar .nav-link');
+
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        if (href && href !== '#' && (currentPath === href || currentPath.startsWith(href))) {
+            
+            link.classList.add('active');
+
+            // Abrir el acordeón si es necesario
+            const parentCollapse = link.closest('.collapse');
+            if (parentCollapse) {
+                parentCollapse.classList.add('show');
+                const toggleBtn = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
+                if (toggleBtn) {
+                    toggleBtn.classList.remove('collapsed');
+                    toggleBtn.setAttribute('aria-expanded', 'true');
                 }
-            } catch (e) {}
-        })();
+            }
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}

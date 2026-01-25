@@ -3,82 +3,135 @@
 
 <head>
     <%- include('../partials/head') %>
-        <title>
-            <%= title %>
-        </title>
-        <style>
-            /* --- ESTILOS PERSONALIZADOS PARA LAS CARDS --- */
-            /* Animación base */
-            .stat-card {
-                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-                border: none;
-                overflow: hidden;
-                position: relative;
-                z-index: 1;
-            }
+    <title><%= title %></title>
+    <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
 
-            /* Efecto Hover (Levantar y Sombra) */
-            .stat-card:hover,
-            .stat-card:focus-within {
-                transform: translateY(-10px) scale(1.02);
-                box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22) !important;
-                cursor: none;
-                z-index: 2;
-            }
+        /* --- ESTILOS PERSONALIZADOS PARA LAS CARDS --- */
+        .stat-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: none;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            color: white; /* Texto blanco por defecto */
+        }
 
-            /* Círculo decorativo de fondo (opcional para estética moderna) */
-            .stat-card::after {
-                content: "";
-                position: absolute;
-                top: -50%;
-                right: -50%;
-                width: 200px;
-                height: 200px;
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 50%;
-                z-index: -1;
-                transition: transform 0.5s;
-            }
+        /* Efecto Hover */
+        .stat-card:hover,
+        .stat-card:focus-within {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 14px 28px rgba(221, 3, 3, 0.25), 0 10px 10px rgba(221, 3, 3, 0.22) !important;
+            cursor: pointer;
+            z-index: 2;
+        }
 
-            .stat-card:hover::after {
-                transform: scale(1.5);
-            }
+        /* Círculo decorativo de fondo */
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            z-index: -1;
+            transition: transform 0.5s;
+        }
 
-            /* Estilo para el número grande */
-            .stat-number {
-                font-size: 3.5rem;
-                font-weight: 800;
-                line-height: 1;
-            }
+        .stat-card:hover::after {
+            transform: scale(1.5);
+        }
 
-            /* Estilo para las cards tipo "Cubo" (hacemos que sean altas) */
-            .card-cube {
-                min-height: 220px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
+        /* --- GRADIENTES FMO PARA LAS TARJETAS --- */
+        
+        /* 1. Equipos (Rojo Intenso) */
+        .card-fmo-red {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, var(--fmo-red) 100%);
+        }
 
-            /* Estilo para la card rectangular */
+        /* 2. Periféricos (Rojo a Naranja) */
+        .card-fmo-orange-red {
+            background: linear-gradient(135deg, var(--fmo-red) 0%, var(--fmo-orange-red) 100%);
+        }
+
+        /* 3. DAET (Naranja Vibrante) */
+        .card-fmo-orange {
+            background: linear-gradient(135deg, var(--fmo-orange-red) 0%, var(--fmo-orange) 100%);
+        }
+
+        /* 4. Pendientes (Amarillo/Dorado) - Texto Oscuro para contraste */
+        .card-fmo-yellow {
+            background: linear-gradient(135deg, var(--fmo-orange) 0%, var(--fmo-yellow) 100%);
+            color: #333 !important; /* Texto oscuro necesario aquí */
+        }
+        .card-fmo-yellow .text-muted {
+            color: #555 !important;
+        }
+        
+        /* Regla general para iconos en la tarjeta amarilla (se sobrescribe para el reloj) */
+        .card-fmo-yellow i:not(.hourglass-spin) {
+            color: rgba(0,0,0,0.15) !important; 
+        }
+
+        /* --- ANIMACIÓN RELOJ DE ARENA --- */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hourglass-spin {
+            color: wheat !important; /* Color solicitado, fuerza sobre el estilo anterior */
+            animation: spin-slow 3s linear infinite; /* Rotación continua suave de 3 segundos */
+            display: inline-block; /* Necesario para que la transformación funcione en elementos <i> */
+        }
+
+        /* Tipografía */
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Dimensiones */
+        .card-cube {
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-wide {
+            min-height: 150px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+        }
+
+        @media (max-width: 768px) {
             .card-wide {
-                min-height: 150px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 50px;
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
             }
-
-            /* En móvil, la rectangular se comporta normal */
-            @media (max-width: 768px) {
-                .card-wide {
-                    flex-direction: column;
-                    text-align: center;
-                    padding: 20px;
-                }
-            }
-        </style>
+        }
+        
+        /* Color de textos en el panel */
+        .text-fmo-title { color: var(--fmo-red-dark); }
+        .border-fmo-bottom { border-bottom: 3px solid var(--fmo-red); }
+    </style>
 </head>
 
 <body>
@@ -87,98 +140,96 @@
 
         <%- include('../partials/sidebar') %>
 
-            <div id="content" class="w-100 bg-light">
+        <div id="content" class="w-100 bg-light">
 
-                <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4">
-                    <div class="container-fluid">
-
-                        <span class="navbar-brand mb-0 h1">
-                            <i class="bi bi-file-spreadsheet"></i>
-                            Panel de Control
-                        </span>
-                    </div>
-                </nav>
-
-                <div class="container-fluid p-4">
-                    <div class="row">
-                        <div class="col-12 mb-4">
-                            <h3 class="fw-bold text-dark">Resumen de Operaciones</h3>
-                            <p class="text-muted">Métricas en tiempo real del departamento de telemática.</p>
-                        </div>
-                    </div>
-
-                    <div class="row g-4 mb-4">
-
-                        <div class="col-md-4">
-                            <div class="card stat-card card-cube bg-primary text-white rounded-4 shadow-sm"
-                                tabindex="0">
-                                <div class="card-body text-center">
-                                    <div class="mb-2" style="font-size: 2.5rem;">
-                                        <i class="bi bi-pc-display"></i>
-                                    </div>
-                                    <h2 class="stat-number mb-2" id="numEquipos">0</h2>
-                                    <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
-                                        Equipos<br>Atendidos</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="card stat-card card-cube bg-success text-white rounded-4 shadow-sm"
-                                tabindex="0">
-                                <div class="card-body text-center">
-                                    <div class="mb-2" style="font-size: 2.5rem;">
-                                        <i class="bi bi-keyboard-fill"></i>
-                                        <i class="bi bi-mouse2-fill"></i>
-                                        <i class="bi bi-printer-fill"></i>
-                                    </div>
-                                    <h2 class="stat-number mb-2" id="numPerifericos">0</h2>
-                                    <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
-                                        Periféricos<br>Atendidos</h6>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="card stat-card card-cube bg-info text-white rounded-4 shadow-sm" tabindex="0">
-                                <div class="card-body text-center">
-                                    <div class="mb-2" style="font-size: 2.5rem;">
-                                        <i class="bi bi-truck"></i>
-                                    </div>
-                                    <h2 class="stat-number mb-2" id="numDaet">0</h2>
-                                    <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">Entregas
-                                        DAET<br>Atendidas</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card stat-card card-wide bg-warning text-dark rounded-4 shadow-sm" tabindex="0">
-                                <div class="text-start">
-                                    <h2 class="stat-number mb-0" id="numPendientes">0</h2>
-                                    <p class="mb-0 fw-bold fs-5">TOTAL PENDIENTES</p>
-                                </div>
-                                <div class="text-end d-none d-md-block">
-                                    <div style="font-size: 5rem; color : grey">
-                                        <i class="bi bi-hourglass-split"></i>
-                                    </div>
-                                </div>
-                                <div class="d-block d-md-none mt-2">
-                                    <span class="badge bg-dark">Atención Requerida</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4">
+                <div class="container-fluid">
+                    <span class="navbar-brand mb-0 h1 text-fmo-title fw-bold">
+                        <i class="bi bi-speedometer2 me-2"></i>Panel de Control
+                    </span>
                 </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h3 class="fw-bold text-dark">Resumen de Operaciones</h3>
+                        <p class="text-muted border-fmo-bottom d-inline-block pb-2">Métricas en tiempo real del departamento de telemática.</p>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+
+                    <div class="col-md-4">
+                        <div class="card stat-card card-cube card-fmo-red rounded-4 shadow-sm" tabindex="0">
+                            <div class="card-body text-center">
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-pc-display"></i>
+                                </div>
+                                <h2 class="stat-number mb-2" id="numEquipos">0</h2>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Equipos<br>Atendidos
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card stat-card card-cube card-fmo-orange-red rounded-4 shadow-sm" tabindex="0">
+                            <div class="card-body text-center">
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-keyboard-fill"></i>
+                                    <i class="bi bi-mouse2-fill"></i>
+                                    <i class="bi bi-printer-fill"></i>
+                                </div>
+                                <h2 class="stat-number mb-2" id="numPerifericos">0</h2>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Periféricos<br>Atendidos
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card stat-card card-cube card-fmo-orange rounded-4 shadow-sm" tabindex="0">
+                            <div class="card-body text-center">
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+                                <h2 class="stat-number mb-2" id="numDaet">0</h2>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Entregas DAET<br>Atendidas
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card stat-card card-wide card-fmo-yellow rounded-4 shadow-sm" tabindex="0">
+                            <div class="text-start">
+                                <h2 class="stat-number mb-0" id="numPendientes">0</h2>
+                                <p class="mb-0 fw-bold fs-5">TOTAL PENDIENTES</p>
+                            </div>
+                            <div class="text-end d-none d-md-block">
+                                <div style="font-size: 5rem;">
+                                    <i class="bi bi-hourglass-split hourglass-spin"></i>
+                                </div>
+                            </div>
+                            <div class="d-block d-md-none mt-2">
+                                <span class="badge bg-dark">Atención Requerida</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </div>
     </div>
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/utils/api.js"></script>
     <script src="/js/scripts/dashboard.js"></script>
 </body>
-
 </html>

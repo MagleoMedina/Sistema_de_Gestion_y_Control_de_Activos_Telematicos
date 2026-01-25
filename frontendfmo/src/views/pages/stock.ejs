@@ -5,6 +5,15 @@
     <%- include('../partials/head') %>
     <title>Inventario y Stock</title>
     <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
         /* Tarjetas de Resumen */
         .stock-card {
             border: none;
@@ -12,21 +21,23 @@
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             overflow: hidden;
             position: relative;
+            border-left: 5px solid var(--fmo-red);
         }
         .stock-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 10px 20px rgba(221, 3, 3, 0.15) !important;
         }
         .icon-bg {
             position: absolute;
             right: -20px;
             bottom: -20px;
             font-size: 5rem;
-            opacity: 0.2;
+            opacity: 0.15;
             transform: rotate(-15deg);
+            color: var(--fmo-red);
         }
 
-        /* Botones de acción circular */
+        /* Botones Circulares de Acción */
         .btn-circle {
             width: 30px;
             height: 30px;
@@ -39,25 +50,51 @@
         }
         .btn-circle:hover { transform: scale(1.2); }
 
-        /* Badge de Stock Bajo */
+        /* Badge de Stock Bajo (Amarillo FMO) */
         .badge-low-stock {
-            background-color: #ffc107;
-            color: #000;
+            background-color: var(--fmo-yellow);
+            color: #333;
+            font-weight: bold;
             animation: pulse-yellow 2s infinite;
         }
         @keyframes pulse-yellow {
-            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(250, 177, 47, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(250, 177, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(250, 177, 47, 0); }
         }
 
-        /* Tabla estilizada */
+        /* Tabla Estilizada (Gradiente Rojo) */
         .table-custom thead {
-            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            background: linear-gradient(135deg, var(--fmo-red-dark), var(--fmo-orange-red));
             color: white;
         }
         .table-custom tbody tr:hover {
-            background-color: #f8f9fa;
+            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+        }
+
+        /* Textos y Botones Personalizados */
+        .text-fmo-primary { color: var(--fmo-red); }
+        .text-fmo-dark { color: #8a0a0a; }
+
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabs Personalizados */
+        .nav-tabs .nav-link.active {
+            color: var(--fmo-red-dark);
+            border-top: 3px solid var(--fmo-red);
+            font-weight: bold;
+        }
+        .nav-tabs .nav-link {
+            color: #666;
         }
     </style>
 </head>
@@ -76,7 +113,7 @@
                     </h4>
                     <p class="text-muted small m-0">Gestiona las entradas y salidas de material.</p>
                 </div>
-                <button class="btn btn-primary shadow-sm" onclick="abrirModalAgregar()">
+                <button class="btn btn-fmo shadow-sm" onclick="abrirModalAgregar()">
                     <i class="fas fa-plus"></i> <i class="bi bi-node-plus-fill" style="vertical-align: bottom; margin-right: 5px;"></i>Agregar Nuevo Item
                 </button>
             </div>
@@ -225,7 +262,7 @@
     <div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
+                <div class="modal-header bg-danger text-white bg-gradient-fmo-danger">
                     <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>

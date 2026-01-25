@@ -4,30 +4,66 @@
     <%- include('../partials/head') %>
     <title>Búsqueda DAET</title>
     <style>
-        .header-title { 
-            letter-spacing: 2px; 
-            font-weight: 900; 
-            text-decoration: underline; 
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
         }
-        /* Clase para ocultar secciones visualmente si no aplican (opcional) */
-        .hidden-section { display: none; }
+
+        .text-fmo-title { color: var(--fmo-red-dark); }
+
+        /* Botón Principal */
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabla (Usa el naranja más fuerte para DAET si quieres diferenciar, o mantén el rojo) */
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--fmo-orange-red) 0%, var(--fmo-orange) 100%);
+            color: white;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #fff8f0;
+        }
+
+        /* Header Modal */
+        .modal-header-fmo {
+            background: linear-gradient(to right, var(--fmo-orange-red), var(--fmo-yellow));
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4 fade-in">
+            
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">Volver al Menú</a>
-                <h5 class="m-0 fw-bold">
-                   <i class="bi bi-truck" style="vertical-align:bottom;"></i> Historial de Entregas al DAET</h5>
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al Menú
+                </a>
+                <h5 class="m-0 fw-bold text-fmo-title">
+                   <i class="bi bi-truck me-2"></i> Historial de Entregas al DAET
+                </h5>
             </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     
                     <div class="row g-2 align-items-center mb-4">
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <label class="form-label small fw-bold text-secondary">Filtrar por:</label>
                             <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
                                 <option value="todo">Listar Todo</option>
                                 <option value="fmoSerial">FmoSerial</option>
@@ -35,30 +71,33 @@
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
+                        
                         <div class="col-md-7" id="containerInputSerial" style="display: none;">
-                            <label class="form-label small fw-bold">Ingrese Serial del Equipo:</label>
+                            <label class="form-label small fw-bold text-fmo-title">Ingrese Serial del Equipo:</label>
                             <input type="text" class="form-control" id="inputBusquedaSerial" placeholder="Ej: XYZ-123...">
                         </div>
                         <div class="col-md-7" id="containerInputLote" style="display: none;">
-                            <label class="form-label small fw-bold">Ingrese FMO del Lote/Equipo:</label>
+                            <label class="form-label small fw-bold text-fmo-title">Ingrese FMO del Lote/Equipo:</label>
                             <input type="text" class="form-control" id="inputBusquedaLote" placeholder="Ej: LOTE-GEN-2025...">
                         </div>
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">
-                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <label class="form-label small fw-bold text-fmo-title">Seleccione Fecha:</label>
                             <input type="date" class="form-control" id="inputBusquedaFecha">
                         </div>
+                        
                         <div class="col-md-7" id="containerVacio"></div>
+                        
                         <div class="col-md-2 text-end">
                             <label class="form-label d-block">&nbsp;</label>
-                            <button class="btn btn-primary w-100" onclick="buscarDaet()">
-                                <i class="bi bi-search" style = "vertical-align: bottom;"></i>
-                                Buscar
+                            <button class="btn btn-fmo w-100" onclick="buscarDaet()">
+                                <i class="bi bi-search me-1"></i> Buscar
                             </button>
                         </div>
                     </div>
+
                     <div class="table-responsive table-scroll-wrapper">
-                        <table class="table table-hover table-bordered align-middle">
-                            <thead class="table-light text-center">
+                        <table class="table table-custom table-hover table-bordered align-middle">
+                            <thead class="text-center">
                                 <tr>
                                     <th width="5%">#</th>
                                     <th>Solicitud DAET</th>
@@ -70,7 +109,7 @@
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados" class="text-center">
-                                <tr><td colspan="7" class="text-muted">Seleccione un filtro y busque para ver resultados.</td></tr>
+                                <tr><td colspan="7" class="text-muted py-5">Seleccione un filtro y busque para ver resultados.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -78,11 +117,12 @@
             </div>
         </div>
     </div>
+    
     <div class="modal fade" id="modalVerDaet" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-light py-2">
-                    <h6 class="modal-title fw-bold"><i class="bi bi-clipboard-data-fill" style="vertical-align: bottom;"></i>Detalle de Entrega</h6>
+                <div class="modal-header modal-header-fmo py-2">
+                    <h6 class="modal-title fw-bold"><i class="bi bi-clipboard-data-fill me-2"></i>Detalle de Entrega</h6>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-secondary bg-opacity-10">
@@ -90,20 +130,22 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-danger" onclick="generarPDFRecibo()">
-                    <i class="bi bi-printer-fill" style="vertical-align: bottom;"></i> Descargar PDF
-                </button>
+                    <button type="button" class="btn btn-danger" style="background-color: var(--fmo-red);" onclick="generarPDFRecibo()">
+                        <i class="bi bi-printer-fill me-1"></i> Descargar PDF
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <%- include('../partials/modal') %>
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/utils/html2pdf.bundle.min.js"></script>
     <script src="/js/utils/pdf.js"></script>
     <script src="/js/utils/mappings.js"></script>   
     <script src="/js/utils/api.js"></script>
-    <script src = "/js/scripts/busquedaDaet.js"></script>
+    <script src="/js/scripts/busquedaDaet.js"></script>
     
 </body>
 </html>

@@ -1,4 +1,14 @@
 <style>
+    /* --- PALETA FMO (Definición Local para el Sidebar) --- */
+    :root {
+        --sidebar-bg: #212529;
+        --sidebar-width: 260px;
+        --sidebar-collapsed-width: 70px;
+        --fmo-red: #d6291c;
+        --fmo-orange: #fa812f;
+        --fmo-gradient: linear-gradient(135deg, #dd0303 0%, #fa812f 100%);
+    }
+
     /* --- 1. LAYOUT GLOBAL --- */
     .wrapper {
         display: flex;
@@ -9,25 +19,24 @@
 
     /* --- 2. SIDEBAR --- */
     #sidebar {
-        min-width: 260px;
-        max-width: 260px;
+        min-width: var(--sidebar-width);
+        max-width: var(--sidebar-width);
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         flex-shrink: 0;
         z-index: 1000;
         overflow-x: hidden;
         white-space: nowrap;
-        background-color: #212529 !important;
-        position: relative; /* Necesario para el dropdown en modo expandido */
+        background-color: var(--sidebar-bg) !important;
+        position: relative;
+        border-right: 1px solid rgba(255,255,255,0.05);
     }
 
-    .no-transition {
-        transition: none !important;
-    }
+    .no-transition { transition: none !important; }
 
     /* Estado Colapsado */
     #sidebar.collapsed {
-        min-width: 70px;
-        max-width: 70px;
+        min-width: var(--sidebar-collapsed-width);
+        max-width: var(--sidebar-collapsed-width);
     }
 
     /* Ocultar textos y flechas */
@@ -39,53 +48,86 @@
         display: none;
     }
 
-    /* --- CORRECCIÓN 1: ALINEACIÓN DE ICONOS --- */
-    /* Contenedor fijo para que todos los iconos ocupen el mismo espacio */
+    /* --- ESTILOS DE NAVEGACIÓN FMO --- */
+    
+    /* Contenedor de iconos */
     .icon-container {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-width: 30px; /* Ancho fijo */
+        min-width: 30px;
         width: 30px;
         margin-right: 0.5rem;
-        font-size: 1.2rem; /* Tamaño unificado */
+        font-size: 1.2rem;
+        color: var(--fmo-orange); /* Color de icono por defecto */
+        transition: color 0.3s;
     }
 
-    /* En modo colapsado, centramos todo el bloque */
+    /* Link Base */
+    .nav-pills .nav-link {
+        color: #e0e0e0;
+        margin-bottom: 4px;
+        transition: all 0.2s ease;
+        border-radius: 8px; /* Bordes más suaves */
+    }
+
+    /* Link Hover (Efecto suave rojo) */
+    .nav-pills .nav-link:hover {
+        background-color: rgba(214, 41, 28, 0.15); /* Rojo transparente */
+        color: white;
+        transform: translateX(3px);
+    }
+    .nav-pills .nav-link:hover .icon-container {
+        color: #fff;
+    }
+
+    /* --- ESTADO ACTIVO (Gradiante FMO) --- */
+    .nav-pills .nav-link.active {
+        background: var(--fmo-gradient) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(221, 3, 3, 0.4); /* Sombra roja */
+    }
+    .nav-pills .nav-link.active .icon-container {
+        color: white !important;
+    }
+
+    /* --- HEADER DEL SIDEBAR --- */
+    .sidebar-title i {
+        color: var(--fmo-red); /* Icono herramienta en rojo */
+    }
+    
+    .toggle-btn {
+        background: none; border: none; color: white;
+        font-size: 1.5rem; cursor: pointer; padding: 0 10px;
+        transition: transform 0.3s; line-height: 1;
+    }
+    .toggle-btn:hover { color: var(--fmo-orange); }
+
+    /* --- AJUSTES DE COLAPSADO --- */
     #sidebar.collapsed .nav-link, 
     #sidebar.collapsed .dropdown-toggle {
         justify-content: center !important; 
         padding-left: 0;
         padding-right: 0;
     }
+    #sidebar.collapsed .icon-container { margin-right: 0 !important; }
+    #sidebar.collapsed .collapse { display: none !important; }
 
-    #sidebar.collapsed .icon-container {
-        margin-right: 0 !important;
-    }
-
-    #sidebar.collapsed .collapse {
-        display: none !important; 
-    }
-
-    /* --- CORRECCIÓN 2: DROPDOWN MENU (PERFIL) --- */
-    /* Cuando está colapsado, sacamos el menú del flujo para que no se corte */
+    /* Dropdown Flotante */
     #sidebar.collapsed .dropdown-menu {
         position: fixed !important;
         left: 75px !important;
         bottom: 20px !important;
         top: auto !important;
         width: auto !important;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
         border: 1px solid rgba(255,255,255,0.1);
+        background: #2c3034;
     }
 
-    /* --- CORRECCIÓN 3: CERO PARPADEO (Seguridad Visual) --- */
-    /* Oculto por defecto en CSS. Solo JS lo mostrará si es ADMIN. */
-    .admin-only {
-        display: none !important;
-    }
-
-    /* --- OTROS ESTILOS --- */
+    /* --- OTROS --- */
+    .admin-only { display: none !important; }
+    
     #content {
         flex-grow: 1;
         width: auto !important;
@@ -95,76 +137,67 @@
     }
 
     .submenu-link {
-        padding-left: 2.5rem !important;
+        padding-left: 3rem !important;
         font-size: 0.9em;
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.3);
+        border-left: 3px solid transparent;
+    }
+    .submenu-link.active {
+        background-color: rgba(214, 41, 28, 0.2) !important;
+        border-left-color: var(--fmo-orange) !important;
+        background-image: none !important; /* Quitar degradado completo en submenús */
+        box-shadow: none !important;
     }
 
-    .toggle-btn {
-        background: none; border: none; color: white;
-        font-size: 1.5rem; cursor: pointer; padding: 0 10px;
-        transition: transform 0.3s; line-height: 1;
-    }
-    .toggle-btn:hover { color: #adb5bd; }
-
-    .nav-link:hover {
-        background-color: rgba(255,255,255,0.1);
-        transform: translateX(5px);
-        transition: transform 0.2s;
-    }
-    
     .bi { vertical-align: text-bottom; }
 </style>
 
-<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark h-100 no-transition">
+<div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white h-100 no-transition">
+    
     <div class="d-flex align-items-center justify-content-between mb-3 text-white text-decoration-none w-100">
         <a href="/dashboard" class="d-flex align-items-center text-white text-decoration-none sidebar-title overflow-hidden">
             <i class="bi bi-tools fs-4 me-2"></i>
-            <span class="fs-4 fw-bold">Soporte FMO</span>
+            <span class="fs-5 fw-bold">Soporte FMO</span>
         </a>
         <button id="sidebarToggle" class="toggle-btn" title="Contraer/Expandir menú">
             <i class="bi bi-list"></i>
         </button>
     </div>
     
-    <hr>
+    <hr style="border-color: rgba(255,255,255,0.15);">
     
-    <ul class="nav nav-pills flex-column mb-auto">
+    <ul class="nav nav-pills flex-column mb-auto" id="sidebarMenu">
         
-        <% 
-            const isRecibosActive = (title === 'Registro de Equipos' || title === 'Gestión Periféricos' || title === 'Entregas DAET');
-        %>
         <li class="nav-item mb-1">
-            <button class="nav-link text-white w-100 d-flex align-items-center <%= isRecibosActive ? '' : 'collapsed' %>" 
+            <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
                     data-bs-toggle="collapse" 
                     data-bs-target="#submenuRecibos" 
-                    aria-expanded="<%= isRecibosActive %>">
+                    aria-expanded="false"
+                    id="btnGrupoRecibos">
                 
                 <span class="icon-container">
                     <i class="bi bi-clipboard-data"></i>
                 </span>
-                
                 <span class="link-text flex-grow-1 text-start">Recibos</span>
-                
                 <span class="dropdown-toggle"></span> 
             </button>
             
-            <div class="collapse <%= isRecibosActive ? 'show' : '' %>" id="submenuRecibos">
+            <div class="collapse" id="submenuRecibos">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                     <li>
-                        <a href="/ingreso-equipos" class="nav-link text-white submenu-link <%= title === 'Registro de Equipos' ? 'active' : '' %>">
+                        <a href="/ingreso-equipos" class="nav-link text-white submenu-link">
                             <span class="icon-container"><i class="bi bi-pc-display"></i></span>
                             <span class="link-text">Equipos</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/perifericos" class="nav-link text-white submenu-link <%= title === 'Gestión Periféricos' ? 'active' : '' %>">
+                        <a href="/perifericos" class="nav-link text-white submenu-link">
                             <span class="icon-container"><i class="bi bi-mouse"></i></span>
                             <span class="link-text">Periféricos</span>
                         </a>
                     </li>
                     <li>
-                        <a href="/daet" class="nav-link text-white submenu-link <%= title === 'Entregas DAET' ? 'active' : '' %>">
+                        <a href="/daet" class="nav-link text-white submenu-link">
                             <span class="icon-container"><i class="bi bi-truck"></i></span>
                             <span class="link-text">Entregas DAET</span>
                         </a>
@@ -174,51 +207,50 @@
         </li>
 
         <li>
-            <a href="/busqueda" class="nav-link text-white d-flex align-items-center <%= title === 'Búsqueda y Reportes' ? 'active' : '' %>">
+            <a href="/busqueda" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-search"></i></span>
                 <span class="link-text">Consultar Recibos</span>
             </a>
         </li>
 
         <li class="admin-only">
-            <a href="/exportar" class="nav-link text-white d-flex align-items-center <%= title === 'Exportar Recibos' ? 'active' : '' %>">
+            <a href="/exportar" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-file-earmark-arrow-down"></i></span>
                 <span class="link-text">Exportar Recibos</span>
             </a>
         </li>
         <li class="admin-only">
-            <a href="/gestion" class="nav-link text-white d-flex align-items-center <%= title === 'Gestion Usuarios' ? 'active' : '' %>">
+            <a href="/gestion" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-people-fill"></i></span>
                 <span class="link-text">Gestión Usuarios</span>
             </a>
         </li>
         <li class="admin-only">
-            <a href="/stock" class="nav-link text-white d-flex align-items-center <%= title === 'Stock e Inventario' ? 'active' : '' %>">
+            <a href="/stock" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-box-seam"></i></span>
                 <span class="link-text">Stock</span>
             </a>
         </li>
         <li class="admin-only">
-            <a href="/eliminar" class="nav-link text-white d-flex align-items-center <%= title === 'Eliminar Registros' ? 'active' : '' %>">
+            <a href="/eliminar" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-trash3-fill"></i></span>
                 <span class="link-text">Eliminar Registros</span>
             </a>
         </li>
     </ul>
     
-    <hr>
+    <hr style="border-color: rgba(255,255,255,0.15);">
     
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
             <span class="icon-container"><i class="bi bi-person-circle"></i></span>
-            <strong class="link-text" id="lblUsuarioSidebar">Usuario</strong>
+            <strong class="link-text" id="lblUsuarioSidebar"></strong>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-            <li><a class="dropdown-item" href="#">Perfil</a></li>
-            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#" onclick="ApiService.logout()">Cerrar Sesión</a></li>
         </ul>
     </div>
 </div>
+
 <script src="/js/utils/api.js"></script>
 <script src="/js/scripts/sidebar.js"></script>

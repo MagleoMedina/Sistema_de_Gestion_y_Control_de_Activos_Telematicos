@@ -4,40 +4,78 @@
     <%- include('../partials/head') %>
     <title>Centro de Búsqueda</title>
     <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
         /* Estilos para las tarjetas de menú */
         .menu-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer;
-            text-decoration: none; /* Quitar subrayado del link */
-            color: inherit; /* Mantener color de texto */
+            text-decoration: none;
+            color: inherit;
             background-color: #fff;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Bordes superiores distintivos por defecto */
+        .menu-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange));
+            opacity: 0.8;
         }
 
         .menu-card:hover {
-            transform: translateY(-5px);
-            border-color: #0d6efd; /* Color primario Bootstrap */
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            border-color: transparent;
+            box-shadow: 0 14px 28px rgba(221, 3, 3, 0.15), 0 10px 10px rgba(221, 3, 3, 0.1);
         }
 
+        .menu-card:hover::before {
+            opacity: 1;
+            height: 8px; /* El borde crece un poco al hover */
+            transition: height 0.2s;
+        }
+
+        /* Iconos con Gradiente (Truco CSS background-clip) */
         .card-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: -webkit-linear-gradient(45deg, var(--fmo-red-dark), var(--fmo-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            transition: transform 0.3s;
+        }
+
+        .menu-card:hover .card-icon {
+            transform: scale(1.1) rotate(-5deg);
         }
 
         .card-title {
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-align: center;
             margin: 0;
+            color: var(--fmo-red-dark); /* Texto rojo oscuro */
         }
         
         /* Enlace que cubre toda la card */
@@ -46,6 +84,15 @@
             color: inherit;
             display: block;
             height: 100%;
+        }
+
+        .text-fmo-title { color: var(--fmo-red-dark); }
+        
+        /* Ajuste específico para tarjeta DAET (Más naranja) */
+        .daet-card .card-icon {
+            background: -webkit-linear-gradient(45deg, var(--fmo-orange-red), var(--fmo-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
     </style>
 </head>
@@ -58,52 +105,64 @@
             
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4">
                 <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1">
-                        <i class="bi bi-journals""></i>
-                        Centro de Búsqueda y Reportes</span>
+                     <span class="navbar-brand mb-0 h1 fw-bold text-fmo-title">
+                        <i class="bi bi-journals me-2" style="color: var(--fmo-red);"></i>
+                        Centro de Búsqueda y Reportes
+                    </span>
                 </div>
             </nav>
 
             <div class="container-fluid p-5">
                 
-                <h4 class="mb-4 text-secondary">Seleccione el módulo a consultar:</h4>
+                <h4 class="mb-4 text-secondary fw-bold border-bottom pb-2 d-inline-block">
+                    Seleccione el módulo a consultar:
+                </h4>
 
-                <div class="row g-4">
-                      <div class="col-md-4">
+                <div class="row g-4 mt-2">
+                    
+                    <div class="col-md-4">
                         <a href="/busqueda/equipos" class="card-link">
                             <div class="menu-card">
                                 <div class="card-icon">
                                     <i class="bi bi-pc-display"></i>
                                 </div>
                                 <h5 class="card-title">Recibo de Equipos</h5>
-                                <p class="text-muted text-center mt-2 small">Equipos completos, ingresos, egresos</p>
+                                <p class="text-muted text-center mt-3 small mb-0">
+                                    Historial de ingresos y salidas de CPUs completos.
+                                </p>
                             </div>
                         </a>
                     </div>
-                        <div class="col-md-4">
+                    
+                    <div class="col-md-4">
                         <a href="/busqueda/perifericos" class="card-link">
                             <div class="menu-card">
                                 <div class="card-icon">
                                     <i class="bi bi-keyboard-fill"></i>
-                                        <i class="bi bi-mouse2-fill"></i>
-                                        <i class="bi bi-printer-fill"></i>
+                                    <i class="bi bi-mouse2-fill"></i>
                                 </div>
                                 <h5 class="card-title">Recibo de Periféricos</h5>
-                                <p class="text-muted text-center mt-2 small">Monitores, mouse, piezas sueltas</p>
+                                <p class="text-muted text-center mt-3 small mb-0">
+                                    Monitores, teclados, mouse y piezas sueltas.
+                                </p>
                             </div>
                         </a>
                     </div>
+
                     <div class="col-md-4">
                         <a href="/busqueda/daet" class="card-link">
-                            <div class="menu-card">
+                            <div class="menu-card daet-card">
                                 <div class="card-icon">
                                     <i class="bi bi-truck"></i>
                                 </div>
                                 <h5 class="card-title">Entregas al DAET</h5>
-                                <p class="text-muted text-center mt-2 small">Consultar envíos y reemplazos</p>
+                                <p class="text-muted text-center mt-3 small mb-0">
+                                    Control de envíos, reemplazos y reparaciones externas.
+                                </p>
                             </div>
                         </a>
                     </div>
+
                 </div>
 
             </div>

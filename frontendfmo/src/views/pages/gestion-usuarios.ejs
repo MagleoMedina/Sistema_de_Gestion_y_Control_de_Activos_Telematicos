@@ -3,6 +3,74 @@
 <head>
     <%- include('../partials/head') %>
     <title>Gestión de Usuarios</title>
+    <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
+        /* Títulos */
+        .text-fmo-title { color: var(--fmo-red-dark); }
+
+        /* Botón Principal (Nuevo Usuario) */
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabla Estilizada */
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, var(--fmo-orange-red) 100%);
+            color: white;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+        }
+
+        /* Botón Eliminar (Rojo Intenso) */
+        .btn-fmo-danger {
+            background-color: white;
+            color: var(--fmo-red);
+            border: 1px solid var(--fmo-red);
+            transition: all 0.2s;
+        }
+        .btn-fmo-danger:hover {
+            background-color: var(--fmo-red);
+            color: white;
+        }
+
+        /* Modal Headers */
+        .modal-header-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange));
+            color: white;
+        }
+        .modal-header-danger {
+            background: linear-gradient(135deg, var(--fmo-red-dark), #b30000);
+            color: white;
+        }
+        
+        /* Badges */
+        .badge-admin {
+            background-color: var(--fmo-red-dark);
+            color: white;
+        }
+        .badge-soporte {
+            background-color: var(--fmo-orange);
+            color: #333;
+        }
+    </style>
 </head>
 
 <body>
@@ -11,17 +79,20 @@
         <div id="content" class="w-100 bg-light p-4 fade-in">
         
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="m-0 fw-bold">👥 Gestión de Usuarios del Sistema</h4>
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
-                    ➕ Nuevo Usuario
+                <h4 class="m-0 fw-bold text-fmo-title">
+                    <i class="bi bi-people-fill me-2"></i>
+                    Gestión de Usuarios del Sistema
+                </h4>
+                <button class="btn btn-fmo shadow-sm px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalCrearUsuario">
+                    <i class="bi bi-person-plus-fill" style="vertical-align: bottom; margin-right: 5px;"></i>Nuevo Usuario
                 </button>
             </div>
 
             <div class="card shadow-sm border-0">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-dark text-center">
+                        <table class="table table-custom table-hover align-middle mb-0">
+                            <thead class="text-center">
                                 <tr>
                                     <th>ID</th>
                                     <th>Nombre de Usuario (Username)</th>
@@ -31,7 +102,7 @@
                             </thead>
                             <tbody id="tablaUsuarios" class="text-center">
                                 <tr>
-                                    <td colspan="4">Cargando usuarios...</td>
+                                    <td colspan="4" class="text-muted py-4">Cargando usuarios...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -45,193 +116,65 @@
     <div class="modal fade" id="modalCrearUsuario" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title fw-bold">Registrar Nuevo Usuario</h5>
+                <div class="modal-header modal-header-fmo">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-person-add me-2"></i>Registrar Nuevo Usuario
+                    </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="formUsuario">
-                        
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Username:</label>
+                            <label class="form-label fw-bold text-fmo-title">Username:</label>
                             <input type="text" class="form-control" id="inputUsername" placeholder="Ej: jpererez" required>
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Contraseña:</label>
+                            <label class="form-label fw-bold text-fmo-title">Contraseña:</label>
                             <input type="text" class="form-control" id="inputClave" placeholder="******" required>
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Tipo de Usuario:</label>
+                            <label class="form-label fw-bold text-fmo-title">Tipo de Usuario:</label>
                             <select class="form-select" id="selectTipo">
                                 <option value="SOPORTE">SOPORTE</option>
                                 <option value="ADMIN">ADMINISTRADOR</option>
                             </select>
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-success" onclick="guardarUsuario()">Guardar Usuario</button>
+                    <button type="button" class="btn btn-fmo" onclick="guardarUsuario()">Guardar Usuario</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-hidden="true">
+
+    <div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header text-white" id="headerNotificacion">
-                    <h5 class="modal-title fw-bold" id="tituloNotificacion">Notificación</h5>
+                <div class="modal-header modal-header-danger">
+                    <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center p-4">
-                    <div id="iconoNotificacion" class="mb-3" style="font-size: 3.5rem;"></div>
-                    <p id="mensajeNotificacion" class="mb-0 fs-5 fw-medium text-secondary"></p>
+                    <div class="mb-3 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem; color: #dd0303;"></i>
+                    </div>
+                    <p class="fs-5">¿Está seguro de que desea eliminar al usuario <b id="lblUsuarioEliminar" class="text-danger"></b>?</p>
+                    <small class="text-muted">Esta acción no se puede deshacer.</small>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Entendido</button>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger px-4" style="background-color: #dd0303; border-color: #dd0303;" onclick="ejecutarEliminacion()">Sí, Eliminar</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <%- include('../partials/modal') %>
+
+    <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-
-    <script>
-
-     function mostrarNotificacion(titulo, mensaje, tipo) {
-            const modalEl = document.getElementById('modalNotificacion');
-            const header = document.getElementById('headerNotificacion');
-            const tituloEl = document.getElementById('tituloNotificacion');
-            const msgEl = document.getElementById('mensajeNotificacion');
-            const iconoEl = document.getElementById('iconoNotificacion');
-
-            // 1. Configurar Textos
-            tituloEl.innerText = titulo;
-            msgEl.innerText = mensaje;
-
-            // 2. Configurar Estilos según el tipo
-            header.className = 'modal-header text-white'; // Reset
-            
-            if (tipo === 'exito') {
-                header.classList.add('bg-success');
-                iconoEl.innerHTML = '✅'; 
-            } else if (tipo === 'error') {
-                header.classList.add('bg-danger');
-                iconoEl.innerHTML = '❌'; 
-            } else {
-                header.classList.add('bg-primary');
-                iconoEl.innerHTML = 'ℹ️'; 
-            }
-
-            // 3. Mostrar Modal
-            new bootstrap.Modal(modalEl).show();
-        }
-
-        // --- LÓGICA PRINCIPAL ---
-
-        document.addEventListener('DOMContentLoaded', () => {
-            listarUsuarios();
-        });
-
-        // 1. LISTAR
-        async function listarUsuarios() {
-            const tbody = document.getElementById('tablaUsuarios');
-            try {
-                const res = await fetch("http://127.0.0.1:8081/api/usuarioSistema");
-                if(!res.ok) throw new Error("Error al obtener usuarios");
-                const usuarios = await res.json();
-
-                tbody.innerHTML = '';
-                if(usuarios.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No hay usuarios registrados.</td></tr>';
-                    return;
-                }
-
-                usuarios.forEach(u => {
-                    const tr = document.createElement('tr');
-                    const idNum = 0;
-                    tr.innerHTML = `
-                        <td class="fw-bold text-secondary">#${u.id}</td>
-                        <td class="fw-bold text-primary">${u.username}</td>
-                        <td><span class="badge bg-info text-dark">${u.tipo}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${u.id}, '${u.username}')">
-                                🗑️ Eliminar
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-danger">Error de conexión con el servidor.</td></tr>`;
-            }
-        }
-
-        // 2. CREAR
-        async function guardarUsuario() {
-            const username = document.getElementById('inputUsername').value;
-            const clave = document.getElementById('inputClave').value;
-            const tipo = document.getElementById('selectTipo').value;
-
-            if(!username || !clave) {
-                mostrarNotificacion("Datos Incompletos", "Por favor complete todos los campos.", "error");
-                return;
-            }
-
-            const nuevoUsuario = { username, clave, tipo };
-
-            try {
-                const res = await fetch("http://127.0.0.1:8081/api/crearUsuarioSistema", {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(nuevoUsuario)
-                });
-
-                if(res.ok) {
-                    // Cerrar modal de registro primero
-                    const modalRegistro = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
-                    modalRegistro.hide();
-                    
-                    // Mostrar modal de éxito
-                    mostrarNotificacion("¡Excelente!", "Usuario creado exitosamente.", "exito");
-                    
-                    document.getElementById('formUsuario').reset(); 
-                    listarUsuarios(); 
-                } else {
-                    mostrarNotificacion("Error", "No se pudo crear. Verifique si el username ya existe.", "error");
-                }
-            } catch (error) {
-                console.error(error);
-                mostrarNotificacion("Error de Conexión", "No se pudo conectar con el servidor.", "error");
-            }
-        }
-
-        // 3. ELIMINAR
-        async function eliminarUsuario(id, nombre) {
-            // Nota: Para reemplazar este confirm nativo también necesitaríamos otro modal de "Confirmación",
-            // pero por ahora mantenemos el confirm nativo para la pregunta y usamos el modal para el resultado.
-            if(!confirm(`¿Está seguro de eliminar al usuario ${nombre}?`)) return;
-
-            try {
-                const res = await fetch(`http://127.0.0.1:8081/api/usuarioSistema/borrar/${nombre}`, {
-                    method: 'DELETE'
-                });
-
-                if(res.ok) {
-                    listarUsuarios();
-                    mostrarNotificacion("Eliminado", `El usuario ${nombre} ha sido eliminado.`, "exito");
-                } else {
-                    mostrarNotificacion("Error", "No se pudo eliminar el usuario.", "error");
-                }
-            } catch (error) {
-                console.error(error);
-                mostrarNotificacion("Error", "Ocurrió un error al intentar eliminar.", "error");
-            }
-        }
-    </script>
+    <script src="/js/scripts/gestionUsuarios.js"></script>
 </body>
 </html>

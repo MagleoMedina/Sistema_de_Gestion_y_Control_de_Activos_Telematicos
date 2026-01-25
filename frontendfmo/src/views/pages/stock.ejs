@@ -5,6 +5,15 @@
     <%- include('../partials/head') %>
     <title>Inventario y Stock</title>
     <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
         /* Tarjetas de Resumen */
         .stock-card {
             border: none;
@@ -12,21 +21,23 @@
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             overflow: hidden;
             position: relative;
+            border-left: 5px solid var(--fmo-red);
         }
         .stock-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 10px 20px rgba(221, 3, 3, 0.15) !important;
         }
         .icon-bg {
             position: absolute;
             right: -20px;
             bottom: -20px;
             font-size: 5rem;
-            opacity: 0.1;
+            opacity: 0.15;
             transform: rotate(-15deg);
+            color: var(--fmo-red);
         }
 
-        /* Botones de acción circular */
+        /* Botones Circulares de Acción */
         .btn-circle {
             width: 30px;
             height: 30px;
@@ -39,25 +50,51 @@
         }
         .btn-circle:hover { transform: scale(1.2); }
 
-        /* Badge de Stock Bajo */
+        /* Badge de Stock Bajo (Amarillo FMO) */
         .badge-low-stock {
-            background-color: #ffc107;
-            color: #000;
+            background-color: var(--fmo-yellow);
+            color: #333;
+            font-weight: bold;
             animation: pulse-yellow 2s infinite;
         }
         @keyframes pulse-yellow {
-            0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(250, 177, 47, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(250, 177, 47, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(250, 177, 47, 0); }
         }
 
-        /* Tabla estilizada */
+        /* Tabla Estilizada (Gradiente Rojo) */
         .table-custom thead {
-            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            background: linear-gradient(135deg, var(--fmo-red-dark), var(--fmo-orange-red));
             color: white;
         }
         .table-custom tbody tr:hover {
-            background-color: #f8f9fa;
+            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+        }
+
+        /* Textos y Botones Personalizados */
+        .text-fmo-primary { color: var(--fmo-red); }
+        .text-fmo-dark { color: #8a0a0a; }
+
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabs Personalizados */
+        .nav-tabs .nav-link.active {
+            color: var(--fmo-red-dark);
+            border-top: 3px solid var(--fmo-red);
+            font-weight: bold;
+        }
+        .nav-tabs .nav-link {
+            color: #666;
         }
     </style>
 </head>
@@ -70,11 +107,14 @@
             
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
-                    <h4 class="m-0 fw-bold text-dark">📋 Control de Stock y Repuestos</h4>
+                    <h4 class="m-0 fw-bold text-dark">
+                        <i class="bi bi-clipboard-data-fill" style="vertical-align: bottom;"></i>
+                        Control de Stock y Repuestos
+                    </h4>
                     <p class="text-muted small m-0">Gestiona las entradas y salidas de material.</p>
                 </div>
-                <button class="btn btn-primary shadow-sm" onclick="abrirModalAgregar()">
-                    <i class="fas fa-plus"></i> ➕ Agregar Nuevo Item
+                <button class="btn btn-fmo shadow-sm" onclick="abrirModalAgregar()">
+                    <i class="fas fa-plus"></i> <i class="bi bi-node-plus-fill" style="vertical-align: bottom; margin-right: 5px;"></i>Agregar Nuevo Item
                 </button>
             </div>
 
@@ -86,7 +126,7 @@
                                 <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Total Items</h6>
                                 <h2 class="fw-bold text-primary mb-0" id="totalItems">0</h2>
                             </div>
-                            <div class="icon-bg text-primary">📊</div>
+                            <div class="icon-bg text-primary"><i class="bi bi-table" style = "color: #000;"></i></div>
                         </div>
                     </div>
                 </div>
@@ -97,7 +137,9 @@
                                 <h6 class="text-white-50 text-uppercase fw-bold" style="font-size: 0.8rem;">Stock Crítico</h6>
                                 <h2 class="fw-bold text-white mb-0" id="totalCritico">0</h2>
                             </div>
-                            <div class="icon-bg text-white">⚠️</div>
+                            <div class="icon-bg text-white">
+                                <i class="bi bi-exclamation-triangle-fill" style="color: yellow;"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,12 +150,13 @@
                     <ul class="nav nav-tabs card-header-tabs" id="stockTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active fw-bold" id="comp-tab" data-bs-toggle="tab" data-bs-target="#tab-componentes" type="button" role="tab">
-                                🖥️ Componentes Internos
+                                <i class="bi bi-pc-display-horizontal" style = "vertical-align: bottom;"></i>
+                                Componentes Internos
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link fw-bold" id="peri-tab" data-bs-toggle="tab" data-bs-target="#tab-perifericos" type="button" role="tab">
-                                ⌨️ Periféricos
+                                <i class="bi bi-keyboard" style="vertical-align: bottom; margin-right: 3px;"></i>Periféricos
                             </button>
                         </li>
                     </ul>
@@ -135,7 +178,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaComponentes">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -153,7 +196,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaPerifericos">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -169,7 +212,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold">📥 Ingreso de Inventario</h5>
+                    <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-zip-fill" style="vertical-align: bottom; margin-right: 3px;"></i>Ingreso de Inventario</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -216,226 +259,32 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white bg-gradient-fmo-danger">
+                    <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="fs-5">¿Está seguro de que desea eliminar este registro del inventario?</p>
+                    <small class="text-muted">Esta acción es irreversible y afectará los reportes.</small>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="ejecutarEliminacionStock()">Sí, Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/modal') %>
+
+    <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script>
-    // URL Base de tu API Spring Boot
-    const API_URL = 'http://127.0.0.1:8081/api/stock';
-
-    // Almacenes temporales para los selectores del modal
-    let listaComponentesDB = [];
-    let listaPerifericosDB = [];
-
-    // --- 1. CARGA INICIAL ---
-    document.addEventListener('DOMContentLoaded', async () => {
-        await cargarCatalogos(); // Llenar las listas desplegables
-        cargarStock();           // Llenar la tabla principal
-    });
-
-    // --- 2. CARGAR CATÁLOGOS (Para el Modal) ---
-    async function cargarCatalogos() {
-        try {
-            // Hacemos las dos peticiones en paralelo para ser más rápidos
-            const [resComp, resPeri] = await Promise.all([
-                fetch(`${API_URL}/componentes`),
-                fetch(`${API_URL}/perifericos`) // Asumiendo que creaste este endpoint similar al de componentes
-            ]);
-
-            if (resComp.ok) listaComponentesDB = await resComp.json();
-            if (resPeri.ok) listaPerifericosDB = await resPeri.json();
-
-            // Inicializar el select
-            cargarListaItems();
-        } catch (error) {
-            console.error("Error cargando catálogos del sistema:", error);
-            alert("Error de conexión al cargar listas de items.");
-        }
-    }
-
-    // --- 3. LOGICA DEL MODAL (Dinámico) ---
-    function abrirModalAgregar() {
-        document.getElementById('formStock').reset();
-        // Resetear selectores
-        document.getElementById('selCategoria').value = "COMPONENTE";
-        cargarListaItems();
-        new bootstrap.Modal(document.getElementById('modalStock')).show();
-    }
-
-    // Llena el segundo select basado en la categoría elegida
-    function cargarListaItems() {
-        const categoria = document.getElementById('selCategoria').value;
-        const select = document.getElementById('selReferencia');
-        select.innerHTML = '<option value="">Seleccione...</option>';
-
-        // Elegimos la lista correcta
-        let datos = (categoria === 'COMPONENTE') ? listaComponentesDB : listaPerifericosDB;
-
-        datos.forEach(item => {
-            // --- FILTRO SOLICITADO ---
-            // Si es componente, excluimos Windows y Canaima (Sistemas Operativos)
-            if (categoria === 'COMPONENTE') {
-                const nombreUpper = (item.nombre || "").toUpperCase();
-                if (nombreUpper.includes("WINDOWS") || nombreUpper.includes("CANAIMA")) {
-                    return; // No lo agregamos al select
-                }
-            }
-            // -------------------------
-
-            const opt = document.createElement('option');
-            opt.value = item.id; // Este ID se enviará como 'idReferencia'
-            opt.textContent = item.nombre;
-            select.appendChild(opt);
-        });
-    }
-    // --- 4. GUARDAR NUEVO STOCK (POST) ---
-    async function guardarNuevoStock() {
-        // Construimos el Payload igual al StockCreateDTO de Java
-        const MINIMO_ALERTA = 5;
-        const payload = {
-            categoria: document.getElementById('selCategoria').value,
-            idReferencia: parseInt(document.getElementById('selReferencia').value),
-            marca: document.getElementById('inputMarca').value,
-            caracteristicas: document.getElementById('inputModelo').value,
-            cantidad: parseInt(document.getElementById('inputCantidad').value),
-            minimoAlerta: MINIMO_ALERTA,
-        }
-
-        // Validaciones básicas
-        if(!payload.idReferencia || !payload.marca || isNaN(payload.cantidad) || payload.cantidad < 0) {
-            return alert("Por favor complete todos los campos correctamente.");
-        }
-
-        try {
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                alert("✅ Item agregado al inventario exitosamente.");
-                // Cerrar modal y recargar
-                bootstrap.Modal.getInstance(document.getElementById('modalStock')).hide();
-                cargarStock();
-            } else {
-                alert("❌ Error al guardar. Verifique los datos.");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Error de conexión con el servidor.");
-        }
-    }
-
-    // --- 5. CARGAR TABLA DE STOCK (GET) ---
-    async function cargarStock() {
-        const tbodyComp = document.getElementById('tablaComponentes');
-        const tbodyPeri = document.getElementById('tablaPerifericos');
-
-        // Limpieza visual antes de cargar
-        tbodyComp.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
-        tbodyPeri.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
-
-        try {
-            const res = await fetch(API_URL);
-            if(!res.ok) throw new Error("Fallo al obtener stock");
-
-            const data = await res.json(); // Array de StockDTO
-            console.log(data);
-
-            // Limpiar para llenar
-            tbodyComp.innerHTML = '';
-            tbodyPeri.innerHTML = '';
-
-            let totalItems = 0;
-            let totalCritico = 0;
-
-            if (data.length === 0) {
-                tbodyComp.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay stock registrado.</td></tr>';
-                tbodyPeri.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay stock registrado.</td></tr>';
-                actualizarResumen(0, 0);
-                return;
-            }
-
-            data.forEach(item => {
-                // Actualizar contadores
-                totalItems += item.cantidad;
-                if (item.estado === 'BAJO' || item.estado === 'AGOTADO') totalCritico++;
-
-                // Generar HTML del estado
-                let estadoHtml = '<span class="badge bg-success">En Stock</span>';
-                if (item.estado === 'AGOTADO') estadoHtml = '<span class="badge bg-danger">Agotado</span>';
-                else if (item.estado === 'BAJO') estadoHtml = '<span class="badge badge-low-stock">Stock Bajo</span>';
-
-                // Fila de la tabla
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="fw-bold text-primary">${item.nombreItem}</td>
-                    <td>
-                        <div class="fw-bold text-dark">${item.marca}</div>
-                        <small class="text-muted">${item.caracteristicas}</small>
-                    </td>
-                    <td class="text-center">
-                        <span class="fs-5 fw-bold ${item.cantidad === 0 ? 'text-danger' : 'text-dark'}">${item.cantidad}</span>
-                    </td>
-                    <td class="text-center">${estadoHtml}</td>
-                    <td class="text-center">
-                        <button class="btn btn-outline-danger btn-circle btn-sm me-1"
-                                onclick="modificarStock(${item.id}, -1)"
-                                ${item.cantidad === 0 ? 'disabled' : ''}
-                                title="Retirar 1">
-                            <i class="fas fa-minus">-</i>
-                        </button>
-                        <button class="btn btn-outline-success btn-circle btn-sm"
-                                onclick="modificarStock(${item.id}, 1)"
-                                title="Agregar 1">
-                            <i class="fas fa-plus">+</i>
-                        </button>
-                    </td>
-                `;
-
-                // Distribuir en la pestaña correcta usando el campo 'categoria' del DTO
-                if (item.categoria === 'COMPONENTE') {
-                    tbodyComp.appendChild(tr);
-                } else {
-                    tbodyPeri.appendChild(tr);
-                }
-            });
-
-            actualizarResumen(totalItems, totalCritico);
-
-        } catch (error) {
-            console.error(error);
-            tbodyComp.innerHTML = '<tr><td colspan="5" class="text-danger text-center">Error de conexión.</td></tr>';
-            tbodyPeri.innerHTML = '<tr><td colspan="5" class="text-danger text-center">Error de conexión.</td></tr>';
-        }
-    }
-
-    // --- 6. MODIFICAR STOCK (Ajuste rápido) ---
-    async function modificarStock(id, cantidad) {
-        try {
-            // Usamos el endpoint específico de ajuste
-            const res = await fetch(`${API_URL}/${id}/ajustar?cantidad=${cantidad}`, {
-                method: 'POST'
-            });
-
-            if (res.ok) {
-                // Recargar la tabla silenciosamente para ver el cambio
-                cargarStock();
-            } else {
-                alert("No se pudo actualizar el stock.");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Error de red.");
-        }
-    }
-
-    // --- Helper: Actualizar Tarjetas Superiores ---
-    function actualizarResumen(total, critico) {
-        // Animación simple de números
-        document.getElementById('totalItems').innerText = total;
-        document.getElementById('totalCritico').innerText = critico;
-    }
-
-</script>
+    <script src="/js/scripts/stock.js"></script>
 </body>
 </html>

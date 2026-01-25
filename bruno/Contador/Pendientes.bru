@@ -7,9 +7,14 @@ meta {
 get {
   url: 127.0.0.1:8081/api/contador/pendientes
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token:  eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtYWdsZW8yMDAzMyIsImlhdCI6MTc2ODkxMjc0MSwiZXhwIjoxNzY4OTQ4NzQxfQ.nuVv_4VkJapYC1jIHb8Rdc7Ygsc691EVFXv51LStI3Q
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

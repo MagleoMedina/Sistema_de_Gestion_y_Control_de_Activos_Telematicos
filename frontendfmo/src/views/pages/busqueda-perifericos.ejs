@@ -1,47 +1,106 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('../partials/head') %>
     <title>Búsqueda Periféricos</title>
+    <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
+        /* Títulos */
+        .text-fmo-title { color: var(--fmo-red-dark); }
+
+        /* Botón Principal (Buscar) */
+        .btn-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .btn-fmo:hover {
+            background: linear-gradient(to right, var(--fmo-red-dark), var(--fmo-red));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Tabla Estilizada */
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, var(--fmo-orange-red) 100%);
+            color: white;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+        }
+
+        /* Modal Header */
+        .modal-header-fmo {
+            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange));
+            color: white;
+        }
+    </style>
 </head>
+
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
         <div id="content" class="w-100 bg-light p-4 fade-in">
-            
+
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="/busqueda" class="btn btn-outline-secondary btn-sm">⬅ Volver al Menú</a>
-                <h5 class="m-0 fw-bold">⌨️ Historial de Periféricos</h5>
+                <a href="/busqueda" class="btn btn-outline-secondary btn-sm rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i>Volver al Menú
+                </a>
+                <h5 class="m-0 fw-bold text-fmo-title">
+                    <i class="bi bi-keyboard-fill me-2" style="vertical-align:bottom;"></i>
+                    Historial de Periféricos
+                </h5>
             </div>
+
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    
+
                     <div class="row g-2 align-items-center mb-4">
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold">Filtrar por:</label>
+                            <label class="form-label small fw-bold text-secondary">Filtrar por:</label>
                             <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
                                 <option value="todo">Listar Todo</option>
-                                <option value="serial">Serial / FMO</option>
+                                <option value="serial">Serial</option>
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
+                        
                         <div class="col-md-7" id="containerInputSerial" style="display: none;">
-                            <label class="form-label small fw-bold">Ingrese Serial o FMO:</label>
-                            <input type="text" class="form-control" id="inputBusquedaSerial" placeholder="Ej: 452 o S/N...">
+                            <label class="form-label small fw-bold text-fmo-title">Ingrese el FMO/Serial:</label>
+                            <input type="text" class="form-control" id="inputBusquedaSerial"
+                                placeholder="Ej: CN-A0jX3W... o FMO-123">
                         </div>
+                        
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">
-                            <label class="form-label small fw-bold">Seleccione Fecha:</label>
+                            <label class="form-label small fw-bold text-fmo-title">Seleccione Fecha:</label>
                             <input type="date" class="form-control" id="inputBusquedaFecha">
                         </div>
+                        
                         <div class="col-md-7" id="containerVacio"></div>
+                        
                         <div class="col-md-2 text-end">
                             <label class="form-label d-block">&nbsp;</label>
-                            <button class="btn btn-primary w-100" onclick="buscarPerifericos()">🔍 Buscar</button>
+                            <button class="btn btn-fmo w-100" onclick="buscarPerifericos()">
+                                <i class="bi bi-search me-1" style="vertical-align: bottom;"></i>
+                                Buscar
+                            </button>
                         </div>
                     </div>
+
                     <div class="table-responsive table-scroll-wrapper">
-                        <table class="table table-hover table-bordered align-middle">
-                            <thead class="table-light text-center">
+                        <table class="table table-custom table-hover table-bordered align-middle mb-0">
+                            <thead class="text-center">
                                 <tr>
                                     <th width="5%">#</th>
                                     <th>FMO/SERIAL</th>
@@ -52,7 +111,9 @@
                                 </tr>
                             </thead>
                             <tbody id="tablaResultados" class="text-center">
-                                <tr><td colspan="6" class="text-muted">Seleccione un filtro y busque para ver resultados.</td></tr>
+                                <tr>
+                                    <td colspan="6" class="text-muted py-5">Seleccione un filtro y busque para ver resultados.</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -60,197 +121,33 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="modalVerPeriferico" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-light py-2">
-                    <h6 class="modal-title fw-bold">📄 Detalle del Recibo</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header modal-header-fmo py-2">
+                    <h6 class="modal-title fw-bold"><i class="bi bi-clipboard-data-fill me-2"></i>Detalle del Recibo</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body bg-secondary bg-opacity-10">
-                    
-                    
-                <%- include('../partials/forms/template-perifericos') %>
-                    </div>
+                    <%- include('../partials/forms/template-perifericos') %>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-danger"onclick="generarPDFRecibo()">🖨️ PDF</button>
+                    <button type="button" class="btn btn-danger" style="background-color: var(--fmo-red);" onclick="generarPDFRecibo()">
+                        <i class="bi bi-printer-fill me-1" style="vertical-align: bottom;"></i>PDF
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-
     <script src="/js/utils/html2pdf.bundle.min.js"></script>
-
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/utils/mappings.js"></script>
     <script src="/js/utils/pdf.js"></script>
+    <script src="/js/scripts/busquedaPerifericos.js"></script>
 
-<script>
-    // --- 1. LÓGICA DE FILTROS ---
-    function cambiarFiltro() {
-        const filtro = document.getElementById('filtroSelect').value;
-        const divSerial = document.getElementById('containerInputSerial');
-        const divFecha = document.getElementById('containerInputFecha');
-        const divVacio = document.getElementById('containerVacio');
-
-        divSerial.style.display = 'none';
-        divFecha.style.display = 'none';
-        divVacio.style.display = 'none';
-
-        if (filtro === 'serial') divSerial.style.display = 'block';
-        else if (filtro === 'fecha') divFecha.style.display = 'block';
-        else divVacio.style.display = 'block';
-    }
-
-    // --- 2. LÓGICA DE BÚSQUEDA ---
-    async function buscarPerifericos() {
-        const filtro = document.getElementById('filtroSelect').value;
-        let url = 'http://127.0.0.1:8081/api/buscarReciboPerifericos'; 
-
-        if (filtro === 'serial') {
-            const val = document.getElementById('inputBusquedaSerial').value;
-            if(!val) return alert("Ingrese Serial");
-            url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/${val}`;
-        } 
-        else if (filtro === 'fecha') {
-            const val = document.getElementById('inputBusquedaFecha').value;
-            if(!val) return alert("Seleccione Fecha");
-            url = `http://127.0.0.1:8081/api/buscarReciboPerifericos/fecha/${val}`;
-        }
-
-        const tbody = document.getElementById('tablaResultados');
-        tbody.innerHTML = '<tr><td colspan="6">Cargando...</td></tr>';
-
-        try {
-            const response = await fetch(url);
-            if(response.status === 404) {
-                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
-                return;
-            }
-            if(!response.ok) throw new Error("Error de servidor.");
-            const data = await response.json();
-            renderizarTabla(data);
-        } catch (error) {
-            console.error(error);
-            tbody.innerHTML = `<tr><td colspan="6" class="text-danger">${error.message}</td></tr>`;
-        }
-    }
-
-    function renderizarTabla(data) {
-        const tbody = document.getElementById('tablaResultados');
-        tbody.innerHTML = '';
-        const lista = Array.isArray(data) ? data : [data];
-
-        if(lista.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
-            return;
-        }
-
-        lista.forEach((item, index) => {
-            // Lógica para determinar qué mostrar en la columna "Tipo"
-            let tipoMostrar = "Varios";
-            if (item.componentePerifericos && item.componentePerifericos.length > 0) tipoMostrar = "Componente Interno";
-            else if (item.perifericos && item.perifericos.length > 0) tipoMostrar = "Periférico";
-            else if (item.otro) tipoMostrar = "Otro";
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="fw-bold">${index + 1}</td>
-                <td class="text-primary fw-bold">${item.fmoSerial || "S/N"}</td>
-                <td><span class="badge bg-secondary">${tipoMostrar}</span></td>
-                <td>${item.fecha || "N/A"}</td>
-                <td>${item.usuario || "N/A"}</td>
-                <td>
-                    <button class="btn btn-sm btn-info text-white" onclick='abrirModalVer(${JSON.stringify(item)})'>
-                        👁️ Ver
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    // --- 3. LÓGICA DE VISUALIZACIÓN (MODAL) ---
-    function abrirModalVer(data) {
-        console.log("Datos recibidos en modal:", data);
-
-        // A. RESETEAR CAMPOS (Limpieza previa)
-        document.querySelectorAll('.modal-peri-check').forEach(c => c.checked = false);
-        setVal('modal_componenteTexto', "");
-        setVal('modal_otros', "");
-
-        // B. MAPEO DE CAMPOS SIMPLES
-        setVal('modal_fecha', data.fecha);
-        setVal('modal_usuario', data.usuario); // El payload dice 'nombre', no 'usuario' (aunque hay campo usuario)
-        setVal('modal_ficha', data.ficha);
-        setVal('modal_ext', data.extension); 
-        
-        setVal('modal_fmoSerial', data.fmoSerial);
-        setVal('modal_fmoAsignado', data.fmoEquipo); // A veces no viene en payload plano, verificar
-        setVal('modal_gerencia', data.gerencia);
-        setVal('modal_falla', data.falla);
-        setVal('modal_solicitudST', data.solicitudST);
-        setVal('modal_solicitudDaet', data.solicitudDAET);
-        
-        setVal('modal_asignadoA', data.asignadoA);
-        setVal('modal_entregadoPor', data.entregadoPor);
-        setVal('modal_recibidoPor', data.recibidoPor);
-
-        // C. MAPEO DE PERIFÉRICOS (Checkboxes)
-        // El payload trae: "perifericos": [ { "id": 1 }, { "id": 5 } ]
-        if (data.perifericos && data.perifericos.length > 0) {
-            data.perifericos.forEach(p => {
-                // Construimos el ID del checkbox: 'chk_' + id
-                // Ejemplo: ID 1 -> busca 'chk_1' (Monitor) y lo marca.
-                const checkId = 'chk_' + p.id;
-                const checkbox = document.getElementById(checkId);
-                if (checkbox) {
-                    checkbox.checked = true;
-                }
-            });
-        }
-
-        // D. MAPEO DE COMPONENTES INTERNOS (Texto)
-        // El payload trae: "componentePerifericos": [ { "idComponente": 10 } ]
-        // Necesitamos convertir ID 10 -> "FAN COOLER"
-        const mapNombresComponentes = {
-            3: "MEMORIA RAM",
-            4: "DISCO DURO",
-            5: "TARJETA MADRE",
-            6: "PROCESADOR",
-            7: "TARJETA DE VIDEO",
-            8: "FUENTE DE PODER",
-            9: "TARJETA DE RED",
-            10: "FAN COOLER",
-            11: "PILA"
-        };
-
-        if (data.componentePerifericos && data.componentePerifericos.length > 0) {
-            // Creamos un array con los nombres encontrados
-            const nombres = data.componentePerifericos.map(c => {
-                return mapNombresComponentes[c.idComponente] || ("ID " + c.idComponente);
-            });
-            // Los unimos con comas por si hay más de uno
-            setVal('modal_componenteTexto', nombres.join(", "));
-        }
-
-        // E. MAPEO DE OTROS
-        // El payload trae: "otro": "Incluye regleta"
-        if (data.otro) {
-            setVal('modal_otros', data.otro);
-        }
-
-        // F. MOSTRAR MODAL
-        const myModal = new bootstrap.Modal(document.getElementById('modalVerPeriferico'));
-        myModal.show();
-    }
-
-    // Helper para setear valor seguro (si es null pone vacío)
-    function setVal(id, val) {
-        const el = document.getElementById(id);
-        if(el) el.value = val || "";
-    }
-</script>
 </body>
 </html>

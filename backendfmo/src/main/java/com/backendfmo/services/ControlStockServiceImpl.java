@@ -69,6 +69,11 @@ public class ControlStockServiceImpl {
         stock.setCantidad(nuevaCantidad);
         return stockRepo.save(stock);
     }
+    public void eliminarItem(Long id) {
+        ControlStock stock = stockRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item de stock no encontrado"));
+        stockRepo.delete(stock);
+    }
 
     // --- HELPER: CONVERTIR ENTIDAD A DTO ---
     private StockDTO convertirADTO(ControlStock entidad) {

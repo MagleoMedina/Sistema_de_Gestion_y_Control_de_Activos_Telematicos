@@ -7,7 +7,11 @@ meta {
 get {
   url: 127.0.0.1:8081/api/exportarCsvJson/2025-12-01/2026-01-03
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJNYWdsZW8yMDAzIiwiaWF0IjoxNzY5MDE2ODg3LCJleHAiOjE3NjkwNTI4ODd9.z1LZ6Q4GfcV8WThM2SU5phavPSSghuRwGNCwnC7fBqU
 }
 
 settings {

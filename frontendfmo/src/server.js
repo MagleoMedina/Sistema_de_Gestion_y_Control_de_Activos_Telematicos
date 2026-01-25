@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const PORT = 3000;
+const HOST = '127.0.0.1';
 
 // Configurar EJS
 app.set('view engine', 'ejs');
@@ -66,23 +67,9 @@ app.get('/', (req, res) => {
 });
 
 // Ruta para procesar el Login (POST)
-app.post('/auth/login', async (req, res) => {
-   // const { username, password } = req.body;
-    
-    // Aquí va tu lógica de validación contra la BD o API Java
-    // Ejemplo ficticio:
-    try {
-        // const usuario = await buscarUsuario(username, password);
-        // if (usuario) {
-        //    req.session.user = usuario;
-        //    return res.redirect('/dashboard');
-        // }
-        res.redirect('/dashboard'); // Temporal para probar
-    } catch (error) {
-        res.render('pages/login', { error: 'Credenciales inválidas' });
-    }
+app.get('/auth/login', async (req, res) => {
+    res.render('/dashboard'); // Temporal para probar
 });
-
 app.get('/health', async (req, res) => {
     try {
         // 1. Intentamos contactar al Backend Java (con un timeout corto de 2s)
@@ -90,7 +77,7 @@ app.get('/health', async (req, res) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 segundos máx
 
-        const response = await fetch('http://127.0.0.1:8081/api/status', { 
+        const response = await fetch(`http://127.0.0.1:8081/api/status`, { 
             method: 'GET',
             signal: controller.signal 
         });
@@ -118,8 +105,8 @@ app.get('/eliminar', (req, res) => {
     res.render('pages/eliminar-registros', { title: 'Stock e Inventario' });
 });
 // Iniciar servidor
-const server = app.listen(PORT, () => {
-    console.log(`Frontend Express corriendo en http://localhost:${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+    console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
 });
 
-module.exports = server;
+module.exports = { server, PORT, HOST };

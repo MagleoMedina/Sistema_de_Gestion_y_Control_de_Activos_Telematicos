@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('../partials/head') %>
     <title><%= title %></title>
     <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red-dark: #dd0303;
+            --fmo-red: #d6291c;
+            --fmo-orange-red: #f25912;
+            --fmo-orange: #fa812f;
+            --fmo-yellow: #fab12f;
+        }
+
         /* --- ESTILOS PERSONALIZADOS PARA LAS CARDS --- */
-        
-        /* Animación base */
         .stat-card {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             border: none;
             overflow: hidden;
             position: relative;
             z-index: 1;
+            color: white; /* Texto blanco por defecto */
         }
 
-        /* Efecto Hover (Levantar y Sombra) */
-        .stat-card:hover, .stat-card:focus-within {
+        /* Efecto Hover */
+        .stat-card:hover,
+        .stat-card:focus-within {
             transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22) !important;
-            cursor:none;
+            box-shadow: 0 14px 28px rgba(221, 3, 3, 0.25), 0 10px 10px rgba(221, 3, 3, 0.22) !important;
+            cursor: pointer;
             z-index: 2;
         }
 
-        /* Círculo decorativo de fondo (opcional para estética moderna) */
+        /* Círculo decorativo de fondo */
         .stat-card::after {
             content: "";
             position: absolute;
@@ -31,24 +41,68 @@
             right: -50%;
             width: 200px;
             height: 200px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             z-index: -1;
             transition: transform 0.5s;
         }
-        
+
         .stat-card:hover::after {
             transform: scale(1.5);
         }
 
-        /* Estilo para el número grande */
+        /* --- GRADIENTES FMO PARA LAS TARJETAS --- */
+        
+        /* 1. Equipos (Rojo Intenso) */
+        .card-fmo-red {
+            background: linear-gradient(135deg, var(--fmo-red-dark) 0%, var(--fmo-red) 100%);
+        }
+
+        /* 2. Periféricos (Rojo a Naranja) */
+        .card-fmo-orange-red {
+            background: linear-gradient(135deg, var(--fmo-red) 0%, var(--fmo-orange-red) 100%);
+        }
+
+        /* 3. DAET (Naranja Vibrante) */
+        .card-fmo-orange {
+            background: linear-gradient(135deg, var(--fmo-orange-red) 0%, var(--fmo-orange) 100%);
+        }
+
+        /* 4. Pendientes (Amarillo/Dorado) - Texto Oscuro para contraste */
+        .card-fmo-yellow {
+            background: linear-gradient(135deg, var(--fmo-orange) 0%, var(--fmo-yellow) 100%);
+            color: #333 !important; /* Texto oscuro necesario aquí */
+        }
+        .card-fmo-yellow .text-muted {
+            color: #555 !important;
+        }
+        
+        /* Regla general para iconos en la tarjeta amarilla (se sobrescribe para el reloj) */
+        .card-fmo-yellow i:not(.hourglass-spin) {
+            color: rgba(0,0,0,0.15) !important; 
+        }
+
+        /* --- ANIMACIÓN RELOJ DE ARENA --- */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .hourglass-spin {
+            color: wheat !important; /* Color solicitado, fuerza sobre el estilo anterior */
+            animation: spin-slow 3s linear infinite; /* Rotación continua suave de 3 segundos */
+            display: inline-block; /* Necesario para que la transformación funcione en elementos <i> */
+        }
+
+        /* Tipografía */
         .stat-number {
             font-size: 3.5rem;
             font-weight: 800;
             line-height: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Estilo para las cards tipo "Cubo" (hacemos que sean altas) */
+        /* Dimensiones */
         .card-cube {
             min-height: 220px;
             display: flex;
@@ -57,7 +111,6 @@
             align-items: center;
         }
 
-        /* Estilo para la card rectangular */
         .card-wide {
             min-height: 150px;
             display: flex;
@@ -67,7 +120,6 @@
             padding: 0 50px;
         }
 
-        /* En móvil, la rectangular se comporta normal */
         @media (max-width: 768px) {
             .card-wide {
                 flex-direction: column;
@@ -75,19 +127,26 @@
                 padding: 20px;
             }
         }
+        
+        /* Color de textos en el panel */
+        .text-fmo-title { color: var(--fmo-red-dark); }
+        .border-fmo-bottom { border-bottom: 3px solid var(--fmo-red); }
     </style>
 </head>
+
 <body>
 
     <div class="wrapper">
-        
+
         <%- include('../partials/sidebar') %>
 
         <div id="content" class="w-100 bg-light">
-            
+
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-4">
                 <div class="container-fluid">
-                    <span class="navbar-brand mb-0 h1">Panel de Control</span>
+                    <span class="navbar-brand mb-0 h1 text-fmo-title fw-bold">
+                        <i class="bi bi-speedometer2 me-2"></i>Panel de Control
+                    </span>
                 </div>
             </nav>
 
@@ -95,38 +154,52 @@
                 <div class="row">
                     <div class="col-12 mb-4">
                         <h3 class="fw-bold text-dark">Resumen de Operaciones</h3>
-                        <p class="text-muted">Métricas en tiempo real del departamento de telemática.</p>
+                        <p class="text-muted border-fmo-bottom d-inline-block pb-2">Métricas en tiempo real del departamento de telemática.</p>
                     </div>
                 </div>
 
                 <div class="row g-4 mb-4">
-                    
+
                     <div class="col-md-4">
-                        <div class="card stat-card card-cube bg-primary text-white rounded-4 shadow-sm" tabindex="0">
+                        <div class="card stat-card card-cube card-fmo-red rounded-4 shadow-sm" tabindex="0">
                             <div class="card-body text-center">
-                                <div class="mb-2" style="font-size: 2.5rem;">🖥️</div>
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-pc-display"></i>
+                                </div>
                                 <h2 class="stat-number mb-2" id="numEquipos">0</h2>
-                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">Equipos<br>Atendidos</h6>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card stat-card card-cube bg-success text-white rounded-4 shadow-sm" tabindex="0">
-                            <div class="card-body text-center">
-                                <div class="mb-2" style="font-size: 2.5rem;">⌨️</div>
-                                <h2 class="stat-number mb-2" id="numPerifericos">0</h2>
-                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">Periféricos<br>Atendidos</h6>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Equipos<br>Atendidos
+                                </h6>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-4">
-                        <div class="card stat-card card-cube bg-info text-white rounded-4 shadow-sm" tabindex="0">
+                        <div class="card stat-card card-cube card-fmo-orange-red rounded-4 shadow-sm" tabindex="0">
                             <div class="card-body text-center">
-                                <div class="mb-2" style="font-size: 2.5rem;">🚚</div>
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-keyboard-fill"></i>
+                                    <i class="bi bi-mouse2-fill"></i>
+                                    <i class="bi bi-printer-fill"></i>
+                                </div>
+                                <h2 class="stat-number mb-2" id="numPerifericos">0</h2>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Periféricos<br>Atendidos
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card stat-card card-cube card-fmo-orange rounded-4 shadow-sm" tabindex="0">
+                            <div class="card-body text-center">
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-truck"></i>
+                                </div>
                                 <h2 class="stat-number mb-2" id="numDaet">0</h2>
-                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">Entregas DAET<br>Atendidas</h6>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Entregas DAET<br>Atendidas
+                                </h6>
                             </div>
                         </div>
                     </div>
@@ -134,13 +207,15 @@
 
                 <div class="row">
                     <div class="col-12">
-                        <div class="card stat-card card-wide bg-warning text-dark rounded-4 shadow-sm" tabindex="0">
+                        <div class="card stat-card card-wide card-fmo-yellow rounded-4 shadow-sm" tabindex="0">
                             <div class="text-start">
                                 <h2 class="stat-number mb-0" id="numPendientes">0</h2>
                                 <p class="mb-0 fw-bold fs-5">TOTAL PENDIENTES</p>
                             </div>
                             <div class="text-end d-none d-md-block">
-                                <div style="font-size: 4rem; opacity: 0.5;">⏳</div>
+                                <div style="font-size: 5rem;">
+                                    <i class="bi bi-hourglass-split hourglass-spin"></i>
+                                </div>
                             </div>
                             <div class="d-block d-md-none mt-2">
                                 <span class="badge bg-dark">Atención Requerida</span>
@@ -154,77 +229,7 @@
     </div>
 
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-
-    <script>
-        // Lógica para cargar los números desde el Backend
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarEstadisticas();
-        });
-
-        async function cargarEstadisticas() {
-            // Animación de carga inicial (opcional)
-            const elementos = ['numEquipos', 'numPerifericos', 'numDaet', 'numPendientes'];
-            elementos.forEach(id => document.getElementById(id).innerText = '-');
-
-            try {
-                // AQUÍ SE CONSUMEN TUS ENDPOINTS
-                // Asumimos que tienes un controlador en Spring Boot que devuelve estos números
-                // Puedes hacer 1 llamada que devuelva todo el objeto o 4 llamadas separadas.
-                // Ejemplo con 4 llamadas separadas:
-
-                // 1. Equipos
-                const resEquipos = await fetch('http://127.0.0.1:8081/api/contador/reciboDeEquipos');
-                const dataEquipos = await resEquipos.json(); // Se asume devuelve un entero, ej: 45
-                animarNumero('numEquipos', dataEquipos);
-
-                // 2. Periféricos
-                const resPeri = await fetch('http://127.0.0.1:8081/api/contador/reciboDePerifericos');
-                const dataPeri = await resPeri.json();
-                animarNumero('numPerifericos', dataPeri);
-
-                // 3. DAET
-                const resDaet = await fetch('http://127.0.0.1:8081/api/contador/entregasAlDaet');
-                const dataDaet = await resDaet.json();
-                console.log(dataDaet);
-                animarNumero('numDaet', dataDaet);
-
-                // 4. Pendientes
-                const resPend = await fetch('http://127.0.0.1:8081/api/contador/pendientes');
-                const dataPend = await resPend.json();
-                animarNumero('numPendientes', dataPend);
-
-            } catch (error) {
-                console.error("Error cargando estadísticas:", error);
-                // Si falla, ponemos 0 o un mensaje de error
-                elementos.forEach(id => {
-                    if(document.getElementById(id).innerText === '-') document.getElementById(id).innerText = '0';
-                });
-            }
-        }
-
-        // Función para animar el conteo (Efecto visual de 0 a N)
-        function animarNumero(idElemento, valorFinal) {
-            const elemento = document.getElementById(idElemento);
-            const valor = parseInt(valorFinal) || 0;
-            let inicio = 0;
-            const duracion = 1000; // 1 segundo
-            const incremento = Math.ceil(valor / (duracion / 16)); // 60 FPS
-
-            if (valor === 0) {
-                elemento.innerText = 0;
-                return;
-            }
-
-            const timer = setInterval(() => {
-                inicio += incremento;
-                if (inicio >= valor) {
-                    elemento.innerText = valor;
-                    clearInterval(timer);
-                } else {
-                    elemento.innerText = inicio;
-                }
-            }, 16);
-        }
-    </script>
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/scripts/dashboard.js"></script>
 </body>
 </html>

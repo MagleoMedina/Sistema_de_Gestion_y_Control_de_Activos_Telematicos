@@ -3,7 +3,7 @@ const path = require('path');
 
 // 1. Iniciar el servidor Express
 // Al requerir el archivo, el servidor comienza a escuchar en el puerto 3000
-require('./server'); 
+const { PORT, HOST } = require('./server'); 
 
 // 2. Configuración de Hot Reload
 // Esto recarga la ventana si cambias un HTML/EJS, 
@@ -23,16 +23,15 @@ function createWindow() {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        icon: 'icon.ico',
         webPreferences: {
             nodeIntegration: false, // Seguridad: False es recomendado al cargar URLs remotas/locales
             contextIsolation: true
         }
     });
 
-    // Cargar la URL de Express
-    // Añadimos un pequeño retraso o reintentos en producción, 
-    // pero para dev local esto suele ser suficiente.
-    mainWindow.loadURL('http://localhost:3000');
+    // Cargar la URL de Express usando HOST y PORT exportados
+    mainWindow.loadURL(`http://${HOST}:${PORT}`);
 
     if (app.isPackaged) {
         mainWindow.setMenu(null);

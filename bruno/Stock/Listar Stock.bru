@@ -1,0 +1,16 @@
+meta {
+  name: Listar Stock
+  type: http
+  seq: 5
+}
+
+get {
+  url: 127.0.0.1:8081/api/stock
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

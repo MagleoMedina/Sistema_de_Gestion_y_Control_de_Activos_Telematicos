@@ -34,6 +34,19 @@
 
     /* Ocultar botones dentro del PDF por si acaso */
     .paper-form button, .paper-form .btn { display: none !important; }
+
+
+    /* width espeificos*/
+    .paper-form-equipos{
+        max-width: 660px;
+    }
+
+    .paper-form-perifericos{
+        max-width: 500px;
+    }
+    .paper-form-daet{
+        max-width: 700px;
+    }
 </style>
 </head>
 <body>
@@ -95,6 +108,8 @@
     <div id="template-perifericos-wrapper"><%- include('../partials/forms/template-perifericos') %></div>
     <div id="template-daet-wrapper"><%- include('../partials/forms/template-daet') %></div>
 </div>
+
+<%- include('../partials/modal') %>
 
 <script src="/js/utils/jspdf.umd.min.js"></script>
 <script src="/js/utils/html2canvas.min.js"></script>

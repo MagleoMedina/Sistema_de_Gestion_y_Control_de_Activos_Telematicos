@@ -44,9 +44,7 @@
                             <span>Guardar Entrega</span>
                         </button>
                     </div>
-
                     <div class="paper-form container p-0" id="formDaet">
-
                         <div class="row row-compact">
                             <div class="col-12 text-center cell-border justify-content-between bg-light p-2">
                                 <div style="width: 30px;"></div> <span class="header-title">ENTREGAS AL DAET</span>
@@ -263,11 +261,11 @@
                         <div class="row row-compact">
                             <div class="col-8 cell-border" style="height: 50px;">
                                 <span class="label-text">RECIBIDO POR:</span>
-                                <input type="text" class="input-line mt-3" id="recibidoPor">
+                                <input type="text" class="input-line" id="recibidoPor">
                             </div>
                             <div class="col-4 cell-border" style="height: 50px;">
                                 <span class="label-text">FICHA:</span>
-                                <input type="text" class="input-line mt-3" id="fichaRecibido">
+                                <input type="text" class="input-line" id="fichaRecibido">
                             </div>
                         </div>
 
@@ -276,6 +274,7 @@
                 </div>
             </div>
     </div>
+    <%- include('../partials/modal') %>
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/scripts/reciboDaet.js"></script>

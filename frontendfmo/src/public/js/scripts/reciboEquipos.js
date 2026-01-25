@@ -70,6 +70,24 @@
         async function guardarRecibo() {
         console.log("Generando Payload con estructura solicitada...");
 
+        // ======================================================
+        // 0. VALIDACIÓN: CAMPO OBLIGATORIO (CPU FMO)
+        // ======================================================
+        const fmoElement = document.getElementById('fmoEquipo');
+        const fmoValor = fmoElement ? fmoElement.value.trim() : '';
+
+        if (!fmoValor) {
+            // Usamos el nuevo sistema de Modales
+            mostrarModal(`
+                <strong>Campo Obligatorio Faltante</strong><br>
+                Por favor, ingrese el código <b>CPU FMO</b> o Identificador del equipo antes de guardar.
+            `, 'error'); // Tipo 'error' para que salga rojo
+            
+            // Hacemos foco en el input para ayudar al usuario
+            if(fmoElement) fmoElement.focus();
+            return; // DETENEMOS LA EJECUCIÓN AQUÍ
+        }
+
         // --- 1. DATOS DE USUARIO (Raíz del JSON) ---
         const usuario = document.getElementById('usuario').value;
         const clave = document.getElementById('clave').value;
@@ -259,12 +277,30 @@
             if (!response.ok) throw new Error(`Error: ${response.error || response.statusText}`);
             
             const data = await response.json();
-            alert("¡Guardado Exitosamente!");
+            // ======================================================
+            // MODAL DE ÉXITO (Reemplaza al alert)
+            // ======================================================
+            mostrarModal(`
+                <strong>¡Operación Exitosa!</strong><br>
+                El equipo <b>${fmoValor}</b> ha sido registrado correctamente en el sistema.<br>
+                <small>Listo para imprimir o consultar.</small>
+            `, 'success');
+
             console.log("Payload Final:", JSON.stringify(payload, null, 2));
-            //window.location.reload(); 
+            
+            // Opcional: Recargar la página después de unos segundos si lo deseas
+            setTimeout(() => window.location.reload(), 4500);
 
         } catch (error) {
-            console.log("Error al enviar:", error);
-            alert("Error: " + error);
+            console.error("Error al enviar:", error);
+            
+            // ======================================================
+            // MODAL DE ERROR DE SERVIDOR
+            // ======================================================
+            mostrarModal(`
+                <strong>Error de Servidor</strong><br>
+                No se pudo guardar el registro.<br>
+                <small>${error.message}</small>
+            `, 'error');
         }
     }

@@ -141,7 +141,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaComponentes">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -159,7 +159,7 @@
                                         </tr>
                                     </thead>
                                     <tbody id="tablaPerifericos">
-                                        </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -221,6 +221,30 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="fs-5">¿Está seguro de que desea eliminar este registro del inventario?</p>
+                    <small class="text-muted">Esta acción es irreversible y afectará los reportes.</small>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="ejecutarEliminacionStock()">Sí, Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/modal') %>
 
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>

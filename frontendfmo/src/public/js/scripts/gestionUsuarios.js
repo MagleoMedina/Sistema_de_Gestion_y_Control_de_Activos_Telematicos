@@ -1,38 +1,10 @@
-
-     function mostrarNotificacion(titulo, mensaje, tipo) {
-            const modalEl = document.getElementById('modalNotificacion');
-            const header = document.getElementById('headerNotificacion');
-            const tituloEl = document.getElementById('tituloNotificacion');
-            const msgEl = document.getElementById('mensajeNotificacion');
-            const iconoEl = document.getElementById('iconoNotificacion');
-
-            // 1. Configurar Textos
-            tituloEl.innerText = titulo;
-            msgEl.innerText = mensaje;
-
-            // 2. Configurar Estilos según el tipo
-            header.className = 'modal-header text-white'; // Reset
-            
-            if (tipo === 'exito') {
-                header.classList.add('bg-success');
-                iconoEl.innerHTML = '✅'; 
-            } else if (tipo === 'error') {
-                header.classList.add('bg-danger');
-                iconoEl.innerHTML = '❌'; 
-            } else {
-                header.classList.add('bg-primary');
-                iconoEl.innerHTML = 'ℹ️'; 
-            }
-
-            // 3. Mostrar Modal
-            new bootstrap.Modal(modalEl).show();
-        }
-
-        // --- LÓGICA PRINCIPAL ---
-
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     listarUsuarios();
 });
+
+// VARIABLES GLOBALES PARA LA ELIMINACIÓN
+let usuarioIdParaBorrar = null;
+let usuarioNombreParaBorrar = '';
 
 // 1. LISTAR USUARIOS
 async function listarUsuarios() {
@@ -48,11 +20,8 @@ async function listarUsuarios() {
             return;
         }
 
-        // Agregamos el parámetro 'index' al forEach para obtener la posición secuencial
         usuarios.forEach((u, index) => {
             const tr = document.createElement('tr');
-            
-            // Calculamos el ID visual (index + 1 para que empiece en 1)
             const idVisual = index + 1;
 
             tr.innerHTML = `
@@ -60,7 +29,7 @@ async function listarUsuarios() {
                 <td class="fw-bold text-primary">${u.username}</td>
                 <td><span class="badge bg-info text-dark">${u.tipo}</span></td>
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${u.id}, '${u.username}')">
+                    <button class="btn btn-sm btn-danger" onclick="solicitarEliminacion(${u.id}, '${u.username}')">
                         <i class="bi bi-trash3-fill" style="vertical-align: bottom;"></i>
                          Eliminar
                     </button>
@@ -74,63 +43,119 @@ async function listarUsuarios() {
     }
 }
 
-        // 2. CREAR
-        async function guardarUsuario() {
-            const username = document.getElementById('inputUsername').value;
-            const clave = document.getElementById('inputClave').value;
-            const tipo = document.getElementById('selectTipo').value;
+// 2. CREAR USUARIO (CON VALIDACIÓN 400)
+async function guardarUsuario() {
+    const username = document.getElementById('inputUsername').value.trim();
+    const clave = document.getElementById('inputClave').value.trim();
+    const tipo = document.getElementById('selectTipo').value;
 
-            if(!username || !clave) {
-                mostrarNotificacion("Datos Incompletos", "Por favor complete todos los campos.", "error");
-                return;
-            }
+    if(!username || !clave) {
+        mostrarModal(`
+            <strong>Datos Incompletos</strong><br>
+            El nombre de usuario y la contraseña son obligatorios.
+        `, 'warning');
+        return;
+    }
 
-            const nuevoUsuario = { username, clave, tipo };
+    const nuevoUsuario = { username, clave, tipo };
 
-            try {
-                const res = await ApiService.fetchAutenticado("/crearUsuarioSistema", {
-                    method: 'POST',
-                    body: JSON.stringify(nuevoUsuario)
-                });
+    try {
+        const res = await ApiService.fetchAutenticado("/crearUsuarioSistema", {
+            method: 'POST',
+            body: JSON.stringify(nuevoUsuario)
+        });
 
-                if(res.ok) {
-                    // Cerrar modal de registro primero
-                    const modalRegistro = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
-                    modalRegistro.hide();
-                    
-                    // Mostrar modal de éxito
-                    mostrarNotificacion("¡Excelente!", "Usuario creado exitosamente.", "exito");
-                    
-                    document.getElementById('formUsuario').reset(); 
-                    listarUsuarios(); 
-                } else {
-                    mostrarNotificacion("Error", "No se pudo crear. Verifique si el username ya existe.", "error");
-                }
-            } catch (error) {
-                console.error(error);
-                mostrarNotificacion("Error de Conexión", "No se pudo conectar con el servidor.", "error");
-            }
+        // --- VALIDACIÓN ESPECÍFICA ERROR 400 ---
+        if (res.status === 400) {
+            mostrarModal(`
+                <strong>Usuario Duplicado</strong><br>
+                El nombre de usuario <b>"${username}"</b> ya se encuentra registrado en el sistema.<br>
+                <small>Intente con otro nombre.</small>
+            `, 'error');
+            return; // Detenemos aquí
         }
 
-        // 3. ELIMINAR
-        async function eliminarUsuario(id, nombre) {
-            // Nota: Para reemplazar este confirm nativo también necesitaríamos otro modal de "Confirmación",
-            // pero por ahora mantenemos el confirm nativo para la pregunta y usamos el modal para el resultado.
-            if(!confirm(`¿Está seguro de eliminar al usuario ${nombre}?`)) return;
+        if(res.ok) {
+            // CERRAR MODAL Y LIMPIAR
+            const modalRegistro = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
+            modalRegistro.hide();
+            
+            mostrarModal(`
+                <strong>¡Usuario Registrado!</strong><br>
+                El usuario <b>${username}</b> (${tipo}) ha sido creado exitosamente.
+            `, 'success');
+            
+            document.getElementById('formUsuario').reset(); 
+            listarUsuarios(); 
 
-            try {
-                const res = await ApiService.fetchAutenticado(`/usuarioSistema/borrar/${nombre}`, {
-                    method: 'DELETE'
-                });
-
-                if(res.ok) {
-                    listarUsuarios();
-                    mostrarNotificacion("Eliminado", `El usuario ${nombre} ha sido eliminado.`, "exito");
-                } else {
-                    mostrarNotificacion("Error", "No se pudo eliminar el usuario.", "error");
-                }
-            } catch (error) {
-                console.error(error);
-                mostrarNotificacion("Error", "Ocurrió un error al intentar eliminar.", "error");
-            }
+        } else {
+            // OTROS ERRORES (500, etc)
+            const errorText = await res.text();
+            mostrarModal(`
+                <strong>Error al Guardar</strong><br>
+                Ocurrió un problema inesperado.<br>
+                <small>${errorText}</small>
+            `, 'error');
         }
+    } catch (error) {
+        console.error(error);
+        mostrarModal(`
+            <strong>Error de Conexión</strong><br>
+            ${error.message}
+        `, 'error');
+    }
+}
+
+// 3. PASO A: SOLICITAR ELIMINACIÓN (ABRIR MODAL)
+// Esta función se llama desde el botón de la tabla
+function solicitarEliminacion(id, nombre) {
+    // Guardamos los datos en variables globales
+    usuarioIdParaBorrar = id;
+    usuarioNombreParaBorrar = nombre;
+
+    // Actualizamos el texto del modal
+    document.getElementById('lblUsuarioEliminar').textContent = nombre;
+
+    // Abrimos el modal de confirmación
+    const modalEl = document.getElementById('modalConfirmarEliminacion');
+    new bootstrap.Modal(modalEl).show();
+}
+
+// 3. PASO B: EJECUTAR ELIMINACIÓN (CLICK EN "SÍ")
+async function ejecutarEliminacion() {
+    // Cerramos el modal de confirmación
+    const modalEl = document.getElementById('modalConfirmarEliminacion');
+    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+    modalInstance.hide();
+
+    if (!usuarioNombreParaBorrar) return;
+
+    try {
+        const res = await ApiService.fetchAutenticado(`/usuarioSistema/borrar/${usuarioNombreParaBorrar}`, {
+            method: 'DELETE'
+        });
+
+        if(res.ok) {
+            listarUsuarios();
+            mostrarModal(`
+                <strong>Usuario Eliminado</strong><br>
+                El usuario <b>${usuarioNombreParaBorrar}</b> ha sido borrado del sistema correctamente.
+            `, 'success');
+        } else {
+            mostrarModal(`
+                <strong>Error al Eliminar</strong><br>
+                No se pudo eliminar el registro.
+            `, 'error');
+        }
+    } catch (error) {
+        console.error(error);
+        mostrarModal(`
+            <strong>Error de Servidor</strong><br>
+            ${error.message}
+        `, 'error');
+    } finally {
+        // Limpiamos variables
+        usuarioIdParaBorrar = null;
+        usuarioNombreParaBorrar = '';
+    }
+}

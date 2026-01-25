@@ -63,7 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } catch (error) {
-                alert("❌ Error de acceso: " + error.message);
+                mostrarModal(`
+    <strong>Error de Acceso</strong><br>
+    ${error.message} <br>
+    <small>Verifique sus credenciales.</small>
+`, 'error');
                 console.error(error);
             } finally {
                 // Restaurar botón

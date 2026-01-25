@@ -23,7 +23,7 @@
         /* --- ESTILOS VISUALES Y ANIMACIONES --- */
         body {
             /* Degradado completo usando tu paleta */
-            background: linear-gradient(135deg, #dd0303 0%, #d6291c 40%, #fa812f 100%);
+            background: linear-gradient(135deg, #dd0303 0%, #d6291c 40%, #fa812f 60%, #ffffff 100%);
             height: 100vh;
             display: flex;
             align-items: center;
@@ -168,7 +168,7 @@
             <img src="/img/ferro.png" alt="Logo" width="90" class="mb-3" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
             
             <h3 class="fw-bold" style="color: #dd0303;">Bienvenido</h3>
-            <p class="text-muted small">Sistema de Gestión Telemática</p>
+            <p class="text-muted small">Sistema de Gestión de Soporte Técnico</p>
         </div>
 
         <form id="loginForm">
@@ -200,6 +200,7 @@
             <small class="text-muted">© 2026 Ing. Magleo Medina</small>
         </div>
     </div>
+    <%- include('../partials/modal') %>
     
     <script src="/js/utils/api.js"></script>
     <script src="/js/scripts/login.js"></script>

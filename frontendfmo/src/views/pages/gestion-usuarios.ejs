@@ -53,17 +53,14 @@
                 </div>
                 <div class="modal-body">
                     <form id="formUsuario">
-                        
                         <div class="mb-3">
                             <label class="form-label fw-bold">Username:</label>
                             <input type="text" class="form-control" id="inputUsername" placeholder="Ej: jpererez" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label fw-bold">Contraseña:</label>
                             <input type="text" class="form-control" id="inputClave" placeholder="******" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label fw-bold">Tipo de Usuario:</label>
                             <select class="form-select" id="selectTipo">
@@ -71,7 +68,6 @@
                                 <option value="ADMIN">ADMINISTRADOR</option>
                             </select>
                         </div>
-
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -81,23 +77,31 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="modalNotificacion" tabindex="-1" aria-hidden="true">
+
+    <div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header text-white" id="headerNotificacion">
-                    <h5 class="modal-title fw-bold" id="tituloNotificacion">Notificación</h5>
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center p-4">
-                    <div id="iconoNotificacion" class="mb-3" style="font-size: 3.5rem;"></div>
-                    <p id="mensajeNotificacion" class="mb-0 fs-5 fw-medium text-secondary"></p>
+                    <div class="mb-3 text-danger">
+                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                    </div>
+                    <p class="fs-5">¿Está seguro de que desea eliminar al usuario <b id="lblUsuarioEliminar"></b>?</p>
+                    <small class="text-muted">Esta acción no se puede deshacer.</small>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Entendido</button>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="ejecutarEliminacion()">Sí, Eliminar</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <%- include('../partials/modal') %>
+
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/scripts/gestionUsuarios.js"></script>

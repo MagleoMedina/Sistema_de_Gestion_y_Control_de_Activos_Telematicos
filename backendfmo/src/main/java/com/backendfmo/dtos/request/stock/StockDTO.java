@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class StockDTO {
 
-    private long id;
+    private Long id;
     private String categoria;   // "COMPONENTE" o "PERIFERICO"
     private String nombreItem;  // Ej: "MEMORIA RAM"
     private String marca;

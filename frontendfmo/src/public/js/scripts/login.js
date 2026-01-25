@@ -73,3 +73,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+    // =========================================================
+    // 3. LÓGICA DE MOSTRAR/OCULTAR CONTRASEÑA
+    // =========================================================
+    const btnToggle = document.getElementById('btnTogglePassword');
+    const inputPass = document.getElementById('password');
+    const iconEye = document.getElementById('iconEye');
+
+    if (btnToggle && inputPass && iconEye) {
+        btnToggle.addEventListener('click', () => {
+            // Verificar estado actual
+            const tipoActual = inputPass.getAttribute('type');
+            
+            if (tipoActual === 'password') {
+                // CAMBIAR A TEXTO VISIBLE
+                inputPass.setAttribute('type', 'text');
+                
+                // Cambiar icono a "Ojo Tachado" (Eye Slash)
+                iconEye.classList.remove('bi-eye-fill');
+                iconEye.classList.add('bi-eye-slash-fill');
+            } else {
+                // CAMBIAR A PASSWORD OCULTO
+                inputPass.setAttribute('type', 'password');
+                
+                // Cambiar icono a "Ojo Normal"
+                iconEye.classList.remove('bi-eye-slash-fill');
+                iconEye.classList.add('bi-eye-fill');
+            }
+        });
+    }

@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const PORT = 3000;
-const HOST = '192.168.1.107';
+const HOST = '127.0.0.1';
 
 // Configurar EJS
 app.set('view engine', 'ejs');
@@ -77,7 +77,7 @@ app.get('/health', async (req, res) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 segundos máx
 
-        const response = await fetch('http://127.0.0.1:8081/api/status', { 
+        const response = await fetch(`http://127.0.0.1:8081/api/status`, { 
             method: 'GET',
             signal: controller.signal 
         });

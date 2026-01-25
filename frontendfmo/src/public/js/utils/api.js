@@ -42,6 +42,30 @@ const ApiService = {
         sessionStorage.removeItem(API_CONFIG.TOKEN_KEY);
         window.location.href = '/';
     },
+
+    // --- NUEVA FUNCIÓN: Obtener Rol desde el Token ---
+    obtenerRol() {
+        const token = sessionStorage.getItem(API_CONFIG.TOKEN_KEY);
+        if (!token) return null;
+
+        try {
+            // Decodificar el Payload del JWT (la segunda parte del string)
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+
+            const payload = JSON.parse(jsonPayload);
+            //console.log("Payload del token:", payload);
+
+            return payload.tipo;
+
+        } catch (e) {
+            console.error("Error al leer rol del token:", e);
+            //return 'SOPORTE'; // Por seguridad, asumimos el rol más bajo si falla
+        }
+    },
     // --- 2. PETICIONES GENÉRICAS PROTEGIDAS ---
     /**
      * Wrapper para fetch que inyecta automáticamente el Token JWT
@@ -50,7 +74,7 @@ const ApiService = {
      */
     async fetchAutenticado(endpoint, options = {}) {
         const token = sessionStorage.getItem(API_CONFIG.TOKEN_KEY);
-        console.log("Usando token:", token);
+        //console.log("Usando token:", token);
 
         // Si no hay token, forzamos salida (Seguridad Frontend)
         if (!token) {
@@ -73,7 +97,6 @@ const ApiService = {
                 ...options.headers
             }
         };
-        console.log("Configuración de la petición:", config);
         try {
             const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, config);
             // Si el token expiró o es inválido (403 Forbidden)
@@ -91,4 +114,6 @@ const ApiService = {
 };
 
 // Exponer globalmente para que otros scripts lo usen
-window.ApiService = ApiService;
+if (typeof window !== 'undefined') {
+    window.ApiService = ApiService;
+}

@@ -1,3 +1,4 @@
+
        //fecha por defecto
         const fechaInput = document.getElementById('fecha');
         if(fechaInput) fechaInput.valueAsDate = new Date();

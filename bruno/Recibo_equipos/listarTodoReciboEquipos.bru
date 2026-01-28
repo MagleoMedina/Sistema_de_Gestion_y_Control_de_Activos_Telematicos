@@ -7,7 +7,11 @@ meta {
 get {
   url: 127.0.0.1:8081/api/buscarReciboEquipos
   body: none
-  auth: inherit
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJ0aXBvIjoiQURNSU4iLCJzdWIiOiJtYWdsZW8yMDAzIiwiaWF0IjoxNzY5NjM5NzMzLCJleHAiOjE3Njk2NzU3MzN9.8f74vlR0x4jwXOPsNnmL0qS1bfJNNVFXiuoQkl6RFzc
 }
 
 settings {

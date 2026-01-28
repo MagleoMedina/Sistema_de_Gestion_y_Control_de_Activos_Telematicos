@@ -15,6 +15,7 @@ import com.backendfmo.repository.AplicacionesRepository;
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.EncabezadoReciboRepository;
 import com.backendfmo.repository.PerifericoRepository;
+import com.backendfmo.repository.ReciboDeEquiposRepository;
 import com.backendfmo.repository.UsuarioRepository;
 
 @Service
@@ -34,6 +35,9 @@ public class ReciboDeEquiposServiceImpl{
 
     @Autowired
     private PerifericoRepository perifericoRepository;
+
+    @Autowired
+    private ReciboDeEquiposRepository reciboDeEquiposRepository;
 
     @Transactional
     public List<BusquedaCompletaDTO> guardarUsuariosYRecibos(RegistroTotalDTO dto) {
@@ -231,19 +235,21 @@ public class ReciboDeEquiposServiceImpl{
     /**
      * NUEVO MÉTODO: Listar todos los recibos de equipos registrados en la base de datos.
      */
+
+
     @Transactional(readOnly = true)
     public List<BusquedaCompletaDTO> listarTodoReciboDeEquipos() {
-        
+      
         // 1. Buscamos todos
-        List<EncabezadoRecibo> todos = encabezadoRepository.findAll();
+        List<ReciboDeEquipos> todos = reciboDeEquiposRepository.findAll();
         if (todos.isEmpty()) {
             throw new RuntimeException("No se encontró ningún recibo");
         }
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
         // 2. Reutilizamos la lógica de conversión
-        for (EncabezadoRecibo encabezado : todos) {
-            respuestaLista.add(convertirEntidadADTO(encabezado));
+        for (ReciboDeEquipos recibo : todos) {
+            respuestaLista.add(convertirEntidadADTO(recibo.getEncabezadoRelacion()));
         }
 
         return respuestaLista;
@@ -270,6 +276,7 @@ public class ReciboDeEquiposServiceImpl{
     @Transactional(readOnly = true)
     public List<BusquedaCompletaDTO> listarReciboDeEquiposPorRangoFechas(String fechaInicio, String fechaFin) {
         
+       
         // 1. Buscamos todos
         List<EncabezadoRecibo> todos = encabezadoRepository.findByFechaBetween(fechaInicio, fechaFin);
         

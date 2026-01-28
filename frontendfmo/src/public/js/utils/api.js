@@ -74,7 +74,8 @@ const ApiService = {
      */
     async fetchAutenticado(endpoint, options = {}) {
         const token = sessionStorage.getItem(API_CONFIG.TOKEN_KEY);
-        //console.log("Usando token:", token);
+        //
+        console.log("Usando token:", token);
 
         // Si no hay token, forzamos salida (Seguridad Frontend)
         if (!token) {

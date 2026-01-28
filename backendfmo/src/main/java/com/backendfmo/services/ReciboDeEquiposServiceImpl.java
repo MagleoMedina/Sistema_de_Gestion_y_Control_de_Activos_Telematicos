@@ -216,7 +216,7 @@ public class ReciboDeEquiposServiceImpl{
     public List<BusquedaCompletaDTO> buscarPorFmo(String fmoEquipo) {
         
         // 1. Buscamos en BD
-        List<EncabezadoRecibo> listaEncabezados = encabezadoRepository.buscarPorFmoConUsuario(fmoEquipo);
+        List<ReciboDeEquipos> listaEncabezados = reciboDeEquiposRepository.findByFmoEquipo(fmoEquipo);
 
         if (listaEncabezados.isEmpty()) {
             throw new RuntimeException("No se encontró ningún recibo con el FMO: " + fmoEquipo);
@@ -225,8 +225,8 @@ public class ReciboDeEquiposServiceImpl{
         List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
 
         // 2. Usamos el método auxiliar para convertir cada elemento
-        for (EncabezadoRecibo encabezado : listaEncabezados) {
-            respuestaLista.add(convertirEntidadADTO(encabezado));
+        for (ReciboDeEquipos recibo : listaEncabezados) {
+            respuestaLista.add(convertirEntidadADTO(recibo.getEncabezadoRelacion()));
         }
 
         return respuestaLista;

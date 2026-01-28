@@ -325,6 +325,7 @@ public class ReciboDeEquiposServiceImpl{
             dto.setUsuarioFicha(String.valueOf(user.getFicha()));
             dto.setUsuarioGerencia(user.getGerencia());
             dto.setClave(user.getClave());
+            dto.setUsuario(user.getUsuario());
             dto.setExtension(user.getExtension());
         }
 

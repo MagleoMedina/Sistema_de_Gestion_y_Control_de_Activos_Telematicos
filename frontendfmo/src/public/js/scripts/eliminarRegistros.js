@@ -30,16 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- 1. BUSCAR REGISTROS ---
 async function buscarRegistros() {
     tipoActual = document.getElementById('selTipo').value;
-    const valor = document.getElementById('inputBusqueda').value.trim();
+    const valorRaw = document.getElementById('inputBusqueda').value.trim();
     const tbody = document.getElementById('tablaResultados');
 
-    if (!valor) {
-        mostrarModal(`
-            <strong>Campo Vacío</strong><br>
-            Por favor ingrese un valor para realizar la búsqueda.
-        `, 'warning');
+if (!valorRaw) {
+        mostrarModal(`<strong>Campo Vacío</strong><br>Por favor ingrese un valor para realizar la búsqueda.`, 'warning');
         return;
     }
+
+    // --- CORRECCIÓN AQUÍ: Codificar el valor para evitar problemas con "N/A" ---
+   const valor = encodeURIComponent(valorRaw.replace(/\//g, '-'));
 
     // Definir URL según tipo
     let url = '';

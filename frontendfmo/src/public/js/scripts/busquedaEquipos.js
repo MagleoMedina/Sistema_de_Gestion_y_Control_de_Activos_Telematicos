@@ -22,12 +22,15 @@ async function buscarEquipos() {
 
     // Construir URL según filtro
     if (filtro === 'fmo') {
-        const val = document.getElementById('inputBusquedaFmo').value.trim();
-        if (!val) {
+        const valRaw = document.getElementById('inputBusquedaFmo').value.trim();
+        if (!valRaw) {
             mostrarModal("Campo Vacío", "Ingrese un FMO o Serial para buscar.", "warning");
             return;
         }
-        url = `/buscarReciboEquipos/${val}`;
+
+        // --- OPCIÓN RECOMENDADA: Reemplazar la barra por un guion o espacio ---
+        const val = valRaw.replace(/\//g, '-'); 
+        url = `/buscarReciboEquipos/${encodeURIComponent(val)}`;
     }
     else if (filtro === 'fecha') {
         const val = document.getElementById('inputBusquedaFecha').value;
@@ -106,7 +109,7 @@ function renderizarTabla(data) {
 function abrirModalVer(data) {
     // A. Datos Generales
     setVal('modal_fecha', data.fecha);
-    setVal('modal_usuario', data.usuarioNombre);
+    setVal('modal_usuario', data.usuario);
     setVal('modal_ficha', data.usuarioFicha);
     setVal('modal_nombre', data.usuarioNombre);
     setVal('modal_extension', data.extension);

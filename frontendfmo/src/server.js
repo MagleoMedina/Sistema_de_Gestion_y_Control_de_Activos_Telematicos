@@ -1,8 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = 3000;
-const HOST = '127.0.0.1';
+// --- CONFIGURACIÓN DINÁMICA ---
+const PORT = process.env.PORT ;
+const HOST = process.env.HOST ;
+
+// Centralizamos la IP y Puerto del Backend usando variables de entorno 
+const BACKEND_URL = `http://${process.env.BACKEND_IP}:${process.env.BACKEND_PORT}/api`;
 
 // Configurar EJS
 app.set('view engine', 'ejs');
@@ -77,7 +82,7 @@ app.get('/health', async (req, res) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 segundos máx
 
-        const response = await fetch(`http://127.0.0.1:8081/api/status`, { 
+        const response = await fetch(`${BACKEND_URL}/status`, { 
             method: 'GET',
             signal: controller.signal 
         });

@@ -179,7 +179,16 @@ async function guardarEntregaDAET() {
             }
         ]
     };
-
+    function limpiarPantalla() {
+    // Resetea inputs de texto y fechas
+    document.querySelectorAll('input').forEach(input => input.value = '');
+    // Resetea selects
+    document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+    // Reinicia la fecha actual (como haces en DOMContentLoaded)
+    const fechaInput = document.getElementById('fecha');
+    if(fechaInput) fechaInput.valueAsDate = new Date();
+    window.location.reload()
+}
     console.log("Payload generado:", JSON.stringify(payload, null, 2));
 
     try {
@@ -194,7 +203,7 @@ async function guardarEntregaDAET() {
                 El envío al DAET se ha guardado correctamente.
             `, 'success');
             
-            setTimeout(() => window.location.reload(), 4500);
+            setTimeout(() => limpiarPantalla(), 4500);
         } else {
             const text = await response.text();
             mostrarModal(`

@@ -4,7 +4,7 @@
  */
 
 const API_CONFIG = {
-    BASE_URL: 'http://127.0.0.1:8081/api', // Tu Backend Java
+BASE_URL: 'http://127.0.0.1:8081/api', // Tu Backend Java
     AUTH_ENDPOINT: '/auth/login',
     TOKEN_KEY: 'jwt_token' // Nombre de la llave en sessionStorage
 };

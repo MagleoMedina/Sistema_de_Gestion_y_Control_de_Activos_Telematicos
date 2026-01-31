@@ -176,6 +176,14 @@ CREATE TABLE IF NOT EXISTS usuario_sistema (
 	clave TEXT NOT NULL,
 	tipo TEXT 
 );
+CREATE TABLE IF NOT EXISTS casos_resueltos(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	usuario INTEGER,
+	fecha TEXT,
+	reporte TEXT,
+	atendido_por TEXT,
+	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
 
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
 INSERT INTO "perifericos" ("id","nombre") VALUES (2,'TECLADO');

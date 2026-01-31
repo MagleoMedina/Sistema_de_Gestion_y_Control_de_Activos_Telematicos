@@ -4,6 +4,7 @@ package com.backendfmo.models.reciboequipos;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.backendfmo.models.casos.CasosResueltos;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -57,6 +58,16 @@ public class Usuario {
     public void agregarRecibo(EncabezadoRecibo recibo) {
         recibos.add(recibo);
         recibo.setUsuarioRelacion(this);
+    }
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<CasosResueltos> casosResueltos = new ArrayList<>();
+
+    // Método helper para vincular
+    public void agregarCasoResuelto(CasosResueltos casoResuelto) {
+        casosResueltos.add(casoResuelto);
+        casoResuelto.setUsuario(this);
     }
 
 }

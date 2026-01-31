@@ -1,0 +1,28 @@
+meta {
+  name: Crear Caso
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/casos/guardar
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+  
+      "ficha": 5,
+      "nombre": "John Doe",
+      "gerencia": "Soporte Técnico",
+      "fecha": "2026-01-31",
+      "reporte": "Mantenimiento preventivo de equipo",
+      "atendidoPor": "Analista Central"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

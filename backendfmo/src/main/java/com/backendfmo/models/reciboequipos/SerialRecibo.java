@@ -31,6 +31,7 @@ public class SerialRecibo {
     // AL GUARDAR ESTE LINK, GUARDAMOS TAMBIÉN EL OBJETO SERIAL_COMPONENTE
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "serial_componentes")
+    @JsonBackReference
     private SerialComponente serialComponente;
     
     @Column(name = "observacion")

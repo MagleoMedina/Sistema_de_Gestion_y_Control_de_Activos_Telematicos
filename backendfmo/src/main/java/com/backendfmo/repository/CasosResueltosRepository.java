@@ -14,6 +14,9 @@ public interface CasosResueltosRepository extends JpaRepository<CasosResueltos, 
     List<CasosResueltos> findByFechaBetween(String inicio, String fin);
     @Query("SELECT c FROM CasosResueltos c WHERE c.usuario.ficha = :ficha")
     List<CasosResueltos> buscarPorFichaDeUsuario(@Param("ficha") Integer ficha);
-
     Boolean existsByUsuario_Ficha(Integer ficha);
+    
+    //Contar cuantos registros hay en la tabla
+    @Query("SELECT COUNT(c) FROM CasosResueltos c")
+    Long contarRegistros();
 }   

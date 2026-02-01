@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function cargarEstadisticas() {
-    // Animación de carga inicial (opcional)
-    const elementos = ['numEquipos', 'numPerifericos', 'numDaet', 'numPendientes'];
+    // Animación de carga inicial (placeholder)
+    const elementos = ['numEquipos', 'numPerifericos', 'numDaet', 'numCasos', 'numPendientes'];
     elementos.forEach(id => {
         const el = document.getElementById(id);
         if(el) el.innerText = '-';
@@ -12,7 +12,6 @@ async function cargarEstadisticas() {
 
     try {
         // --- 1. Equipos ---
-        // Usamos endpoint relativo porque ApiService ya tiene la BASE_URL
         const resEquipos = await ApiService.fetchAutenticado('/contador/reciboDeEquipos');
         if (resEquipos) {
             const dataEquipos = await resEquipos.json();
@@ -33,7 +32,14 @@ async function cargarEstadisticas() {
             animarNumero('numDaet', dataDaet);
         }
 
-        // --- 4. Pendientes ---
+        // --- 4. NUEVO: Casos Resueltos ---
+        const resCasos = await ApiService.fetchAutenticado('/contador/casosResueltos');
+        if (resCasos) {
+            const dataCasos = await resCasos.json();
+            animarNumero('numCasos', dataCasos);
+        }
+
+        // --- 5. Pendientes ---
         const resPend = await ApiService.fetchAutenticado('/contador/pendientes');
         if (resPend) {
             const dataPend = await resPend.json();
@@ -42,7 +48,7 @@ async function cargarEstadisticas() {
 
     } catch (error) {
         console.error("Error cargando estadísticas:", error);
-        // Si falla, ponemos 0
+        // Si falla, ponemos 0 a todo
         elementos.forEach(id => {
             const el = document.getElementById(id);
             if(el && el.innerText === '-') el.innerText = '0';
@@ -50,17 +56,16 @@ async function cargarEstadisticas() {
     }
 }
 
-// Función para animar el conteo (Efecto visual de 0 a N) - SE MANTIENE IGUAL
+// Función para animar el conteo
 function animarNumero(idElemento, valorFinal) {
     const elemento = document.getElementById(idElemento);
     if (!elemento) return;
 
     const valor = parseInt(valorFinal) || 0;
     let inicio = 0;
-    const duracion = 1000; // 1 segundo
+    const duracion = 1000; 
     
-    // Evitar división por cero si la duración es muy corta o valor es pequeño
-    const pasos = duracion / 16; // Aprox 60 FPS
+    const pasos = duracion / 16; 
     const incremento = Math.ceil(valor / pasos); 
 
     if (valor === 0) {

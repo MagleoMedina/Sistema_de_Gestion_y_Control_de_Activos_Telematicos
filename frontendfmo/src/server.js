@@ -1,13 +1,13 @@
-require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
-// --- CONFIGURACIÓN DINÁMICA ---
-const PORT = process.env.PORT ;
-const HOST = process.env.HOST ;
+
+// --- CONFIGURACIÓN DINÁMICA del FRONTEND ---
+const PORT = 3000;
+const HOST = 'localhost';
 
 // Centralizamos la IP y Puerto del Backend usando variables de entorno 
-const BACKEND_URL = `http://${process.env.BACKEND_IP}:${process.env.BACKEND_PORT}/api`;
+const BACKEND_URL ='http://127.0.0.1:8081/api';
 
 // Configurar EJS
 app.set('view engine', 'ejs');
@@ -16,7 +16,10 @@ app.set('views', path.join(__dirname, 'views'));
 // IMPORTANTE: Servir archivos estáticos (CSS, JS del cliente)
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+// Ruta para exponer BACKEND_URL al frontend
+app.get('/config/backend-url', (req, res) => {
+    res.json({ BACKEND_URL });
+});
 // --- RUTAS DE NAVEGACIÓN (Renderizan el HTML) ---
 
 // 1. Inicio
@@ -123,4 +126,4 @@ const server = app.listen(PORT, HOST, () => {
     console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
 });
 
-module.exports = { server, PORT, HOST };
+module.exports = { server, PORT, HOST, BACKEND_URL };

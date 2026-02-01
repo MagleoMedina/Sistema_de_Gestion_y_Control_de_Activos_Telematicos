@@ -20,13 +20,21 @@
         let url = '/buscarReciboPerifericos'; 
 
         if (filtro === 'serial') {
-            const val = document.getElementById('inputBusquedaSerial').value;
-            if(!val) return alert("Ingrese Serial");
+            const valRaw = document.getElementById('inputBusquedaSerial').value.trim();
+            if(!valRaw) {
+                mostrarModal("Campo Requerido", "Por favor ingrese un Serial para buscar.", "warning");
+                return;
+            }
+            // --- CORRECCIÓN: Limpieza de caracteres y codificación para URL ---
+            const val = encodeURIComponent(valRaw.replace(/\//g, '-'));
             url = `/buscarReciboPerifericos/${val}`;
         } 
         else if (filtro === 'fecha') {
             const val = document.getElementById('inputBusquedaFecha').value;
-            if(!val) return alert("Seleccione Fecha");
+            if(!val) {
+                mostrarModal("Fecha Requerida", "Seleccione una fecha válida para filtrar.", "warning");
+                return;
+            }
             url = `/buscarReciboPerifericos/fecha/${val}`;
         }
 
@@ -35,16 +43,21 @@
 
         try {
             const response = await ApiService.fetchAutenticado(url);
+            
+            if(!response) return; // Redirigido por sesión expirada
+
             if(response.status === 404) {
-                tbody.innerHTML = '<tr><td colspan="6">No hay registros.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-muted">No se encontraron registros.</td></tr>';
                 return;
             }
-            if(!response.ok) throw new Error("Error de servidor.");
+            if(!response.ok) throw new Error("Error en el servidor al recuperar datos.");
+            
             const data = await response.json();
             renderizarTabla(data);
         } catch (error) {
             console.error(error);
             tbody.innerHTML = `<tr><td colspan="6" class="text-danger">${error.message}</td></tr>`;
+            mostrarModal("Error de Búsqueda", "No se pudo completar la solicitud.", "error");
         }
     }
 

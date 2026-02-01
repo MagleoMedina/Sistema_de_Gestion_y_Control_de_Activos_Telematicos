@@ -1,0 +1,15 @@
+meta {
+  name: Buscar Por analista
+  type: http
+  seq: 7
+}
+
+get {
+  url: 127.0.0.1:8081/api/casos/buscarPorTecnico/{tecnico}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

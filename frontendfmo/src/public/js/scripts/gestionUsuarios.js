@@ -49,12 +49,22 @@ async function guardarUsuario() {
     const clave = document.getElementById('inputClave').value.trim();
     const tipo = document.getElementById('selectTipo').value;
 
+    // --- VALIDACIÓN DE CAMPOS VACÍOS ---
     if(!username || !clave) {
         mostrarModal(`
             <strong>Datos Incompletos</strong><br>
             El nombre de usuario y la contraseña son obligatorios.
         `, 'warning');
         return;
+    }
+
+    // --- NUEVA VALIDACIÓN: RESTRICCIÓN DE "/" ---
+    if (username.includes('/')) {
+        mostrarModal(`
+            <strong>Carácter no permitido</strong><br>
+            El nombre de usuario no puede contener barras diagonales (<b>/</b>).
+        `, 'warning');
+        return; // Detenemos la ejecución
     }
 
     const nuevoUsuario = { username, clave, tipo };
@@ -72,11 +82,10 @@ async function guardarUsuario() {
                 El nombre de usuario <b>"${username}"</b> ya se encuentra registrado en el sistema.<br>
                 <small>Intente con otro nombre.</small>
             `, 'error');
-            return; // Detenemos aquí
+            return; 
         }
 
         if(res.ok) {
-            // CERRAR MODAL Y LIMPIAR
             const modalRegistro = bootstrap.Modal.getInstance(document.getElementById('modalCrearUsuario'));
             modalRegistro.hide();
             
@@ -89,7 +98,6 @@ async function guardarUsuario() {
             listarUsuarios(); 
 
         } else {
-            // OTROS ERRORES (500, etc)
             const errorText = await res.text();
             mostrarModal(`
                 <strong>Error al Guardar</strong><br>

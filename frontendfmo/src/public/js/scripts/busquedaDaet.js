@@ -19,39 +19,62 @@
         }
 
         // --- 2. LÓGICA DE BÚSQUEDA ---
-        async function buscarDaet() {
-            const filtro = document.getElementById('filtroSelect').value;
-            let url = '/buscarEntregasAlDaet'; 
+async function buscarDaet() {
+    const filtro = document.getElementById('filtroSelect').value;
+    let url = '/buscarEntregasAlDaet'; 
 
-            if (filtro === 'fmoSerial') {
-                const val = document.getElementById('inputBusquedaSerial').value;
-                if(!val) return alert("Ingrese el Serial");
-                url = `/buscarEntregasAlDaet/fmoSerial/${val}`;
-            }
-            else if (filtro === 'fmoEquipo') {
-                const val = document.getElementById('inputBusquedaLote').value;
-                if(!val) return alert("Ingrese el FMO Equipo");
-                url = `/buscarEntregasAlDaet/fmoEquipo/${val}`; 
-            }
-            else if (filtro === 'fecha') {
-                const val = document.getElementById('inputBusquedaFecha').value;
-                if(!val) return alert("Seleccione Fecha");
-                url = `/buscarEntregasAlDaet/fecha/${val}`;
-            }
-
-            const tbody = document.getElementById('tablaResultados');
-            tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
-
-            try {
-                const response = await ApiService.fetchAutenticado(url);
-                if(!response.ok) throw new Error("Sin resultados o error de conexión.");
-                const data = await response.json();
-                renderizarTabla(data);
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7" class="text-danger">${error.message}</td></tr>`;
-            }
+    if (filtro === 'fmoSerial') {
+        const valRaw = document.getElementById('inputBusquedaSerial').value.trim();
+        if(!valRaw) {
+            mostrarModal("Campo Vacío", "Por favor ingrese el Serial para realizar la búsqueda.", "warning");
+            return;
         }
+        // --- APLICACIÓN DE LIMPIEZA Y CODIFICACIÓN ---
+        const val = encodeURIComponent(valRaw.replace(/\//g, '-'));
+        url = `/buscarEntregasAlDaet/fmoSerial/${val}`;
+    }
+    else if (filtro === 'fmoEquipo') {
+        const valRaw = document.getElementById('inputBusquedaLote').value.trim();
+        if(!valRaw) {
+            mostrarModal("Campo Vacío", "Por favor ingrese el FMO del Equipo.", "warning");
+            return;
+        }
+        // --- APLICACIÓN DE LIMPIEZA Y CODIFICACIÓN ---
+        const val = encodeURIComponent(valRaw.replace(/\//g, '-'));
+        url = `/buscarEntregasAlDaet/fmoEquipo/${val}`; 
+    }
+    else if (filtro === 'fecha') {
+        const val = document.getElementById('inputBusquedaFecha').value;
+        if(!val) {
+            mostrarModal("Fecha Requerida", "Seleccione una fecha válida para filtrar.", "warning");
+            return;
+        }
+        url = `/buscarEntregasAlDaet/fecha/${val}`;
+    }
+
+    const tbody = document.getElementById('tablaResultados');
+    tbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+
+    try {
+        const response = await ApiService.fetchAutenticado(url);
+        
+        if(!response) return; // Redirigido por sesión expirada
+
+        if(response.status === 404) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-muted">No se encontraron registros.</td></tr>'; 
+            return;
+        }
+
+        if(!response.ok) throw new Error("Error en la conexión con el servidor.");
+        
+        const data = await response.json();
+        renderizarTabla(data);
+    } catch (error) {
+        console.error(error);
+        tbody.innerHTML = `<tr><td colspan="7" class="text-danger">${error.message}</td></tr>`;
+        mostrarModal("Error de Búsqueda", "Ocurrió un problema al intentar recuperar los datos.", "error");
+    }
+}
 
         function renderizarTabla(data) {
             const tbody = document.getElementById('tablaResultados');

@@ -67,19 +67,23 @@
         .card-fmo-orange {
             background: linear-gradient(135deg, var(--fmo-orange-red) 0%, var(--fmo-orange) 100%);
         }
+        
+        /* 4. NUEVA: Casos (Rojo Profundo - Para mantener contraste) */
+        .card-fmo-dark {
+            background: linear-gradient(135deg, #8a0a0a 0%, var(--fmo-red-dark) 100%);
+        }
 
-        /* 4. Pendientes (Amarillo/Dorado) - Texto Oscuro para contraste */
+        /* 5. Pendientes (Amarillo/Dorado) - Texto Oscuro */
         .card-fmo-yellow {
             background: linear-gradient(135deg, var(--fmo-orange) 0%, var(--fmo-yellow) 100%);
-            color: #333 !important; /* Texto oscuro necesario aquí */
+            color: #333 !important; 
         }
         .card-fmo-yellow .text-muted {
             color: #555 !important;
         }
         
-        /* Regla general para iconos en la tarjeta amarilla (se sobrescribe para el reloj) */
         .card-fmo-yellow i:not(.hourglass-spin) {
-            color: rgba(0,0,0,0.15) !important; 
+            color: rgba(0,0,0,0.15) !important;
         }
 
         /* --- ANIMACIÓN RELOJ DE ARENA --- */
@@ -89,9 +93,9 @@
         }
 
         .hourglass-spin {
-            color: wheat !important; /* Color solicitado, fuerza sobre el estilo anterior */
-            animation: spin-slow 3s linear infinite; /* Rotación continua suave de 3 segundos */
-            display: inline-block; /* Necesario para que la transformación funcione en elementos <i> */
+            color: wheat !important;
+            animation: spin-slow 3s linear infinite;
+            display: inline-block;
         }
 
         /* Tipografía */
@@ -128,7 +132,6 @@
             }
         }
         
-        /* Color de textos en el panel */
         .text-fmo-title { color: var(--fmo-red-dark); }
         .border-fmo-bottom { border-bottom: 3px solid var(--fmo-red); }
     </style>
@@ -160,7 +163,7 @@
 
                 <div class="row g-4 mb-4">
 
-                    <div class="col-md-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stat-card card-cube card-fmo-red rounded-4 shadow-sm" tabindex="0">
                             <div class="card-body text-center">
                                 <div class="mb-2" style="font-size: 2.5rem;">
@@ -174,7 +177,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stat-card card-cube card-fmo-orange-red rounded-4 shadow-sm" tabindex="0">
                             <div class="card-body text-center">
                                 <div class="mb-2" style="font-size: 2.5rem;">
@@ -190,7 +193,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
                         <div class="card stat-card card-cube card-fmo-orange rounded-4 shadow-sm" tabindex="0">
                             <div class="card-body text-center">
                                 <div class="mb-2" style="font-size: 2.5rem;">
@@ -203,6 +206,20 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card stat-card card-cube card-fmo-dark rounded-4 shadow-sm" tabindex="0">
+                            <div class="card-body text-center">
+                                <div class="mb-2" style="font-size: 2.5rem;">
+                                    <i class="bi bi-headset"></i> </div>
+                                <h2 class="stat-number mb-2" id="numCasos">0</h2>
+                                <h6 class="card-title text-uppercase fw-bold" style="letter-spacing: 1px;">
+                                    Casos<br>Atendidos
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="row">

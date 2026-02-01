@@ -15,21 +15,18 @@
         }
 
         .tag-badge { 
-            background-color: #000080; 
+            background-color: #000080;
             color: white; 
             padding: 1px 3px; 
             border-radius: 4px; 
             margin-right: 4px; 
-            font-size: 10px; 
+            font-size: 10px;
         }
         
-        /* Ocultar secciones de templates por defecto */
         .template-section { display: none; }
-
-        /* Textos */
         .text-fmo-red { color: var(--fmo-red) !important; }
 
-        /* Botón Principal (Buscar) */
+        /* Botón Principal */
         .btn-fmo {
             background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
             border: none;
@@ -51,14 +48,13 @@
             background-color: #fff5f5;
         }
 
-        /* Modal de Peligro (Eliminación) */
+        /* Modal de Peligro */
         .bg-gradient-fmo-danger {
             background: linear-gradient(135deg, var(--fmo-red-dark) 0%, #b30000 100%);
             color: white;
             border-bottom: 3px solid #8a0a0a;
         }
         
-        /* Botón de Eliminación */
         .btn-danger-fmo {
             background-color: var(--fmo-red);
             border-color: var(--fmo-red);
@@ -92,6 +88,7 @@
                                 <option value="equipos">Recibo de Equipos</option>
                                 <option value="perifericos">Recibo de Periféricos</option>
                                 <option value="daet">Entrega al DAET</option>
+                                <option value="casos">Casos Resueltos</option> 
                             </select>
                         </div>
 
@@ -116,10 +113,10 @@
                             <thead class="text-center">
                                 <tr>
                                     <th>#</th>
-                                    <th>Identificador</th>
+                                    <th id="th_identificador">Identificador</th>
                                     <th>Fecha</th>
-                                    <th>Usuario / Responsable</th>
-                                    <th>Estatus</th>
+                                    <th id="th_usuario">Usuario / Responsable</th>
+                                    <th id="th_estatus">Estatus</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -157,6 +154,48 @@
                         <%- include('../partials/forms/template-daet') %>
                     </div>
 
+                    <div id="view_casos" class="template-section">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white border-bottom-0 pb-0">
+                                <h6 class="text-danger fw-bold text-uppercase"><i class="bi bi-person-lines-fill me-2"></i>Información del Caso</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12 col-md-5">
+                                        <label class="fw-bold text-muted small text-uppercase">Nombre Trabajador</label>
+                                        <div class="fs-5 text-dark fw-semibold text-break" id="v_casos_nombre"></div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <label class="fw-bold text-muted small text-uppercase">Ficha</label>
+                                        <div class="fs-5 text-primary fw-bold" id="v_casos_ficha"></div>
+                                    </div>
+                                    <div class="col-6 col-md-4">
+                                        <label class="fw-bold text-muted small text-uppercase">Fecha Atención</label>
+                                        <div class="fs-5 text-dark" id="v_casos_fecha"></div>
+                                    </div>
+
+                                    <div class="col-12"><hr class="my-1 text-muted opacity-25"></div>
+
+                                    <div class="col-12 col-md-6">
+                                        <label class="fw-bold text-muted small text-uppercase">Gerencia / Dpto</label>
+                                        <div class="text-secondary text-break" id="v_casos_gerencia"></div>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label class="fw-bold text-muted small text-uppercase">Atendido Por</label>
+                                        <div><span class="badge bg-secondary fs-6 text-wrap" id="v_casos_tecnico"></span></div>
+                                    </div>
+
+                                    <div class="col-12 mt-4">
+                                        <label class="fw-bold text-muted small text-uppercase mb-2">Descripción del Reporte / Solución</label>
+                                        <div class="p-3 bg-white border rounded shadow-sm" style="min-height: 100px;">
+                                            <p class="mb-0 text-break" id="v_casos_reporte" style="white-space: pre-wrap; font-family: monospace, sans-serif; font-size: 0.95rem;"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -179,7 +218,7 @@
                     <div class="mb-3" style="font-size: 3rem; color: var(--fmo-red-dark);">
                         <i class="bi bi-trash3-fill"></i>
                     </div>
-                    <p class="fs-5">Está a punto de eliminar el registro <strong id="lblIdEliminar"></strong></p>
+                    <p class="fs-5">Está a punto de eliminar el registro ID: <strong id="lblIdEliminar"></strong></p>
                     <p class="text-danger fw-bold">Esta acción es irreversible. ¿Está seguro?</p>
                 </div>
                 <div class="modal-footer justify-content-center">
@@ -196,6 +235,5 @@
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/utils/mappings.js"></script>
-    
 </body>
 </html>

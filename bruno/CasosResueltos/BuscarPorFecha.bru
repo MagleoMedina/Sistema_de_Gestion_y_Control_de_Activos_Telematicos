@@ -1,0 +1,15 @@
+meta {
+  name: BuscarPorFecha
+  type: http
+  seq: 3
+}
+
+get {
+  url: 127.0.0.1:8081/api/casos/buscarPorFecha
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

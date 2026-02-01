@@ -173,6 +173,16 @@ async function guardarPerifericos() {
             return;
         }
 
+    function limpiarPantalla() {
+    // Resetea inputs de texto y fechas
+    document.querySelectorAll('input').forEach(input => input.value = '');
+    // Resetea selects
+    document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+    // Reinicia la fecha actual (como haces en DOMContentLoaded)
+    const fechaInput = document.getElementById('fecha');
+    if(fechaInput) fechaInput.valueAsDate = new Date();
+    window.location.reload()
+}
         // 4. ENVÍO
         const response = await ApiService.fetchAutenticado('/crearReciboPerifericos', { 
             method: 'POST',
@@ -186,7 +196,7 @@ async function guardarPerifericos() {
                 Se ha registrado la entrega asociada al FMO <b>${valAsignado}</b>.
             `, 'success');
             
-            setTimeout(() => window.location.reload(), 4500);
+            setTimeout(() => limpiarPantalla(), 4500);
         } else {
             const txt = await response.text();
             mostrarModal(`

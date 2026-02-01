@@ -2,9 +2,18 @@
  * api.js
  * Módulo centralizado para la comunicación con el Backend Spring Boot
  */
+let BASE_URL = null;
+
+async function getBackendUrl() {
+    if (BASE_URL) return BASE_URL;
+    const res = await fetch('/config/backend-url');
+    const data = await res.json();
+    BASE_URL = data.BACKEND_URL;
+    return BASE_URL;
+}
 
 const API_CONFIG = {
-    BASE_URL: 'http://127.0.0.1:8081/api', // Tu Backend Java
+// Tu Backend Java
     AUTH_ENDPOINT: '/auth/login',
     TOKEN_KEY: 'jwt_token' // Nombre de la llave en sessionStorage
 };
@@ -16,7 +25,8 @@ const ApiService = {
      */
     async login(username, clave) {
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}${API_CONFIG.AUTH_ENDPOINT}`, {
+            const BASE_URL = await getBackendUrl();
+            const response = await fetch(`${BASE_URL}${API_CONFIG.AUTH_ENDPOINT}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, clave })
@@ -74,6 +84,7 @@ const ApiService = {
      */
     async fetchAutenticado(endpoint, options = {}) {
         const token = sessionStorage.getItem(API_CONFIG.TOKEN_KEY);
+        //
         //console.log("Usando token:", token);
 
         // Si no hay token, forzamos salida (Seguridad Frontend)
@@ -98,7 +109,8 @@ const ApiService = {
             }
         };
         try {
-            const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, config);
+            const BASE_URL = await getBackendUrl();
+            const response = await fetch(`${BASE_URL}${endpoint}`, config);
             // Si el token expiró o es inválido (403 Forbidden)
             if (response.status === 403) {
                 alert("Su sesión ha expirado. Por favor ingrese nuevamente.");
@@ -117,3 +129,5 @@ const ApiService = {
 if (typeof window !== 'undefined') {
     window.ApiService = ApiService;
 }
+
+console.log("API Backend URL:", BASE_URL);

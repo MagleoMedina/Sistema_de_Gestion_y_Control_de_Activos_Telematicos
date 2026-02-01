@@ -40,6 +40,11 @@ public class ContadorController {
         return ResponseEntity.ok(service.getTotalPendientes());
     }
 
+    @GetMapping("/casosResueltos")
+    public ResponseEntity<?> contarCasosResueltos(){
+        return ResponseEntity.ok(service.contarCasosResueltos());
+    }
+
 }
     
 

@@ -1,8 +1,13 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+
+// --- CONFIGURACIÓN DINÁMICA del FRONTEND ---
 const PORT = 3000;
-const HOST = '127.0.0.1';
+const HOST = 'localhost';
+
+// Centralizamos la IP y Puerto del Backend usando variables de entorno 
+const BACKEND_URL ='http://127.0.0.1:8081/api';
 
 // Configurar EJS
 app.set('view engine', 'ejs');
@@ -11,7 +16,10 @@ app.set('views', path.join(__dirname, 'views'));
 // IMPORTANTE: Servir archivos estáticos (CSS, JS del cliente)
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+// Ruta para exponer BACKEND_URL al frontend
+app.get('/config/backend-url', (req, res) => {
+    res.json({ BACKEND_URL });
+});
 // --- RUTAS DE NAVEGACIÓN (Renderizan el HTML) ---
 
 // 1. Inicio
@@ -77,7 +85,7 @@ app.get('/health', async (req, res) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 segundos máx
 
-        const response = await fetch(`http://127.0.0.1:8081/api/status`, { 
+        const response = await fetch(`${BACKEND_URL}/status`, { 
             method: 'GET',
             signal: controller.signal 
         });
@@ -104,9 +112,18 @@ app.get('/stock', (req, res) => {
 app.get('/eliminar', (req, res) => {
     res.render('pages/eliminar-registros', { title: 'Stock e Inventario' });
 });
+// Ruta para el formulario de crear casos
+app.get('/casos/crear', (req, res) => {
+    res.render('pages/casos-resueltos', { title: 'Registrar Caso' });
+});
+
+// Ruta placeholder para buscar (para que el botón del sidebar funcione)
+app.get('/casos/buscar', (req, res) => {
+    res.render('pages/busqueda-casos', { title: 'Buscar Casos' }); // Asumiendo que crearás esta vista luego
+});
 // Iniciar servidor
 const server = app.listen(PORT, HOST, () => {
     console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
 });
 
-module.exports = { server, PORT, HOST };
+module.exports = { server, PORT, HOST, BACKEND_URL };

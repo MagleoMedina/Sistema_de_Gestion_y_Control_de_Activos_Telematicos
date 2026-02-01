@@ -267,6 +267,16 @@
 
         console.log("Payload Final:", JSON.stringify(payload, null, 2));
 
+    function limpiarPantalla() {
+    // Resetea inputs de texto y fechas
+    document.querySelectorAll('input').forEach(input => input.value = '');
+    // Resetea selects
+    document.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+    // Reinicia la fecha actual (como haces en DOMContentLoaded)
+    const fechaInput = document.getElementById('fecha');
+    if(fechaInput) fechaInput.valueAsDate = new Date();
+    window.location.reload()
+}
         // --- 7. ENVÍO ---
         try {
             const response = await ApiService.fetchAutenticado('/crearReciboEquipos', {
@@ -289,7 +299,7 @@
             console.log("Payload Final:", JSON.stringify(payload, null, 2));
             
             // Opcional: Recargar la página después de unos segundos si lo deseas
-            setTimeout(() => window.location.reload(), 4500);
+            setTimeout(() => limpiarPantalla(), 4500);
 
         } catch (error) {
             console.error("Error al enviar:", error);

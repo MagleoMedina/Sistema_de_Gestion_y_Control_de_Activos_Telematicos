@@ -213,10 +213,10 @@
             </a>
         </li>
 
-        <li class="admin-only">
+        <li>
             <a href="/exportar" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-file-earmark-arrow-down"></i></span>
-                <span class="link-text">Exportar Recibos</span>
+                <span class="link-text">Exportar</span>
             </a>
         </li>
         <li class="admin-only">
@@ -237,7 +237,39 @@
                 <span class="link-text">Eliminar Registros</span>
             </a>
         </li>
+        <li class="nav-item mb-1">
+            <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#submenuCasos" 
+                    aria-expanded="false"
+                    id="btnGrupoCasos">
+                
+                <span class="icon-container">
+                    <i class="bi bi-person-lines-fill"></i>
+                </span>
+                <span class="link-text flex-grow-1 text-start">Atención Usuario</span>
+                <span class="dropdown-toggle"></span> 
+            </button>
+            
+            <div class="collapse" id="submenuCasos">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                        <a href="/casos/crear" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-plus-circle"></i></span>
+                            <span class="link-text">Registrar Caso</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/casos/buscar" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-search"></i></span>
+                            <span class="link-text">Consultar Casos</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
     </ul>
+    
     
     <hr style="border-color: rgba(255,255,255,0.15);">
     

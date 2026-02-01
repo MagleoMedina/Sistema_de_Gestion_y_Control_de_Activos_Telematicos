@@ -109,6 +109,15 @@ app.get('/stock', (req, res) => {
 app.get('/eliminar', (req, res) => {
     res.render('pages/eliminar-registros', { title: 'Stock e Inventario' });
 });
+// Ruta para el formulario de crear casos
+app.get('/casos/crear', (req, res) => {
+    res.render('pages/casos-resueltos', { title: 'Registrar Caso' });
+});
+
+// Ruta placeholder para buscar (para que el botón del sidebar funcione)
+app.get('/casos/buscar', (req, res) => {
+    res.render('pages/busqueda-casos', { title: 'Buscar Casos' }); // Asumiendo que crearás esta vista luego
+});
 // Iniciar servidor
 const server = app.listen(PORT, HOST, () => {
     console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);

@@ -1,61 +1,116 @@
-// Variable global para guardar las opciones originales
+// Variable global para guardar las opciones originales del select
 let opcionesTipoOriginales = "";
 
 document.addEventListener('DOMContentLoaded', () => {
     const selTipo = document.getElementById('selTipo');
+    const selFormato = document.getElementById('selFormato');
+
+    // 1. Guardar las opciones originales (Equipos, Periféricos, etc.) al cargar
     if (selTipo) {
         opcionesTipoOriginales = selTipo.innerHTML;
     }
-    toggleFormato();
+
+    // 2. Inicializar el estado (por si el navegador recuerda valores al recargar)
+    gestorInteraccion('init');
 });
 
-function toggleFormato() {
-    const formato = document.getElementById('selFormato').value;
+// FUNCIÓN CENTRAL DE CONTROL DE INTERFAZ
+function gestorInteraccion(origen) {
     const selTipo = document.getElementById('selTipo');
+    const selFormato = document.getElementById('selFormato');
 
-    if (formato === 'csv') {
-        selTipo.innerHTML = '<option value="todo" selected>Todo</option>';
-        selTipo.disabled = true;
-    } else {
-        selTipo.disabled = false;
-        if (opcionesTipoOriginales) {
-            selTipo.innerHTML = opcionesTipoOriginales;
+    // --- CASO A: EL USUARIO CAMBIÓ EL TIPO DE REGISTRO ---
+    if (origen === 'tipo') {
+        if (selTipo.value === 'casos') {
+            // Regla 1: "Atención al Usuario" fuerza CSV y bloquea el formato
+            selFormato.value = 'csv';
+            selFormato.disabled = true;
+            selFormato.classList.add('input-disabled-fmo');
+        } else {
+            // Regla 2: Cualquier otro tipo fuerza PDF (reseteando el bloqueo de casos)
+            selFormato.disabled = false;
+            selFormato.classList.remove('input-disabled-fmo');
+            selFormato.value = 'pdf'; 
+        }
+    }
+
+    // --- CASO B: EL USUARIO CAMBIÓ EL FORMATO ---
+    if (origen === 'formato') {
+        if (selFormato.value === 'csv') {
+            // Regla 3: Seleccionar CSV manual cambia Tipo a "Todos los recibos" y lo bloquea
+            // (Solo si no estamos en modo 'casos', aunque el disabled lo previene)
+            selTipo.innerHTML = '<option value="todo" selected>Todos los recibos</option>';
+            selTipo.disabled = true;
+        } else {
+            // Regla 4: Volver a PDF restaura las opciones originales de Tipo
+            if (selTipo.disabled) { 
+                selTipo.disabled = false;
+                selTipo.innerHTML = opcionesTipoOriginales;
+                selTipo.value = 'equipos'; // Seleccionar el primero por defecto
+            }
+        }
+    }
+
+    // --- CASO C: INICIALIZACIÓN ---
+    if (origen === 'init') {
+        if (selTipo.value === 'casos') {
+            gestorInteraccion('tipo');
+        } else if (selFormato.value === 'csv') {
+            gestorInteraccion('formato');
         }
     }
 }
 
+// FUNCIÓN DE PROCESAMIENTO
 async function procesarExportacion() {
     const tipo = document.getElementById('selTipo').value;
     const formato = document.getElementById('selFormato').value;
     const inicio = document.getElementById('fechaInicio').value;
     const fin = document.getElementById('fechaFin').value;
 
-    // 1. VALIDACIÓN DE CAMPOS VACÍOS
+    // VALIDACIONES
     if (!inicio || !fin) {
-        mostrarModal(`
-            <strong>Fechas Incompletas</strong><br>
-            Debe seleccionar una fecha de inicio y una fecha de fin.
-        `, 'warning');
+        mostrarModal('<strong>Fechas Incompletas</strong><br>Seleccione rango de fechas.', 'warning');
         return;
     }
-
-    // 2. NUEVA VALIDACIÓN: RANGO LÓGICO
     if (new Date(inicio) > new Date(fin)) {
-        mostrarModal(`
-            <strong>Rango Inválido</strong><br>
-            La fecha de inicio (${inicio}) no puede ser mayor a la fecha de fin (${fin}).<br>
-            <small>Por favor corrija el rango seleccionado.</small>
-        `, 'warning');
+        mostrarModal('<strong>Rango Inválido</strong><br>Inicio no puede ser mayor a Fin.', 'warning');
         return;
     }
 
-    // Limpiamos el área de estado
-    const statusArea = document.getElementById('statusArea');
-    if(statusArea) statusArea.innerHTML = ''; 
+    // 1. EXPORTACIÓN ESPECIAL: CASOS (Endpoint Específico)
+    if (tipo === 'casos') {
+        try {
+            mostrarModal('<strong>Exportando Casos...</strong><br>Generando reporte CSV.', 'info', 2000);
+            
+            // Usamos el endpoint específico que creamos para Casos
+            const url = `/casos/exportar-csv?inicio=${inicio}&fin=${fin}`;
+            
+            // Descarga vía Blob para soportar Auth headers si es necesario
+            const response = await ApiService.fetchAutenticado(url);
+            if (!response.ok) throw new Error("Error al descargar el archivo.");
 
-    // ======================================================
-    // CASO 1: EXPORTAR A PDF (Lógica Frontend)
-    // ======================================================
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `Casos_${inicio}_al_${fin}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            
+            mostrarModal('<strong>Éxito</strong><br>Reporte de atención descargado.', 'success');
+
+        } catch (error) {
+            console.error(error);
+            mostrarModal('<strong>Error</strong><br>No se pudo descargar el reporte de casos.', 'error');
+        }
+        return;
+    }
+
+    // 2. EXPORTACIÓN GENÉRICA (Equipos, Periféricos, DAET o "Todo")
+    
+    // A. Formato PDF (Solo aplica si NO es 'todo', ya que 'todo' solo existe en CSV)
     if (formato === 'pdf') {
         let url = '';
         if(tipo === 'equipos') url = `/buscarReciboEquipos/rangoFechas/${inicio}/${fin}`;
@@ -63,100 +118,53 @@ async function procesarExportacion() {
         else if(tipo === 'daet') url = `/buscarEntregasAlDaet/rangoFechas/${inicio}/${fin}`;
 
         try {
-            mostrarModal(`
-                <strong>Procesando...</strong><br>
-                Buscando registros y generando PDF. Esto puede tardar unos segundos.
-            `, 'info', 3000);
+            mostrarModal('<strong>Generando PDF...</strong><br>Espere un momento.', 'info', 3000);
             
             const res = await ApiService.fetchAutenticado(url); 
             if (!res) return;
 
-            // --- CORRECCIÓN AQUÍ ---
-            // 1. Leemos la respuesta cruda como texto primero
             const textoRespuesta = await res.text();
             let data;
-
-            try {
-                // 2. Intentamos convertir ese texto a JSON
-                data = JSON.parse(textoRespuesta);
-            } catch (e) {
-                // 3. Si falla, es porque el servidor envió un mensaje de texto plano (ej: "No se encontraron...")
-                // Mostramos ese mensaje como advertencia y detenemos.
-                mostrarModal(`
-                    <strong>Aviso del Servidor</strong><br>
-                    ${textoRespuesta}
-                `, 'warning');
+            try { data = JSON.parse(textoRespuesta); } catch (e) {
+                mostrarModal(`<strong>Aviso</strong><br>${textoRespuesta}`, 'warning');
                 return;
             }
 
-            // 4. Si llegamos aquí, es JSON válido. Verificamos si está vacío.
             if(!Array.isArray(data) || data.length === 0) {
-                mostrarModal(`
-                    <strong>Sin Resultados</strong><br>
-                    No se encontraron registros en el rango seleccionado.
-                `, 'warning');
+                mostrarModal('<strong>Sin Resultados</strong><br>No hay registros en ese rango.', 'warning');
                 return;
             }
 
-            // 5. Generar PDF
             await generarPDFMasivo(data, tipo); 
-            
-            mostrarModal(`
-                <strong>¡PDF Generado!</strong><br>
-                El archivo se ha descargado correctamente.
-            `, 'success');
+            mostrarModal('<strong>¡PDF Generado!</strong>', 'success');
 
         } catch (error) {
             console.error(error);
-            mostrarModal(`
-                <strong>Error al Generar PDF</strong><br>
-                ${error.message}
-            `, 'error');
+            mostrarModal(`<strong>Error</strong><br>${error.message}`, 'error');
         }
     }
-    // ======================================================
-    // CASO 2: EXPORTAR A CSV
-    // ======================================================
+    // B. Formato CSV Genérico ("Todos los recibos")
     else {
         try {
-            mostrarModal(`
-                <strong>Conectando...</strong><br>
-                Solicitando archivo CSV al servidor.
-            `, 'info', 2000);
-
+            mostrarModal('<strong>Descargando CSV General...</strong>', 'info', 2000);
+            
+            // Endpoint genérico legado (asumiendo que existe para "Todo")
             const response = await ApiService.fetchAutenticado(`/exportarCsv/${inicio}/${fin}`);
-
-            if (!response) return; 
-            if (!response.ok) throw new Error("Error generando el archivo en el servidor.");
-
+            
+            if (!response.ok) throw new Error("Error del servidor.");
+            
             const blob = await response.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = downloadUrl;
-            
-            const contentDisposition = response.headers.get('Content-Disposition');
-            let fileName = `Reporte_${inicio}_al_${fin}.csv`;
-            if (contentDisposition && contentDisposition.indexOf('filename=') !== -1) {
-                fileName = contentDisposition.split('filename=')[1].replace(/"/g, '');
-            }
-            
-            a.download = fileName;
+            a.download = `Reporte_General_${inicio}_${fin}.csv`;
             document.body.appendChild(a);
             a.click();
             a.remove();
-            window.URL.revokeObjectURL(downloadUrl);
-
-            mostrarModal(`
-                <strong>¡Exportación Exitosa!</strong><br>
-                El archivo CSV se ha descargado a su equipo.
-            `, 'success');
-
+            
+            mostrarModal('<strong>Éxito</strong><br>CSV General Descargado.', 'success');
         } catch (error) {
-            console.error("Error descarga CSV:", error);
-            mostrarModal(`
-                <strong>Fallo en Descarga</strong><br>
-                No se pudo descargar el archivo CSV. Verifique la conexión.
-            `, 'error');
+            mostrarModal('<strong>Error</strong><br>Fallo en descarga CSV genérico.', 'error');
         }
     }
 }

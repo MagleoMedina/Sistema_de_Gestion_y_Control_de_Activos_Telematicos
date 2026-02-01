@@ -1,6 +1,8 @@
 package com.backendfmo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,7 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import com.backendfmo.dtos.request.casos.CasoConUsuarioDTO;
 import com.backendfmo.services.CasosResueltosServiceImpl;
@@ -102,5 +107,20 @@ public class CasosResueltosController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/exportar-csv")
+    public ResponseEntity<Resource> descargarCsv(
+            @RequestParam String inicio,
+            @RequestParam String fin) {
+
+        String nombreArchivo = "Casos_Resueltos_" + inicio + "_al_" + fin + ".csv";
+
+        InputStreamResource file = new InputStreamResource(service.generarReporteCsv(inicio, fin));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + nombreArchivo)
+                .contentType(MediaType.parseMediaType("application/csv")) // O "text/csv"
+                .body(file);
     }
 }

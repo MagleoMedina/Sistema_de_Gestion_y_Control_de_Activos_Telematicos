@@ -1,5 +1,8 @@
 package com.backendfmo.services;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -159,5 +162,71 @@ public class CasosResueltosServiceImpl {
         return entidades.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
+    }
+
+    public ByteArrayInputStream generarReporteCsv(String fechaInicio, String fechaFin) {
+        // 1. Obtener la data filtrada
+        List<CasosResueltos> casos = repository.findByFechaBetween(fechaInicio, fechaFin);
+
+        // 2. Preparar el flujo de salida
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try (PrintWriter writer = new PrintWriter(out)) {
+
+            // TRUCO: Agregar BOM (Byte Order Mark) para que Excel reconozca UTF-8 (tildes y
+            // ñ)
+            out.write(0xEF);
+            out.write(0xBB);
+            out.write(0xBF);
+
+            // 3. Crear Encabezados del CSV
+            // Usamos punto y coma (;) que suele ser el estándar por defecto en Excel en
+            // español,
+            // o coma (,) si tu configuración regional es inglés. Aquí uso coma.
+            writer.println("ID,Ficha,Nombre,Gerencia,Fecha Atencion,Atendido Por,Reporte");
+
+            // 4. Recorrer la lista y escribir filas
+            for (CasosResueltos caso : casos) {
+                Usuario user = caso.getUsuario();
+
+                // Manejo de nulos seguro
+                String ficha = (user != null && user.getFicha() != null) ? user.getFicha().toString() : "S/D";
+                String nombre = (user != null) ? escaparCsv(user.getNombre()) : "Usuario Eliminado";
+                String gerencia = (user != null) ? escaparCsv(user.getGerencia()) : "S/D";
+
+                String linea = String.format("%s,%s,%s,%s,%s,%s,%s",
+                        caso.getId(),
+                        ficha,
+                        nombre,
+                        gerencia,
+                        caso.getFecha(),
+                        escaparCsv(caso.getAtendidoPor()), // Asegúrate de usar el getter correcto
+                        escaparCsv(caso.getReporte()));
+
+                writer.println(linea);
+            }
+
+            writer.flush();
+            return new ByteArrayInputStream(out.toByteArray());
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al generar el archivo CSV: " + e.getMessage());
+        }
+    }
+
+    // Método auxiliar para evitar que las comas o saltos de línea dentro del texto
+    // rompan el CSV
+    private String escaparCsv(String texto) {
+        if (texto == null)
+            return "";
+        // Reemplazar comillas dobles por comillas simples para evitar conflicto
+        String limpio = texto.replace("\"", "'");
+        // Reemplazar saltos de línea por espacios
+        limpio = limpio.replace("\n", " ").replace("\r", " ");
+        // Si el texto contiene comas, lo encerramos en comillas dobles (estándar CSV)
+        if (limpio.contains(",")) {
+            return "\"" + limpio + "\"";
+        }
+        return limpio;
     }
 }

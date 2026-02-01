@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Búsqueda de Casos - FMO</title>
+    <style>
+        .search-card {
+            border-left: 5px solid var(--fmo-red);
+            transition: transform 0.2s;
+        }
+        .search-card:hover { transform: translateY(-2px); }
+        .input-group-dynamic { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(250, 129, 47, 0.1);
+            cursor: pointer;
+        }
+        .badge-fmo {
+            background: linear-gradient(135deg, #212529 0%, #343a40 100%);
+            border: 1px solid #fa812f;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <%- include('../partials/sidebar') %>
+
+        <div id="content" class="w-100 bg-light p-4 fade-in">
+            
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark">
+                        <i class="bi bi-search me-2 text-danger"></i>Consultar Casos Resueltos
+                    </h2>
+                    <p class="text-muted mb-0">Historial de atenciones y soporte técnico.</p>
+                </div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="window.location.reload()">
+                    <i class="bi bi-arrow-clockwise me-1"></i>Refrescar
+                </button>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-4 search-card">
+                <div class="card-body p-4">
+                    <div class="row g-3 align-items-end">
+                        
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-danger small text-uppercase">Criterio de Búsqueda</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white text-danger"><i class="bi bi-funnel-fill"></i></span>
+                                <select class="form-select fw-bold" id="selectCriterio" onchange="cambiarInterfazBusqueda()">
+                                    <option value="todos">Listar Todo</option>
+                                    <option value="ficha">Por Ficha</option>
+                                    <option value="tecnico">Por Analista</option>
+                                    <option value="fecha">Fecha</option>
+                                    <option value="rango">Rango de Fechas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <div id="containerGenerico" class="input-group-dynamic" style="display:none;">
+                                <label class="form-label fw-bold text-muted small" id="lblGenerico">Valor</label>
+                                <input type="text" class="form-control" id="inputGenerico" placeholder="..." autocomplete="off">
+                            </div>
+
+                            <div id="containerFecha" class="input-group-dynamic" style="display:none;">
+                                <label class="form-label fw-bold text-muted small">Seleccione Fecha</label>
+                                <input type="date" class="form-control" id="inputFecha">
+                            </div>
+
+                            <div id="containerRango" class="input-group-dynamic row g-2" style="display:none;">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold text-muted small">Desde</label>
+                                    <input type="date" class="form-control" id="inputFechaInicio">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold text-muted small">Hasta</label>
+                                    <input type="date" class="form-control" id="inputFechaFin">
+                                </div>
+                            </div>
+
+                            <div id="containerTodos" class="input-group-dynamic">
+                                <label class="form-label text-white small">.</label>
+                                <input type="text" class="form-control bg-light text-muted" value="Se listarán los últimos 50 registros..." disabled>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                            <button class="btn w-100 text-white fw-bold" 
+                                    style="background: linear-gradient(to right, #d6291c, #fa812f);"
+                                    onclick="ejecutarBusqueda()">
+                                <i class="bi bi-search me-2"></i>Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary small text-uppercase">
+                                <tr>
+                                    <th class="ps-4">#</th>
+                                    <th>Fecha</th>
+                                    <th>Usuario (Ficha)</th>
+                                    <th>Gerencia</th>
+                                    <th>Atendido Por</th>
+                                    <th>Reporte (Resumen)</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaResultados">
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="bi bi-arrow-up-circle fs-1 d-block mb-2"></i>
+                                        Seleccione un criterio y presione buscar.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDetalleCaso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0">
+                <div class="modal-header text-white" style="background: var(--fmo-red);">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-file-text me-2"></i>Detalle del Caso</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold">Usuario</label>
+                            <p class="fs-5 fw-bold text-dark" id="modal_usuario"></p>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge badge-fmo fs-6" id="modal_ficha"></span>
+                        </div>
+                        <div class="col-12"><hr></div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">Fecha</label>
+                            <p id="modal_fecha"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">Atendido Por</label>
+                            <p id="modal_tecnico" class="text-primary fw-bold"></p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold">Gerencia</label>
+                            <p id="modal_gerencia"></p>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning bg-opacity-10 text-dark fw-bold small">
+                                    REPORTE TÉCNICO / SOLUCIÓN
+                                </div>
+                                <div class="card-body bg-white">
+                                    <p class="card-text" id="modal_reporte" style="white-space: pre-wrap;"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/modal') %>
+
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/scripts/busquedaCasos.js"></script>
+</body>
+</html>

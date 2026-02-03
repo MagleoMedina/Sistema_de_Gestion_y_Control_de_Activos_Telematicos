@@ -25,8 +25,8 @@ public interface EntregasAlDAETRepository extends JpaRepository<EntregasAlDAET, 
     List<EntregasAlDAET> findByFechaEncabezadoBetween(@Param("fechaInicio") String fechaInicio, @Param("fechaFin") String fechaFin);
 
     // 1. Contar Entregas Atendidas
-   @Query("SELECT COUNT(d) FROM EntregasAlDAET d JOIN d.encabezadoRelacion e WHERE e.estatus = :estatus")
-   long contarPorEstatus(@Param("estatus") String estatus);
+     @Query("SELECT COUNT(d) FROM EntregasAlDAET d JOIN d.encabezadoRelacion e WHERE e.estatus = :estatus")
+    long contarPorEstatus(@Param("estatus") String estatus);
 
     // 2. Contar Entregas Pendientes
     @Query("SELECT COUNT(d) FROM EntregasAlDAET d JOIN d.encabezadoRelacion e WHERE e.estatus <> :estatus")

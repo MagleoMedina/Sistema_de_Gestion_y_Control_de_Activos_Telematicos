@@ -4,10 +4,13 @@ import lombok.Data;
 
 @Data
 public class StockCreateDTO {
-    private String categoria;   // "COMPONENTE" o "PERIFERICO"
-    private Long idReferencia; // El ID del catálogo seleccionado
+
+    private String categoria; // "COMPONENTE" o "PERIFERICO"
+
+    // Usamos Long para recibir el ID (ej: 1, 2, 3...)
+    private Long idReferencia;
+
     private String marca;
-    private Integer cantidad;
-    private Integer minimoAlerta;
     private String caracteristicas;
+    private String serial;
 }

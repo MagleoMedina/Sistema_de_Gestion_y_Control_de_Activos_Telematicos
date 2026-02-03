@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.backendfmo.models.perifericos.ReciboDePerifericos;
 
+
 public interface ReciboDePerifericosRepository extends JpaRepository<ReciboDePerifericos, Long> {
     
     // Spring JPA genera la query automáticamente basándose en el nombre del método
@@ -18,6 +19,10 @@ public interface ReciboDePerifericosRepository extends JpaRepository<ReciboDePer
 
     @Query("SELECT e FROM ReciboDePerifericos e WHERE e.encabezadoRelacion.fecha = :fecha")
     List<ReciboDePerifericos> findByFechaEncabezado(@Param("fecha") String fecha);
+
+    //Listar por Ficha del usuario de la tabla Usuario
+    @Query("SELECT p FROM ReciboDePerifericos p JOIN p.encabezadoRelacion e JOIN e.usuarioRelacion u WHERE u.ficha = :ficha")
+    List<ReciboDePerifericos> findByFichaUsuario(@Param("ficha") Integer ficha);
 
     @Query("SELECT e FROM ReciboDePerifericos e WHERE e.encabezadoRelacion.fecha between :fechaInicio AND :fechaFin")
     List<ReciboDePerifericos> findByFechaEncabezadoBetween(@Param("fechaInicio") String fechaInicio, @Param("fechaFin") String fechaFin);

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.backendfmo.models.daet.EntregasAlDAET;
 import com.backendfmo.models.perifericos.ReciboDePerifericos;
+import com.backendfmo.models.stock.RelacionStock;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -113,6 +114,16 @@ public class EncabezadoRecibo {
         if (listaPerifericosSueltos == null) listaPerifericosSueltos = new ArrayList<>();
         listaPerifericosSueltos.add(item);
         item.setEncabezadoRelacion(this);
+    }
+
+    @OneToMany(mappedBy = "encabezadoRelacion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<RelacionStock> relacionStocks = new ArrayList<>();
+
+    public void agregarRelacionStock(RelacionStock relacionStock) {
+        if(relacionStocks == null) relacionStocks = new ArrayList<>();
+        relacionStocks.add(relacionStock);
+        relacionStock.setEncabezadoRelacion(this);
     }
 
 }

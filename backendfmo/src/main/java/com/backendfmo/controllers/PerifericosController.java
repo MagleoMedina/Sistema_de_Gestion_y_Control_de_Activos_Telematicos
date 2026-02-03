@@ -74,4 +74,15 @@ public class PerifericosController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping("/buscarReciboPerifericos/buscarPorFicha/{ficha}")
+    public ResponseEntity<?> buscarReciboDePerifericosPorFicha(@PathVariable Integer ficha) {
+        try {
+            return ResponseEntity.status(202).body(perifericosService.buscarPorFicha(ficha));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

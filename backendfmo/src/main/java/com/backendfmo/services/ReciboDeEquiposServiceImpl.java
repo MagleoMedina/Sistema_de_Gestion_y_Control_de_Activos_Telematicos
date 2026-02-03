@@ -322,6 +322,25 @@ public class ReciboDeEquiposServiceImpl{
         encabezadoRepository.deleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public List<BusquedaCompletaDTO> buscarPorFicha (Integer ficha){
+        // 1. Buscamos por ficha
+        List<EncabezadoRecibo> listaEncabezados = encabezadoRepository.buscarPorFicha(ficha);
+
+        if (listaEncabezados.isEmpty()) {
+            throw new RuntimeException("No se encontró ningún recibo con la ficha: " + ficha);
+        }
+
+        List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
+
+        // 2. Usamos el método auxiliar para convertir cada elemento
+        for (EncabezadoRecibo encabezado : listaEncabezados) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
+
+        return respuestaLista;
+    }
+
     private BusquedaCompletaDTO convertirEntidadADTO(EncabezadoRecibo encabezado) {
         BusquedaCompletaDTO dto = new BusquedaCompletaDTO();
 

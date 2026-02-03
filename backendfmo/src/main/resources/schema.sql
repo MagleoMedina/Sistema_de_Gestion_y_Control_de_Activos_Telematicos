@@ -74,9 +74,8 @@ CREATE TABLE IF NOT EXISTS "control_stock" (
 	"componentes_computadora_internos"	INTEGER,
 	"categoria"	TEXT,
 	"marca"	TEXT,
-	"cantidad"	INTEGER DEFAULT 0,
-	"fecha_actualizacion"	TEXT DEFAULT CURRENT_TIMESTAMP,
 	"caracteristicas"	TEXT,
+	"serial" TEXT UNIQUE,
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("componentes_computadora_internos") REFERENCES "componentes_computadora_internos"("id") ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY("perifericos") REFERENCES "perifericos"("id") ON UPDATE CASCADE ON DELETE CASCADE,
@@ -185,6 +184,14 @@ CREATE TABLE IF NOT EXISTS casos_resueltos(
 	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS relacion_stock(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	control_stock INTEGER,
+	casos_resueltos INTEGER,
+	FOREIGN KEY(control_stock) REFERENCES control_stock(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(casos_resueltos) REFERENCES casos_resueltos(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
 INSERT INTO "perifericos" ("id","nombre") VALUES (2,'TECLADO');
 INSERT INTO "perifericos" ("id","nombre") VALUES (3,'MOUSE');
@@ -199,8 +206,7 @@ INSERT INTO "aplicaciones" ("id","nombre") VALUES (2,'SAP');
 INSERT INTO "aplicaciones" ("id","nombre") VALUES (3,'AUTOCAD');
 INSERT INTO "aplicaciones" ("id","nombre") VALUES (4,'PROJECT');
 
-INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (1,'');
-INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (2,'');
+
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (3,'MEMORIA RAM');
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (4,'DISCO DURO');
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (5,'TARJETA MADRE');
@@ -213,4 +219,5 @@ INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (11,'PILA'
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (12,'WINDOWS');
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (13,'CANAIMA');
 
+INSERT INTO usuario_sistema (username, clave, tipo) VALUES ('magleo2003', 'vegetta777', 'ADMIN');
 COMMIT;

@@ -56,17 +56,6 @@ public class ControlStockController {
         }
     }
 
-    // POST /api/stock/{id}/ajustar?cantidad=1 (o -1)
-    @PostMapping("/{id}/ajustar")
-    public ResponseEntity<?> ajustarStock(@Valid @PathVariable Long id, @Valid @RequestParam Integer cantidad) {
-        try {
-            return ResponseEntity.status(202).body(stockService.ajustarCantidad(id, cantidad));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
 
     @GetMapping("/componentes")
     public ResponseEntity<?> listarComponentes() {

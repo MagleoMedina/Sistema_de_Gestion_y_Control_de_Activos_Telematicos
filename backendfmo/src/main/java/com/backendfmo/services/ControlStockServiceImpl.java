@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backendfmo.dtos.request.stock.*;
 import com.backendfmo.models.perifericos.Periferico;
@@ -26,7 +27,8 @@ public class ControlStockServiceImpl {
     @Autowired
     private PerifericoRepository perifericosRepo;
 
-    // --- 1. LISTAR TODO EL STOCK ---
+    // --- 1. LISTAR STOCK COMPLETO ---
+
     public List<StockDTO> listarStock() {
         if (stockRepo.count() == 0) {
             throw new RuntimeException("No hay items en el stock");
@@ -34,41 +36,45 @@ public class ControlStockServiceImpl {
         return stockRepo.findAll().stream().map(this::convertirADTO).collect(Collectors.toList());
     }
 
-    // --- 2. AGREGAR NUEVO ITEM ---
+    // --- 2. AGREGAR NUEVO ITEM (REFERENCIANDO EXISTENTE) ---
+    @Transactional
     public ControlStock guardarNuevo(StockCreateDTO dto) {
         ControlStock stock = new ControlStock();
-        stock.setMarca(dto.getMarca());
-        stock.setCantidad(dto.getCantidad());
-        stock.setCaracteristicas(dto.getCaracteristicas());
-        stock.setMinimoAlerta(5);
 
-        // Lógica para decidir dónde guardar la relación
-        if ("COMPONENTE".equalsIgnoreCase(dto.getCategoria())) {
+        // 1. Datos propios del Stock
+        stock.setMarca(dto.getMarca());
+        stock.setCaracteristicas(dto.getCaracteristicas());
+        stock.setSerial(dto.getSerial());
+
+        String cat = dto.getCategoria() != null ? dto.getCategoria().toUpperCase() : "DESCONOCIDO";
+        stock.setCategoria(cat);
+
+        // 2. Lógica de Búsqueda por ID (Ya existente en DB)
+        if ("COMPONENTE".equals(cat)) {
+            // Buscamos el componente por su ID (ej: 3 para MEMORIA RAM)
             ComponenteInterno comp = componentesRepo.findById(dto.getIdReferencia())
-                    .orElseThrow(() -> new RuntimeException("Componente no encontrado ID: " + dto.getIdReferencia()));
+                    .orElseThrow(
+                            () -> new RuntimeException("No existe un Componente con el ID: " + dto.getIdReferencia()));
+
             stock.setComponente(comp);
-            stock.setPeriferico(null); // Asegurar nulo el otro
-        } else {
+            stock.setPeriferico(null); // Constraint Check
+
+        } else if ("PERIFERICO".equals(cat)) {
+            // Buscamos el periférico por su ID (ej: 2 para TECLADO)
             Periferico peri = perifericosRepo.findById(dto.getIdReferencia())
-                    .orElseThrow(() -> new RuntimeException("Periférico no encontrado ID: " + dto.getIdReferencia()));
+                    .orElseThrow(
+                            () -> new RuntimeException("No existe un Periférico con el ID: " + dto.getIdReferencia()));
+
             stock.setPeriferico(peri);
-            stock.setComponente(null); // Asegurar nulo el otro
+            stock.setComponente(null); // Constraint Check
+        } else {
+            throw new RuntimeException("Categoría inválida: Use 'COMPONENTE' o 'PERIFERICO'");
         }
 
+        // 3. Guardar el Stock
         return stockRepo.save(stock);
     }
 
-    // --- 3. AJUSTAR CANTIDAD (+1 o -1) ---
-    public ControlStock ajustarCantidad(Long id, Integer cantidadAjuste) {
-        ControlStock stock = stockRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item de stock no encontrado"));
-
-        int nuevaCantidad = stock.getCantidad() + cantidadAjuste;
-        if (nuevaCantidad < 0) nuevaCantidad = 0; // Evitar negativos
-
-        stock.setCantidad(nuevaCantidad);
-        return stockRepo.save(stock);
-    }
     public void eliminarItem(Long id) {
         ControlStock stock = stockRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item de stock no encontrado"));
@@ -80,11 +86,9 @@ public class ControlStockServiceImpl {
         StockDTO dto = new StockDTO();
         dto.setId(entidad.getId());
         dto.setMarca(entidad.getMarca());
-        dto.setCantidad(entidad.getCantidad());
+        dto.setSerial(entidad.getSerial());
         dto.setCaracteristicas(entidad.getCaracteristicas());
-        dto.setMinimoAlerta(5);
 
-        // Determinar nombre y categoría basado en cuál relación no es nula
         if (entidad.getComponente() != null) {
             dto.setCategoria("COMPONENTE");
             dto.setNombreItem(entidad.getComponente().getNombre());
@@ -95,12 +99,6 @@ public class ControlStockServiceImpl {
             dto.setCategoria("DESCONOCIDO");
             dto.setNombreItem("Item Huérfano");
         }
-
-        // Calcular estado visual
-        if (dto.getCantidad() == 0) dto.setEstado("AGOTADO");
-        else if (dto.getCantidad() <= dto.getMinimoAlerta()) dto.setEstado("BAJO");
-        else dto.setEstado("OK");
-
         return dto;
     }
 }

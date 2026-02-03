@@ -4,10 +4,10 @@ const app = express();
 
 // --- CONFIGURACIÓN DINÁMICA del FRONTEND ---
 const PORT = 3000;
-const HOST = 'localhost';
+const HOST = '170.108.112.55';
 
 // Centralizamos la IP y Puerto del Backend usando variables de entorno 
-const BACKEND_URL ='http://127.0.0.1:8081/api';
+const BACKEND_URL ='http://170.108.112.55:8081/api';
 
 // Configurar EJS
 app.set('view engine', 'ejs');

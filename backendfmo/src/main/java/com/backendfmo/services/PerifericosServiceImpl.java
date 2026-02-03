@@ -187,6 +187,21 @@ public class PerifericosServiceImpl {
             .collect(Collectors.toList());
     }
 
+@Transactional(readOnly = true)
+    public List<ReciboPerifericosDTO> buscarPorFicha(Integer ficha) {
+        
+        // 1. Buscar TODOS los registros que coincidan con el serial
+        List<ReciboDePerifericos> resultados = perifericoRepository.findByFichaUsuario(ficha);
+
+        if (resultados.isEmpty()) {
+            throw new RuntimeException("No se encontró ningún componente para la ficha de usuario: " + ficha);
+        }
+
+        // 2. Convertir cada resultado encontrado en un DTO
+        return resultados.stream()
+            .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
+            .collect(Collectors.toList());
+    }
 
 // Método auxiliar corregido
     private ReciboPerifericosDTO convertirADTO(ReciboDePerifericos perifericoHijo) {

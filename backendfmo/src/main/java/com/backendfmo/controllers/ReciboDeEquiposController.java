@@ -109,4 +109,17 @@ public class ReciboDeEquiposController {
         }
     }
 
+    @GetMapping("/buscarReciboEquipos/ficha/{ficha}")
+    public ResponseEntity<?> obtenerDatosPorFicha(@Valid @PathVariable Integer ficha) {
+        try {
+            return ResponseEntity.status(202).body(service.buscarPorFicha(ficha));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }catch(Exception e){
+            return ResponseEntity.internalServerError().build();
+
+        }
+
+    }
+
 }

@@ -74,14 +74,15 @@
                             <label class="form-label small fw-bold text-secondary">Filtrar por:</label>
                             <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
                                 <option value="todo">Listar Todo</option>
-                                <option value="fmo">FMO</option>
+                                <option value="fmo">FMO / Serial</option>
+                                <option value="ficha">Ficha de Usuario</option>
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
                         
                         <div class="col-md-7" id="containerInputTexto" style="display: none;">
-                            <label class="form-label small fw-bold text-fmo-title">Ingrese el FMO del equipo:</label>
-                            <input type="text" class="form-control" id="inputBusquedaFmo" placeholder="Ej: 119000">
+                            <label class="form-label small fw-bold text-fmo-title" id="lblInputTexto">Ingrese valor:</label>
+                            <input type="text" class="form-control" id="inputBusquedaFmo" placeholder="...">
                         </div>
                         
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">

@@ -124,4 +124,15 @@ public class ControlStockController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // ENDPOINT 3: VER DETALLE DE RELACIÓN POR STOCK
+@GetMapping("/relacion/{idStock}")
+public ResponseEntity<?> verRelacionStock(@PathVariable Long idStock) {
+    try {
+        RelacionStockResponseDTO detalle = stockService.obtenerRelacionPorIdStock(idStock);
+        return ResponseEntity.ok(detalle);
+    } catch (RuntimeException e) {
+        return ResponseEntity.status(404).body(e.getMessage());
+    }
+}
 }

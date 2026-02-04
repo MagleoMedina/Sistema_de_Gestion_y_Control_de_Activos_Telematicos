@@ -110,23 +110,29 @@ async function cargarStock() {
         let asignados = 0;
 
         data.forEach(item => {
-            const esAsignado = serialesAsignados.includes(item.serial);
-            if(esAsignado) asignados++; else libres++;
+    const esAsignado = serialesAsignados.includes(item.serial);
+    if(esAsignado) asignados++; else libres++;
 
-            const badge = esAsignado 
-                ? '<span class="badge bg-secondary">Asignado</span>' 
-                : '<span class="badge bg-success">Disponible</span>';
+    const badge = esAsignado 
+        ? '<span class="badge bg-secondary">Asignado</span>' 
+        : '<span class="badge bg-success">Disponible</span>';
 
-            const botonesAccion = esAsignado
-                ? `<button class="btn btn-sm btn-outline-warning" onclick="abrirDesvincular('${item.serial}')" title="Desvincular del Equipo">
-                     <i class="bi bi-link-45deg"></i>
-                   </button>`
-                : `<button class="btn btn-sm btn-success" onclick="abrirModalAsignar(${item.id}, '${item.nombreItem}', '${item.serial}')" title="Asignar a Personal">
-                     <i class="bi bi-person-plus-fill"></i>
-                   </button>
-                   <button class="btn btn-sm btn-outline-danger ms-1" onclick="abrirEliminar(${item.id})" title="Borrar del Sistema">
-                     <i class="bi bi-trash3"></i>
-                   </button>`;
+    // MODIFICACIÓN AQUÍ: Agregamos el botón de ver (ojo) si está asignado
+    const botonesAccion = esAsignado
+        ? `<div class="btn-group shadow-sm">
+             <button class="btn btn-sm btn-info text-white" onclick="verRelacion(${item.id})" title="Ver Detalles de Asignación">
+               <i class="bi bi-eye-fill"></i>
+             </button>
+             <button class="btn btn-sm btn-outline-warning" onclick="abrirDesvincular('${item.serial}')" title="Desvincular del Equipo">
+               <i class="bi bi-link-45deg"></i>
+             </button>
+           </div>`
+        : `<button class="btn btn-sm btn-success" onclick="abrirModalAsignar(${item.id}, '${item.nombreItem}', '${item.serial}')" title="Asignar a Personal">
+             <i class="bi bi-person-plus-fill"></i>
+           </button>
+           <button class="btn btn-sm btn-outline-danger ms-1" onclick="abrirEliminar(${item.id})" title="Borrar del Sistema">
+             <i class="bi bi-trash3"></i>
+           </button>`;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -258,5 +264,37 @@ async function ejecutarEliminacionDb() {
         }
     } catch(e) {
         mostrarModal("Error de conexión.", 'error');
+    }
+}
+
+// --- 8. VER RELACIÓN (GET /stock/relacion/:id) ---
+async function verRelacion(idStock) {
+    try {
+        const res = await ApiService.fetchAutenticado(`/stock/relacion/${idStock}`);
+        
+        if (!res.ok) {
+            mostrarModal("No se pudo obtener la información de asignación.", "error");
+            return;
+        }
+
+        const data = await res.json();
+        
+        // Llenar el modal con los datos recibidos
+        document.getElementById('view_nombreItem').textContent = data.nombreItem || "N/A";
+        document.getElementById('view_serial').textContent = data.serial || "N/A";
+        
+        document.getElementById('view_fmo').textContent = data.fmoEquipo || "N/A";
+        document.getElementById('view_fecha').textContent = data.fecha || "N/A";
+        
+        document.getElementById('view_usuario').textContent = data.nombreUsuario || "Sin Usuario";
+        document.getElementById('view_gerencia').textContent = data.gerencia || "";
+        document.getElementById('view_ficha').textContent = data.ficha || "-";
+        document.getElementById('view_ext').textContent = data.extension || "-";
+
+        new bootstrap.Modal(document.getElementById('modalVerRelacion')).show();
+
+    } catch (error) {
+        console.error(error);
+        mostrarModal("Error de conexión al consultar detalles.", "error");
     }
 }

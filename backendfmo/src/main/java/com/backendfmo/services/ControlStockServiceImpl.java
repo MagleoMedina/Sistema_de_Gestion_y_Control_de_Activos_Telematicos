@@ -117,25 +117,23 @@ public class ControlStockServiceImpl {
     @Autowired
     private RelacionStockRepository relacionStockRepo; // Para guardar la unión
 
-   // --- 3. ASIGNAR STOCK A UN EQUIPO (CREANDO USUARIO SI NO EXISTE) ---
+    // --- 3. ASIGNAR STOCK A UN EQUIPO (CREANDO USUARIO SI NO EXISTE) ---
     @Transactional
     public void asignarStockAEquipo(AsignacionStockDTO dto) {
 
-       
         // 1. Validar Stock
         ControlStock stock = stockRepo.findById(dto.getIdStock())
                 .orElseThrow(() -> new RuntimeException("Item de stock no encontrado ID: " + dto.getIdStock()));
 
-                       
         // 1. Validar Stock por ID
         ControlStock stockExist = stockRepo.findById(dto.getIdStock())
                 .orElseThrow(() -> new RuntimeException("Item de stock no encontrado ID: " + dto.getIdStock()));
 
         // === NUEVA VALIDACIÓN: Verificar si ya está asignado ===
         if (relacionStockRepo.existsByStockId(stockExist)) {
-            throw new RuntimeException("El item '" + stockExist.getNombreItem() + 
-                                       "' con serial " + stockExist.getSerial() + 
-                                       " ya se encuentra asignado a otro equipo. Desvincúlelo primero.");
+            throw new RuntimeException("El item '" + stockExist.getNombreItem() +
+                    "' con serial " + stockExist.getSerial() +
+                    " ya se encuentra asignado a otro equipo. Desvincúlelo primero.");
         }
         // 2. Lógica de Usuario (Buscar o Crear)
         Usuario usuario = usuarioRepo.findByFicha(dto.getFichaUsuario())
@@ -152,7 +150,7 @@ public class ControlStockServiceImpl {
         usuario.setNombre(dto.getNombreUsuario());
         usuario.setExtension(dto.getExtension());
         usuario.setGerencia(dto.getGerencia());
-        
+
         // Guardamos el usuario en BD
         usuario = usuarioRepo.save(usuario);
 
@@ -161,7 +159,7 @@ public class ControlStockServiceImpl {
         recibo.setFmoEquipo(dto.getFmoEquipo());
         recibo.setFecha(dto.getFecha());
         recibo.setUsuarioRelacion(usuario); // Vinculamos al usuario recién guardado/actualizado
-        
+
         // Guardamos el recibo
         recibo = encabezadoRepo.save(recibo);
 
@@ -213,11 +211,48 @@ public class ControlStockServiceImpl {
 
         // 2. Buscar si tiene una relación activa (si está asignado)
         RelacionStock relacion = relacionStockRepo.findByStockId(stock)
-                .orElseThrow(() -> new RuntimeException("El item con serial " + serial + " existe, pero NO está asignado a ningún equipo."));
+                .orElseThrow(() -> new RuntimeException(
+                        "El item con serial " + serial + " existe, pero NO está asignado a ningún equipo."));
 
         // 3. Eliminar la relación
-        // Al borrar el registro de la tabla intermedia, el item queda "libre" 
+        // Al borrar el registro de la tabla intermedia, el item queda "libre"
         // y el check "existsByStockId" dará false en el futuro.
         relacionStockRepo.delete(relacion);
+    }
+
+    // --- 6. OBTENER DETALLE DE ASIGNACIÓN POR ID DE STOCK ---
+    public RelacionStockResponseDTO obtenerRelacionPorIdStock(Long idStock) {
+        // 1. Buscamos el stock
+        ControlStock stock = stockRepo.findById(idStock)
+                .orElseThrow(() -> new RuntimeException("Item de stock no encontrado"));
+
+        // 2. Buscamos la relación usando el repositorio existente
+        RelacionStock relacion = relacionStockRepo.findByStockId(stock)
+                .orElseThrow(() -> new RuntimeException("Este item no tiene una asignación activa."));
+
+        // 3. Mapeamos a DTO (Igual que en el listado masivo)
+        RelacionStockResponseDTO dto = new RelacionStockResponseDTO();
+        dto.setIdRelacion(relacion.getId());
+
+        // Datos del Item
+        dto.setNombreItem(stock.getNombreItem());
+        dto.setSerial(stock.getSerial());
+
+        // Datos del Encabezado (Equipo y Fecha)
+        EncabezadoRecibo enc = relacion.getEncabezadoRelacion();
+        if (enc != null) {
+            dto.setFmoEquipo(enc.getFmoEquipo());
+            dto.setFecha(enc.getFecha());
+
+            // Datos del Usuario
+            Usuario u = enc.getUsuarioRelacion();
+            if (u != null) {
+                dto.setFicha(u.getFicha());
+                dto.setNombreUsuario(u.getNombre());
+                dto.setExtension(u.getExtension());
+                dto.setGerencia(u.getGerencia());
+            }
+        }
+        return dto;
     }
 }

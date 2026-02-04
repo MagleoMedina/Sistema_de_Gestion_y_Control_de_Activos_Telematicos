@@ -1,89 +1,70 @@
-// Almacenes temporales
+// Variables Globales
 let listaComponentesDB = [];
 let listaPerifericosDB = [];
-let itemParaEliminarId = null; // Variable global para la eliminación
+let tempSerial = null; // Para desvincular
+let tempIdEliminar = null; // Para borrar de DB
 
-// --- 1. CARGA INICIAL ---
 document.addEventListener('DOMContentLoaded', async () => {
     await cargarCatalogos();
     cargarStock();
+    
+    // Setear fecha de hoy en modal asignar
+    document.getElementById('asigFecha').value = new Date().toISOString().split('T')[0];
 });
 
-// --- 2. CARGAR CATÁLOGOS ---
+// --- 1. CARGAR CATALOGOS (Dropdowns) ---
 async function cargarCatalogos() {
     try {
         const resComp = await ApiService.fetchAutenticado('/stock/componentes');
         const resPeri = await ApiService.fetchAutenticado('/stock/perifericos');
 
-        if (resComp && resComp.ok) listaComponentesDB = await resComp.json();
-        if (resPeri && resPeri.ok) listaPerifericosDB = await resPeri.json();
+        if (resComp.ok) listaComponentesDB = await resComp.json();
+        if (resPeri.ok) listaPerifericosDB = await resPeri.json();
 
-        cargarListaItems(); // Inicia la lista y los placeholders
     } catch (error) {
-        console.error("Error cargando catálogos:", error);
-        mostrarModal("No se pudieron cargar los catálogos de items.", 'error');
+        console.error("Error catálogos:", error);
     }
 }
 
-// --- 3. LÓGICA DEL MODAL (Dinámico) ---
+// --- 2. GESTIÓN DEL MODAL CREAR ---
 function abrirModalAgregar() {
     document.getElementById('formStock').reset();
     document.getElementById('selCategoria').value = "COMPONENTE";
-    cargarListaItems(); // Esto también resetea los placeholders
+    cargarListaItems(); 
     new bootstrap.Modal(document.getElementById('modalStock')).show();
 }
 
-// Actualiza el Select y los Placeholders
 function cargarListaItems() {
     const categoria = document.getElementById('selCategoria').value;
     const select = document.getElementById('selReferencia');
-    const inputMarca = document.getElementById('inputMarca');
-    const inputModelo = document.getElementById('inputModelo');
-
-    // A. Llenar el Select
+    
     select.innerHTML = '<option value="">Seleccione...</option>';
     let datos = (categoria === 'COMPONENTE') ? listaComponentesDB : listaPerifericosDB;
 
     datos.forEach(item => {
-        if (categoria === 'COMPONENTE') {
-            const nombreUpper = (item.nombre || "").toUpperCase();
-            if (nombreUpper.includes("WINDOWS") || nombreUpper.includes("CANAIMA")) return; 
-        }
+        // Filtro opcional si quieres ocultar SOs
+        const nombreUpper = (item.nombre || "").toUpperCase();
+        if (categoria === 'COMPONENTE' && (nombreUpper.includes("WINDOWS") || nombreUpper.includes("CANAIMA"))) return; 
+        
         const opt = document.createElement('option');
         opt.value = item.id; 
         opt.textContent = item.nombre;
         select.appendChild(opt);
     });
-
-    // B. CAMBIAR PLACEHOLDERS DINÁMICAMENTE
-    if (categoria === 'COMPONENTE') {
-        inputMarca.placeholder = "Ej: Kingston / Samsung";
-        inputModelo.placeholder = "Ej: 8GB DDR4 / 500GB SSD";
-    } else {
-        inputMarca.placeholder = "Ej: Genius / HP";
-        inputModelo.placeholder = "Ej: Inalámbrico / USB / Negro";
-    }
 }
 
-// --- 4. GUARDAR NUEVO STOCK ---
+// --- 3. GUARDAR NUEVO ITEM (POST) ---
 async function guardarNuevoStock() {
-    const MINIMO_ALERTA = 5;
     const payload = {
         categoria: document.getElementById('selCategoria').value,
         idReferencia: parseInt(document.getElementById('selReferencia').value),
         marca: document.getElementById('inputMarca').value.trim(),
-        caracteristicas: document.getElementById('inputModelo').value.trim(),
-        cantidad: parseInt(document.getElementById('inputCantidad').value),
-        minimoAlerta: MINIMO_ALERTA,
+        caracteristicas: document.getElementById('inputCaract').value.trim(),
+        serial: document.getElementById('inputSerial').value.trim()
     }
 
-    // VALIDACIÓN CAMPOS VACÍOS
-    if(!payload.idReferencia || !payload.marca || !payload.caracteristicas || isNaN(payload.cantidad) || payload.cantidad < 0) {
-        mostrarModal(`
-            <strong>Datos Incompletos</strong><br>
-            Por favor, seleccione un artículo y complete marca y características.
-        `, 'warning');
-        return;
+    if(!payload.idReferencia || !payload.marca || !payload.serial) {
+        return mostrarModal("Complete los campos obligatorios (Referencia, Marca, Serial).", 'warning');
     }
 
     try {
@@ -92,163 +73,190 @@ async function guardarNuevoStock() {
             body: JSON.stringify(payload)
         });
 
-        if (res && res.ok) {
-            mostrarModal(`
-                <strong>¡Item Agregado!</strong><br>
-                Se ingresó: <b>${payload.marca}</b> al inventario.
-            `, 'success');
-
+        if (res.ok) {
+            mostrarModal("Item registrado exitosamente.", 'success');
             bootstrap.Modal.getInstance(document.getElementById('modalStock')).hide();
             cargarStock();
         } else {
-            mostrarModal("Error al guardar en el servidor.", 'error');
+            mostrarModal("Error al guardar. Verifique si el serial ya existe.", 'error');
         }
-    } catch (error) {
-        console.error(error);
-        mostrarModal(`Error de conexión: ${error.message}`, 'error');
+    } catch (e) {
+        mostrarModal("Error de conexión.", 'error');
     }
 }
 
-// --- 5. CARGAR TABLA DE STOCK ---
+// --- 4. LISTAR STOCK (GET) ---
 async function cargarStock() {
-    const tbodyComp = document.getElementById('tablaComponentes');
-    const tbodyPeri = document.getElementById('tablaPerifericos');
-
-    tbodyComp.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
-    tbodyPeri.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
+    const tbody = document.getElementById('tablaStock');
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Cargando inventario...</td></tr>';
 
     try {
         const res = await ApiService.fetchAutenticado('/stock');
+        if (!res.ok) throw new Error("Error al obtener datos");
         
-        if (!res || res.status === 404) {
-            mostrarVacio(tbodyComp, tbodyPeri);
-            return;
+        const data = await res.json(); // Lista plana de StockDTO
+        
+        // Obtenemos asignaciones para saber el estado real
+        // Esto es un truco: cruzamos data con el endpoint de asignaciones para saber cual está ocupado
+        const resAsig = await ApiService.fetchAutenticado('/stock/asignaciones');
+        let serialesAsignados = [];
+        if(resAsig.ok) {
+            const dataAsig = await resAsig.json();
+            serialesAsignados = dataAsig.map(a => a.serial);
         }
 
-        if(!res.ok) throw new Error("Fallo al obtener stock");
-        const data = await res.json(); 
-
-        tbodyComp.innerHTML = '';
-        tbodyPeri.innerHTML = '';
-
-        let totalItems = 0;
-        let totalCritico = 0;
-
-        if (!data || data.length === 0) {
-            mostrarVacio(tbodyComp, tbodyPeri);
-            actualizarResumen(0, 0);
-            return;
-        }
+        tbody.innerHTML = '';
+        let libres = 0;
+        let asignados = 0;
 
         data.forEach(item => {
-            totalItems += item.cantidad;
-            if (item.estado === 'BAJO' || item.estado === 'AGOTADO') totalCritico++;
+            const esAsignado = serialesAsignados.includes(item.serial);
+            if(esAsignado) asignados++; else libres++;
 
-            let estadoHtml = '<span class="badge bg-success">En Stock</span>';
-            if (item.estado === 'AGOTADO') estadoHtml = '<span class="badge bg-danger">Agotado</span>';
-            else if (item.estado === 'BAJO') estadoHtml = '<span class="badge badge-low-stock">Stock Bajo</span>';
+            const badge = esAsignado 
+                ? '<span class="badge bg-secondary">Asignado</span>' 
+                : '<span class="badge bg-success">Disponible</span>';
+
+            const botonesAccion = esAsignado
+                ? `<button class="btn btn-sm btn-outline-warning" onclick="abrirDesvincular('${item.serial}')" title="Desvincular del Equipo">
+                     <i class="bi bi-link-45deg"></i>
+                   </button>`
+                : `<button class="btn btn-sm btn-success" onclick="abrirModalAsignar(${item.id}, '${item.nombreItem}', '${item.serial}')" title="Asignar a Personal">
+                     <i class="bi bi-person-plus-fill"></i>
+                   </button>
+                   <button class="btn btn-sm btn-outline-danger ms-1" onclick="abrirEliminar(${item.id})" title="Borrar del Sistema">
+                     <i class="bi bi-trash3"></i>
+                   </button>`;
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="fw-bold text-primary">${item.nombreItem}</td>
                 <td>
-                    <div class="fw-bold text-dark">${item.marca}</div>
-                    <small class="text-muted">${item.caracteristicas}</small>
+                    <div class="fw-bold text-dark">${item.nombreItem}</div>
+                    <small class="badge bg-light text-secondary border">${item.categoria}</small>
                 </td>
-                <td class="text-center">
-                    <span class="fs-5 fw-bold ${item.cantidad === 0 ? 'text-danger' : 'text-dark'}">${item.cantidad}</span>
+                <td>
+                    <div class="small fw-bold">${item.marca}</div>
+                    <div class="small text-muted text-wrap" style="max-width: 250px;">${item.caracteristicas}</div>
                 </td>
-                <td class="text-center">${estadoHtml}</td>
-                <td class="text-center">
-                    <button class="btn btn-outline-danger btn-circle btn-sm me-1"
-                            onclick="modificarStock(${item.id}, -1)" ${item.cantidad === 0 ? 'disabled' : ''} title="Retirar 1">
-                        <i class="fas fa-minus">-</i>
-                    </button>
-                    <button class="btn btn-outline-success btn-circle btn-sm me-2"
-                            onclick="modificarStock(${item.id}, 1)" title="Agregar 1">
-                        <i class="fas fa-plus">+</i>
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm"
-                            onclick="abrirConfirmarEliminacion(${item.id})" title="Eliminar registro">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
+                <td class="font-monospace text-primary">${item.serial}</td>
+                <td class="text-center">${badge}</td>
+                <td class="text-center">${botonesAccion}</td>
             `;
-
-            if (item.categoria === 'COMPONENTE') tbodyComp.appendChild(tr);
-            else tbodyPeri.appendChild(tr);
+            tbody.appendChild(tr);
         });
 
-        if (tbodyComp.innerHTML === '') mostrarVacio(tbodyComp, null);
-        if (tbodyPeri.innerHTML === '') mostrarVacio(null, tbodyPeri);
+        // Actualizar contadores cards
+        document.getElementById('totalLibres').innerText = libres;
+        document.getElementById('totalAsignados').innerText = asignados;
 
-        actualizarResumen(totalItems, totalCritico);
+        if (data.length === 0) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Inventario vacío.</td></tr>';
 
     } catch (error) {
         console.error(error);
-        mostrarVacio(tbodyComp, tbodyPeri);
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar datos.</td></tr>';
     }
 }
 
-// --- 6. MODIFICAR STOCK ---
-async function modificarStock(id, cantidad) {
+// --- 5. ASIGNACIÓN (Logica Completa) ---
+function abrirModalAsignar(id, nombre, serial) {
+    document.getElementById('hdnIdStockAsignar').value = id;
+    document.getElementById('lblItemAsignar').innerText = nombre;
+    document.getElementById('lblSerialAsignar').innerText = "Serial: " + serial;
+    // Limpiar campos de usuario
+    document.getElementById('asigFmo').value = "";
+    document.getElementById('asigFicha').value = "";
+    document.getElementById('asigNombre').value = "";
+    document.getElementById('asigGerencia').value = "";
+    document.getElementById('asigExtension').value = "";
+    
+    new bootstrap.Modal(document.getElementById('modalAsignar')).show();
+}
+
+async function ejecutarAsignacion() {
+    const payload = {
+        idStock: parseInt(document.getElementById('hdnIdStockAsignar').value),
+        fmoEquipo: document.getElementById('asigFmo').value.trim(),
+        fecha: document.getElementById('asigFecha').value,
+        
+        fichaUsuario: parseInt(document.getElementById('asigFicha').value),
+        nombreUsuario: document.getElementById('asigNombre').value.trim(),
+        extension: document.getElementById('asigExtension').value.trim(),
+        gerencia: document.getElementById('asigGerencia').value.trim()
+    };
+
+    if(!payload.fmoEquipo || !payload.fichaUsuario || !payload.nombreUsuario) {
+        return mostrarModal("FMO, Ficha y Nombre son obligatorios.", 'warning');
+    }
+
     try {
-        const res = await ApiService.fetchAutenticado(`/stock/${id}/ajustar?cantidad=${cantidad}`, { method: 'POST' });
-        if (res && res.ok) {
+        const res = await ApiService.fetchAutenticado('/stock/asignar', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+            mostrarModal("Equipo asignado correctamente.", 'success');
+            bootstrap.Modal.getInstance(document.getElementById('modalAsignar')).hide();
             cargarStock();
         } else {
-            mostrarModal("No se pudo actualizar el stock.", 'error');
+            const txt = await res.text();
+            mostrarModal(`Error: ${txt}`, 'error');
         }
-    } catch (error) {
-        mostrarModal("Error de red.", 'error');
+    } catch (e) {
+        mostrarModal("Error de conexión.", 'error');
     }
 }
 
-// --- 7. ELIMINAR ITEM (CON MODAL) ---
-
-// PASO A: Abrir Modal
-function abrirConfirmarEliminacion(id) {
-    itemParaEliminarId = id; // Guardamos ID globalmente
-    new bootstrap.Modal(document.getElementById('modalConfirmarEliminacion')).show();
+// --- 6. DESVINCULAR (DELETE /desvincular/:serial) ---
+function abrirDesvincular(serial) {
+    tempSerial = serial;
+    document.getElementById('lblSerialDesvincular').innerText = serial;
+    new bootstrap.Modal(document.getElementById('modalDesvincular')).show();
 }
 
-// PASO B: Ejecutar (Click en "Sí")
-async function ejecutarEliminacionStock() {
-    // Cerramos el modal de confirmación
-    const modalEl = document.getElementById('modalConfirmarEliminacion');
-    bootstrap.Modal.getInstance(modalEl).hide();
-
-    if (!itemParaEliminarId) return;
+async function ejecutarDesvinculacion() {
+    if (!tempSerial) return;
+    
+    // Codificar serial por si tiene barras (/)
+    const safeSerial = encodeURIComponent(tempSerial);
 
     try {
-        const res = await ApiService.fetchAutenticado(`/stock/${itemParaEliminarId}`, {
+        const res = await ApiService.fetchAutenticado(`/stock/desvincular/${safeSerial}`, {
             method: 'DELETE'
         });
 
-        if (res && res.ok) {
-            mostrarModal("Registro eliminado del inventario correctamente.", 'success');
+        if (res.ok) {
+            mostrarModal("Item liberado correctamente.", 'success');
+            bootstrap.Modal.getInstance(document.getElementById('modalDesvincular')).hide();
             cargarStock();
         } else {
-            mostrarModal("No se pudo eliminar el registro.", 'error');
+            const txt = await res.text();
+            mostrarModal(`No se pudo desvincular: ${txt}`, 'error');
         }
-    } catch (error) {
-        console.error(error);
-        mostrarModal(`Error al eliminar: ${error.message}`, 'error');
-    } finally {
-        itemParaEliminarId = null; // Limpieza
+    } catch (e) {
+        mostrarModal("Error al procesar.", 'error');
     }
 }
 
-// --- HELPERS ---
-function actualizarResumen(total, critico) {
-    const elTotal = document.getElementById('totalItems');
-    const elCritico = document.getElementById('totalCritico');
-    if(elTotal) elTotal.innerText = total;
-    if(elCritico) elCritico.innerText = critico;
+// --- 7. ELIMINAR DE DB (DELETE /stock/:id) ---
+function abrirEliminar(id) {
+    tempIdEliminar = id;
+    new bootstrap.Modal(document.getElementById('modalEliminar')).show();
 }
 
-function mostrarVacio(compBody, periBody) {
-    const msg = '<tr><td colspan="5" class="text-center text-muted p-4">No se encontraron elementos</td></tr>';
-    if (compBody) compBody.innerHTML = msg;
-    if (periBody) periBody.innerHTML = msg;
+async function ejecutarEliminacionDb() {
+    if(!tempIdEliminar) return;
+
+    try {
+        const res = await ApiService.fetchAutenticado(`/stock/${tempIdEliminar}`, { method: 'DELETE' });
+        if(res.ok) {
+            mostrarModal("Registro eliminado.", 'success');
+            bootstrap.Modal.getInstance(document.getElementById('modalEliminar')).hide();
+            cargarStock();
+        } else {
+            mostrarModal("Error al eliminar. Verifique que no esté asignado.", 'error');
+        }
+    } catch(e) {
+        mostrarModal("Error de conexión.", 'error');
+    }
 }

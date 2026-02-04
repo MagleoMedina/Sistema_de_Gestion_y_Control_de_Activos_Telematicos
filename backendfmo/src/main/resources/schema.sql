@@ -187,9 +187,9 @@ CREATE TABLE IF NOT EXISTS casos_resueltos(
 CREATE TABLE IF NOT EXISTS relacion_stock(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	control_stock INTEGER,
-	casos_resueltos INTEGER,
+	encabezado_recibo INTEGER,
 	FOREIGN KEY(control_stock) REFERENCES control_stock(id) ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY(casos_resueltos) REFERENCES casos_resueltos(id) ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');

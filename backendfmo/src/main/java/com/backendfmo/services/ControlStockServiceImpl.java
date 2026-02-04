@@ -10,10 +10,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backendfmo.dtos.request.stock.*;
 import com.backendfmo.models.perifericos.Periferico;
 import com.backendfmo.models.reciboequipos.ComponenteInterno;
+import com.backendfmo.models.reciboequipos.EncabezadoRecibo;
+import com.backendfmo.models.reciboequipos.Usuario;
 import com.backendfmo.models.stock.ControlStock;
+import com.backendfmo.models.stock.RelacionStock;
 import com.backendfmo.repository.ComponenteInternoRepository;
 import com.backendfmo.repository.ControlStockRepository;
+import com.backendfmo.repository.EncabezadoReciboRepository;
 import com.backendfmo.repository.PerifericoRepository;
+import com.backendfmo.repository.UsuarioRepository;
+import com.backendfmo.repository.RelacionStockRepository;
 
 @Service
 public class ControlStockServiceImpl {
@@ -100,5 +106,118 @@ public class ControlStockServiceImpl {
             dto.setNombreItem("Item Huérfano");
         }
         return dto;
+    }
+
+    @Autowired
+    private UsuarioRepository usuarioRepo; // Necesario para buscar por ficha
+
+    @Autowired
+    private EncabezadoReciboRepository encabezadoRepo; // Para guardar el recibo
+
+    @Autowired
+    private RelacionStockRepository relacionStockRepo; // Para guardar la unión
+
+   // --- 3. ASIGNAR STOCK A UN EQUIPO (CREANDO USUARIO SI NO EXISTE) ---
+    @Transactional
+    public void asignarStockAEquipo(AsignacionStockDTO dto) {
+
+       
+        // 1. Validar Stock
+        ControlStock stock = stockRepo.findById(dto.getIdStock())
+                .orElseThrow(() -> new RuntimeException("Item de stock no encontrado ID: " + dto.getIdStock()));
+
+                       
+        // 1. Validar Stock por ID
+        ControlStock stockExist = stockRepo.findById(dto.getIdStock())
+                .orElseThrow(() -> new RuntimeException("Item de stock no encontrado ID: " + dto.getIdStock()));
+
+        // === NUEVA VALIDACIÓN: Verificar si ya está asignado ===
+        if (relacionStockRepo.existsByStockId(stockExist)) {
+            throw new RuntimeException("El item '" + stockExist.getNombreItem() + 
+                                       "' con serial " + stockExist.getSerial() + 
+                                       " ya se encuentra asignado a otro equipo. Desvincúlelo primero.");
+        }
+        // 2. Lógica de Usuario (Buscar o Crear)
+        Usuario usuario = usuarioRepo.findByFicha(dto.getFichaUsuario())
+                .orElseGet(() -> {
+                    // Si no existe, instanciamos uno nuevo y configuramos credenciales por defecto
+                    Usuario u = new Usuario();
+                    u.setFicha(dto.getFichaUsuario());
+                    u.setUsuario("u" + dto.getFichaUsuario()); // Ej: u12345
+
+                    return u;
+                });
+
+        // 3. Actualizamos los datos del usuario (sea nuevo o existente)
+        usuario.setNombre(dto.getNombreUsuario());
+        usuario.setExtension(dto.getExtension());
+        usuario.setGerencia(dto.getGerencia());
+        
+        // Guardamos el usuario en BD
+        usuario = usuarioRepo.save(usuario);
+
+        // 4. Crear el Encabezado del Recibo
+        EncabezadoRecibo recibo = new EncabezadoRecibo();
+        recibo.setFmoEquipo(dto.getFmoEquipo());
+        recibo.setFecha(dto.getFecha());
+        recibo.setUsuarioRelacion(usuario); // Vinculamos al usuario recién guardado/actualizado
+        
+        // Guardamos el recibo
+        recibo = encabezadoRepo.save(recibo);
+
+        // 5. Crear la Relación Stock
+        RelacionStock relacion = new RelacionStock();
+        relacion.setStockId(stock);
+        relacion.setEncabezadoRelacion(recibo);
+
+        // Guardamos la relación final
+        relacionStockRepo.save(relacion);
+    }
+
+    // --- 4. LISTAR RELACIONES ---
+    public List<RelacionStockResponseDTO> listarRelacionesAsignadas() {
+        List<RelacionStock> relaciones = relacionStockRepo.findAll();
+
+        return relaciones.stream().map(rel -> {
+            RelacionStockResponseDTO dto = new RelacionStockResponseDTO();
+            dto.setIdRelacion(rel.getId());
+
+            if (rel.getStockId() != null) {
+                dto.setNombreItem(rel.getStockId().getNombreItem());
+                dto.setSerial(rel.getStockId().getSerial());
+            }
+
+            EncabezadoRecibo enc = rel.getEncabezadoRelacion();
+            if (enc != null) {
+                dto.setFmoEquipo(enc.getFmoEquipo());
+                dto.setFecha(enc.getFecha());
+
+                Usuario usu = enc.getUsuarioRelacion();
+                if (usu != null) {
+                    dto.setFicha(usu.getFicha());
+                    dto.setNombreUsuario(usu.getNombre());
+                    dto.setExtension(usu.getExtension());
+                    dto.setGerencia(usu.getGerencia());
+                }
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    // --- 5. NUEVO: DESVINCULAR (ELIMINAR RELACIÓN POR SERIAL) ---
+    @Transactional
+    public void desvincularPorSerial(String serial) {
+        // 1. Buscar el item en stock por Serial
+        ControlStock stock = stockRepo.findBySerial(serial)
+                .orElseThrow(() -> new RuntimeException("No existe ningún item registrado con el serial: " + serial));
+
+        // 2. Buscar si tiene una relación activa (si está asignado)
+        RelacionStock relacion = relacionStockRepo.findByStockId(stock)
+                .orElseThrow(() -> new RuntimeException("El item con serial " + serial + " existe, pero NO está asignado a ningún equipo."));
+
+        // 3. Eliminar la relación
+        // Al borrar el registro de la tabla intermedia, el item queda "libre" 
+        // y el check "existsByStockId" dará false en el futuro.
+        relacionStockRepo.delete(relacion);
     }
 }

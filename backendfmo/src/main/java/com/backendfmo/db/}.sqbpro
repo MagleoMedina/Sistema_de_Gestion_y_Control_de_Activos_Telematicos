@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="test.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="4258"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="control_stock" custom_title="0" dock_id="1" table="4,13:maincontrol_stock"/><dock_state state="000000ff00000000fd000000010000000200000401000002d4fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000000004010000015600ffffff000003790000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="SPRING_SESSION" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="104"/><column index="2" value="98"/><column index="3" value="131"/><column index="4" value="151"/><column index="5" value="202"/><column index="6" value="108"/><column index="7" value="144"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="control_stock" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="55"/><column index="2" value="88"/><column index="3" value="274"/><column index="4" value="84"/><column index="5" value="60"/><column index="6" value="78"/><column index="7" value="162"/><column index="8" value="122"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="perifericos" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="55"/><column index="2" value="84"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">BEGIN TRANSACTION;
+
+CREATE TABLE IF NOT EXISTS SPRING_SESSION (
+    PRIMARY_ID CHAR(36) NOT NULL,
+    SESSION_ID CHAR(36) NOT NULL,
+    CREATION_TIME INTEGER NOT NULL,
+    LAST_ACCESS_TIME INTEGER NOT NULL,
+    MAX_INACTIVE_INTERVAL INTEGER NOT NULL,
+    EXPIRY_TIME INTEGER NOT NULL,
+    PRINCIPAL_NAME VARCHAR(100),
+    CONSTRAINT SPRING_SESSION_PK PRIMARY KEY (PRIMARY_ID)
+);
+CREATE TABLE IF NOT EXISTS SPRING_SESSION_ATTRIBUTES (
+    SESSION_PRIMARY_ID CHAR(36) NOT NULL,
+    ATTRIBUTE_NAME VARCHAR(200) NOT NULL,
+    ATTRIBUTE_BYTES BLOB NOT NULL,
+    CONSTRAINT SPRING_SESSION_ATTRIBUTES_PK PRIMARY KEY (SESSION_PRIMARY_ID, ATTRIBUTE_NAME),
+    CONSTRAINT SPRING_SESSION_ATTRIBUTES_FK FOREIGN KEY (SESSION_PRIMARY_ID) REFERENCES SPRING_SESSION(PRIMARY_ID) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS actividad (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	nombre_de_actividad TEXT
+
+);
+CREATE TABLE IF NOT EXISTS aplicaciones (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	nombre TEXT
+);
+CREATE TABLE IF NOT EXISTS &quot;aplicaciones_recibo_equipos&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;aplicaciones&quot;	INTEGER,
+	&quot;recibo_de_equipos&quot;	INTEGER,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;aplicaciones&quot;) REFERENCES &quot;aplicaciones&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;recibo_de_equipos&quot;) REFERENCES &quot;recibo_de_equipos&quot;(&quot;id&quot;) ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS carpeta_de_red (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	nombre_carpeta Text 
+);
+CREATE TABLE IF NOT EXISTS &quot;carpeta_red_recibo&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;recibo_de_equipos&quot;	INTEGER,
+	&quot;carpeta_de_red&quot;	INTEGER,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;carpeta_de_red&quot;) REFERENCES &quot;carpeta_de_red&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;recibo_de_equipos&quot;) REFERENCES &quot;recibo_de_equipos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS componentes_computadora_internos (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	nombre TEXT
+);
+CREATE TABLE IF NOT EXISTS &quot;componentes_internos_cpu_daet&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;entregas_al_daet&quot;	INTEGER,
+	&quot;componentes_computadora_internos&quot;	INTEGER,
+	&quot;cantidad&quot;	INTEGER,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;componentes_computadora_internos&quot;) REFERENCES &quot;componentes_computadora_internos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;entregas_al_daet&quot;) REFERENCES &quot;entregas_al_daet&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;componentes_recibo&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;recibo_de_equipos&quot;	INTEGER,
+	&quot;componentes_computadora_internos&quot;	INTEGER,
+	&quot;cantidad&quot;	INTEGER,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;componentes_computadora_internos&quot;) REFERENCES &quot;componentes_computadora_internos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;recibo_de_equipos&quot;) REFERENCES &quot;recibo_de_equipos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;control_stock&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;perifericos&quot;	INTEGER,
+	&quot;componentes_computadora_internos&quot;	INTEGER,
+	&quot;categoria&quot;	TEXT,
+	&quot;marca&quot;	TEXT,
+	&quot;caracteristicas&quot;	TEXT,
+	&quot;serial&quot; TEXT,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;componentes_computadora_internos&quot;) REFERENCES &quot;componentes_computadora_internos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;perifericos&quot;) REFERENCES &quot;perifericos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	CONSTRAINT &quot;check_tipo_item&quot; CHECK((&quot;componentes_computadora_internos&quot; IS NOT NULL AND &quot;perifericos&quot; IS NULL) OR (&quot;componentes_computadora_internos&quot; IS NULL AND &quot;perifericos&quot; IS NOT NULL))
+);
+CREATE TABLE IF NOT EXISTS encabezado_recibo (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	usuario INTEGER,
+	fmo_equipo TEXT,
+	solicitud_DAET TEXT,
+	solicitud_ST TEXT,
+	entregado_por TEXT,
+	recibido_por TEXT,
+	asignado_a TEXT,
+	estatus TEXT,
+	falla TEXT,
+	fecha TEXT,
+	observacion TEXT,
+	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;entregas_al_daet&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;encabezado_recibo&quot;	INTEGER,
+	&quot;actividad&quot;	TEXT,
+	&quot;perifericos&quot;	TEXT,
+	&quot;fmo_serial&quot;	TEXT,
+	&quot;estado&quot;	TEXT,
+	&quot;identifique&quot;	TEXT,
+	&quot;componentes_computadora_internos&quot;	INTEGER,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;componentes_computadora_internos&quot;) REFERENCES &quot;componentes_computadora_internos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;encabezado_recibo&quot;) REFERENCES &quot;encabezado_recibo&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;perifericos&quot;) REFERENCES &quot;perifericos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS perifericos (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	nombre TEXT
+);
+CREATE TABLE IF NOT EXISTS &quot;recibo_de_equipos&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;encabezado_recibo&quot;	INTEGER,
+	&quot;respaldo&quot;	TEXT,
+	&quot;marca&quot;	TEXT,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;encabezado_recibo&quot;) REFERENCES &quot;encabezado_recibo&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;recibo_de_perifericos&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;encabezado_recibo&quot;	INTEGER,
+	&quot;componentes_computadora_internos&quot;	INTEGER,
+	&quot;fmo_serial&quot;	TEXT,
+	&quot;perifericos&quot;	INTEGER,
+	&quot;otro&quot;	TEXT,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;componentes_computadora_internos&quot;) REFERENCES &quot;componentes_computadora_internos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;encabezado_recibo&quot;) REFERENCES &quot;encabezado_recibo&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;perifericos&quot;) REFERENCES &quot;perifericos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;recibo_perifericos&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;recibo_de_equipos&quot;	INTEGER,
+	&quot;perifericos&quot;	INTEGER,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;perifericos&quot;) REFERENCES &quot;perifericos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;recibo_de_equipos&quot;) REFERENCES &quot;recibo_de_equipos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;serial_componentes&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;componentes_computadora_internos&quot;	INTEGER,
+	&quot;marca&quot;	TEXT,
+	&quot;serial&quot;	TEXT,
+	&quot;capacidad&quot;	TEXT,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;componentes_computadora_internos&quot;) REFERENCES &quot;componentes_computadora_internos&quot;(&quot;id&quot;) ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS &quot;serial_recibo&quot; (
+	&quot;id&quot;	INTEGER,
+	&quot;recibo_de_equipos&quot;	INTEGER,
+	&quot;serial_componentes&quot;	INTEGER,
+	&quot;observacion&quot;	TEXT,
+	PRIMARY KEY(&quot;id&quot; AUTOINCREMENT),
+	FOREIGN KEY(&quot;recibo_de_equipos&quot;) REFERENCES &quot;recibo_de_equipos&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(&quot;serial_componentes&quot;) REFERENCES &quot;serial_componentes&quot;(&quot;id&quot;) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS usuario (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	usuario TEXT,
+	clave TEXT,
+	ficha INTEGER,
+	nombre TEXT,
+	extension TEXT,
+	gerencia TEXT
+);
+CREATE TABLE IF NOT EXISTS usuario_sistema (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	username TEXT UNIQUE NOT NULL,
+	clave TEXT NOT NULL,
+	tipo TEXT 
+);
+CREATE TABLE IF NOT EXISTS casos_resueltos(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	usuario INTEGER,
+	fecha TEXT,
+	reporte TEXT,
+	atendido_por TEXT,
+	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (1,'MONITOR');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (2,'TECLADO');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (3,'MOUSE');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (4,'REGULADOR');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (5,'IMPRESORA');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (6,'SCANER');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (7,'PENDRIVES');
+INSERT INTO &quot;perifericos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (8,'TONER');
+
+INSERT INTO &quot;aplicaciones&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (1,'SIQUEL');
+INSERT INTO &quot;aplicaciones&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (2,'SAP');
+INSERT INTO &quot;aplicaciones&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (3,'AUTOCAD');
+INSERT INTO &quot;aplicaciones&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (4,'PROJECT');
+
+
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (3,'MEMORIA RAM');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (4,'DISCO DURO');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (5,'TARJETA MADRE');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (6,'PROCESADOR');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (7,'TARJETA DE VIDEO');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (8,'FUENTE DE PODER');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (9,'TARJETA DE RED');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (10,'FAN COOLER');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (11,'PILA');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (12,'WINDOWS');
+INSERT INTO &quot;componentes_computadora_internos&quot; (&quot;id&quot;,&quot;nombre&quot;) VALUES (13,'CANAIMA');
+
+INSERT INTO usuario_sistema (username, clave, tipo) VALUES ('magleo2003', 'vegetta777', 'ADMIN');
+COMMIT;
+</sql><current_tab id="0"/></tab_sql></sqlb_project>

@@ -4,8 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.backendfmo.models.stock.ControlStock;
-
+import java.util.Optional;
 @Repository
 public interface ControlStockRepository extends JpaRepository<ControlStock, Long> {
+
+    Optional<ControlStock> findBySerial(String serial);
 
 }

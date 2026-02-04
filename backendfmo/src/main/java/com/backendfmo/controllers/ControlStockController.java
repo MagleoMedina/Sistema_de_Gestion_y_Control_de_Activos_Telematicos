@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backendfmo.dtos.request.stock.AsignacionStockDTO;
+import com.backendfmo.dtos.request.stock.RelacionStockResponseDTO;
 import com.backendfmo.dtos.request.stock.StockCreateDTO;
 
 import jakarta.validation.Valid;
@@ -91,6 +93,35 @@ public class ControlStockController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // ENDPOINT 1: ASIGNAR STOCK A FMO (Registrar salida)
+    @PostMapping("/asignar")
+    public ResponseEntity<?> asignarStock(@RequestBody AsignacionStockDTO dto) {
+        try {
+            stockService.asignarStockAEquipo(dto);
+            return ResponseEntity.ok("Stock asignado correctamente al equipo " + dto.getFmoEquipo());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // ENDPOINT 2: LISTAR ASIGNACIONES
+    @GetMapping("/asignaciones")
+    public ResponseEntity<?> listarAsignaciones() {
+        return ResponseEntity.ok(stockService.listarRelacionesAsignadas());
+    }
+
+    // NUEVO ENDPOINT: Desvincular por serial
+    @DeleteMapping("/desvincular/{serial}")
+    public ResponseEntity<?> desvincularItem(@PathVariable String serial) {
+        try {
+            stockService.desvincularPorSerial(serial);
+            return ResponseEntity.ok("El item con serial " + serial + " ha sido desvinculado y devuelto al stock disponible.");
+        } catch (RuntimeException e) {
+            // Retorna 400 Bad Request con el mensaje del error (ej: "Serial no existe" o "No está asignado")
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

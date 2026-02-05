@@ -14,5 +14,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     //Buscar Por ficha
     @Query("SELECT u FROM Usuario u WHERE u.ficha = ?1")
     Optional<Usuario> findByFicha(Integer ficha);
+    // En UsuarioRepository.java
+    Optional<Usuario> findFirstByFicha(Integer ficha);
 }
 

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backendfmo.dtos.request.stock.AsignacionStockDTO;
 import com.backendfmo.dtos.request.stock.RelacionStockResponseDTO;
 import com.backendfmo.dtos.request.stock.StockCreateDTO;
+import com.backendfmo.dtos.request.stock.UsuarioAutocompletadoDTO;
+import com.backendfmo.models.reciboequipos.Usuario;
 
 import jakarta.validation.Valid;
 
@@ -35,6 +37,9 @@ public class ControlStockController {
 
     @Autowired
     private PerifericoRepository perifericoRepository;
+
+    @Autowired
+    private com.backendfmo.repository.UsuarioRepository usuarioRepo;
 
     // GET /api/stock -> Devuelve la lista completa formateada
     @GetMapping
@@ -134,5 +139,29 @@ public ResponseEntity<?> verRelacionStock(@PathVariable Long idStock) {
     } catch (RuntimeException e) {
         return ResponseEntity.status(404).body(e.getMessage());
     }
+}
+
+// NUEVO ENDPOINT: Buscar asignados por ficha
+    @GetMapping("/asignaciones/buscar/{ficha}")
+    public ResponseEntity<?> buscarAsignacionesPorFicha(@PathVariable Integer ficha) {
+        try {
+            return ResponseEntity.status(200).body(stockService.listarAsignacionesPorFicha(ficha));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error al buscar por ficha: " + e.getMessage());
+        }
+    }
+
+    // NUEVO ENDPOINT: Buscar datos de usuario por ficha
+@GetMapping("/usuario/{ficha}")
+public ResponseEntity<?> obtenerUsuarioPorFicha(@PathVariable Integer ficha) {
+    return usuarioRepo.findByFicha(ficha)
+        .map(u -> {
+            UsuarioAutocompletadoDTO dto = new UsuarioAutocompletadoDTO();
+            dto.setNombre(u.getNombre());
+            dto.setGerencia(u.getGerencia());
+            dto.setExtension(u.getExtension());
+            return ResponseEntity.ok(dto);
+        })
+        .orElse(ResponseEntity.notFound().build());
 }
 }

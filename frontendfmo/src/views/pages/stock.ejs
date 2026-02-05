@@ -73,7 +73,7 @@
         <%- include('../partials/sidebar') %>
 
         <div id="content" class="w-100 bg-light p-4">
-            
+
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
                     <h4 class="m-0 fw-bold text-dark">
@@ -114,30 +114,76 @@
             <div class="card shadow-sm border-0 fade-in">
                 <div class="card-header bg-white border-bottom-0 pt-3 px-4">
                     <ul class="nav nav-tabs card-header-tabs" id="stockTabs" role="tablist">
+
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="stock-tab" data-bs-toggle="tab" data-bs-target="#tab-stock" type="button">
-                                <i class="bi bi-list-ul me-2"></i>Inventario General
+                            <button class="nav-link active" id="stock-tab" data-bs-toggle="tab" data-bs-target="#tab-disponibles" type="button" onclick="cargarDisponibles()">
+                                <i class="bi bi-box-seam me-2"></i>Disponibles
                             </button>
                         </li>
-                        </ul>
+
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="asignados-tab" data-bs-toggle="tab" data-bs-target="#tab-asignados" type="button" onclick="cargarAsignados()">
+                                <i class="bi bi-person-badge me-2"></i>Asignados
+                            </button>
+                        </li>
+
+                    </ul>
                 </div>
-                
+
                 <div class="card-body p-0">
                     <div class="tab-content">
-                        
-                        <div class="tab-pane fade show active" id="tab-stock">
+
+                        <div class="tab-pane fade show active" id="tab-disponibles">
                             <div class="table-responsive">
                                 <table class="table table-custom align-middle mb-0">
                                     <thead>
                                         <tr>
                                             <th>Categoría / Item</th>
                                             <th>Detalles Técnicos</th>
-                                            <th>Serial (Único)</th>
+                                            <th>Serial</th>
                                             <th class="text-center">Estado</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tablaStock">
+                                    <tbody id="tablaDisponibles">
+                                        </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="tab-asignados">
+
+                            <div class="p-3 bg-light border-bottom">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-auto">
+                                        <label class="fw-bold text-muted small">Buscar por Ficha:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" id="inputBuscarFicha" class="form-control form-control-sm" placeholder="Ej: 12345">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-sm btn-primary" onclick="buscarAsignadosPorFicha()">
+                                            <i class="bi bi-search me-1"></i>Buscar
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="cargarAsignados()">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-custom align-middle mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Item / Serial</th>
+                                            <th>Asignado A</th>
+                                            <th>Ubicación (FMO)</th>
+                                            <th>Fecha</th>
+                                            <th class="text-center">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablaAsignados">
                                         </tbody>
                                 </table>
                             </div>
@@ -166,12 +212,10 @@
                                 <option value="PERIFERICO">Periférico Externo</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-muted">Tipo de Artículo</label>
                             <select class="form-select" id="selReferencia" required></select>
                         </div>
-
                         <div class="row g-2 mb-3">
                             <div class="col-6">
                                 <label class="form-label fw-bold small text-muted">Marca</label>
@@ -182,7 +226,6 @@
                                 <input type="text" class="form-control" id="inputSerial" placeholder="SN-12345" required>
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label fw-bold small text-muted">Características / Modelo</label>
                             <textarea class="form-control" id="inputCaract" rows="2" placeholder="Ej: 16GB RAM, Negro, USB..."></textarea>
@@ -209,10 +252,8 @@
                         <strong id="lblItemAsignar"></strong> <br>
                         <small class="text-muted" id="lblSerialAsignar"></small>
                     </div>
-                    
                     <form id="formAsignar">
                         <input type="hidden" id="hdnIdStockAsignar">
-                        
                         <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Datos del Equipo y Fecha</h6>
                         <div class="row g-2 mb-3">
                             <div class="col-6">
@@ -224,7 +265,6 @@
                                 <input type="date" class="form-control" id="asigFecha" required>
                             </div>
                         </div>
-
                         <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Datos del Usuario</h6>
                         <div class="row g-2 mb-2">
                             <div class="col-4">
@@ -251,6 +291,58 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-success" onclick="ejecutarAsignacion()">Confirmar Asignación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVerRelacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: linear-gradient(to right, #0d6efd, #0dcaf0);">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-info-circle-fill me-2"></i>Detalle de Asignación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted fw-bold">ITEM</small>
+                                <h5 class="mb-0 fw-bold text-dark" id="view_nombreItem"></h5>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted fw-bold">SERIAL</small>
+                                <div class="badge bg-dark fs-6 font-monospace" id="view_serial"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Ubicación Actual</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="small text-muted fw-bold">FMO Equipo</label>
+                            <p class="fs-5 fw-bold text-dark mb-0" id="view_fmo"></p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <label class="small text-muted fw-bold">Fecha Asignación</label>
+                            <p class="fs-6 mb-0" id="view_fecha"></p>
+                        </div>
+                        <div class="col-12"><hr class="my-1 text-muted opacity-25"></div>
+                        <div class="col-8">
+                            <label class="small text-muted fw-bold">Usuario Responsable</label>
+                            <p class="fw-bold text-dark mb-0" id="view_usuario"></p>
+                            <small class="text-muted" id="view_gerencia"></small>
+                        </div>
+                        <div class="col-4 text-end">
+                            <label class="small text-muted fw-bold">Ficha</label>
+                            <div class="fw-bold text-primary" id="view_ficha"></div>
+                            <small class="d-block mt-1">Ext: <span id="view_ext"></span></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -293,61 +385,7 @@
             </div>
         </div>
     </div>
-<div class="modal fade" id="modalVerRelacion" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header text-white" style="background: linear-gradient(to right, #0d6efd, #0dcaf0);">
-                <h5 class="modal-title fw-bold">
-                    <i class="bi bi-info-circle-fill me-2"></i>Detalle de Asignación
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4 bg-light">
-                <div class="card mb-3 border-0 shadow-sm">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <small class="text-muted fw-bold">ITEM</small>
-                            <h5 class="mb-0 fw-bold text-dark" id="view_nombreItem"></h5>
-                        </div>
-                        <div class="text-end">
-                            <small class="text-muted fw-bold">SERIAL</small>
-                            <div class="badge bg-dark fs-6 font-monospace" id="view_serial"></div>
-                        </div>
-                    </div>
-                </div>
 
-                <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Ubicación Actual</h6>
-                
-                <div class="row g-3">
-                    <div class="col-6">
-                        <label class="small text-muted fw-bold">FMO Equipo</label>
-                        <p class="fs-5 fw-bold text-dark mb-0" id="view_fmo"></p>
-                    </div>
-                    <div class="col-6 text-end">
-                        <label class="small text-muted fw-bold">Fecha Asignación</label>
-                        <p class="fs-6 mb-0" id="view_fecha"></p>
-                    </div>
-                    
-                    <div class="col-12"><hr class="my-1 text-muted opacity-25"></div>
-                    
-                    <div class="col-8">
-                        <label class="small text-muted fw-bold">Usuario Responsable</label>
-                        <p class="fw-bold text-dark mb-0" id="view_usuario"></p>
-                        <small class="text-muted" id="view_gerencia"></small>
-                    </div>
-                    <div class="col-4 text-end">
-                        <label class="small text-muted fw-bold">Ficha</label>
-                        <div class="fw-bold text-primary" id="view_ficha"></div>
-                        <small class="d-block mt-1">Ext: <span id="view_ext"></span></small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
     <%- include('../partials/modal') %>
 
     <script src="/js/utils/api.js"></script>

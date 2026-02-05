@@ -1,114 +1,141 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <%- include('../partials/head') %>
-    <title>Registro de Casos - Soporte FMO</title>
-    <style>
-        /* Paleta FMO para Títulos */
-        .text-fmo-gradient {
-            background: linear-gradient(135deg, #dd0303 0%, #fa812f 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .card-header-fmo {
-            background: linear-gradient(90deg, #dd0303 0%, #b90202 100%);
-            color: white;
-            border-bottom: 3px solid #fa812f;
-        }
-        .btn-fmo-primary {
-            background: linear-gradient(to right, #d6291c, #fa812f);
-            border: none;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        .btn-fmo-primary:hover {
-            box-shadow: 0 4px 12px rgba(214, 41, 28, 0.4);
-            transform: translateY(-2px);
-            color: white;
-        }
-    </style>
+        <title>Registro de Casos - Soporte FMO</title>
+        <style>
+            /* Paleta FMO para Títulos */
+            .text-fmo-gradient {
+                background: linear-gradient(135deg, #dd0303 0%, #fa812f 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .card-header-fmo {
+                background: linear-gradient(90deg, #dd0303 0%, #b90202 100%);
+                color: white;
+                border-bottom: 3px solid #fa812f;
+            }
+
+            .btn-fmo-primary {
+                background: linear-gradient(to right, #d6291c, #fa812f);
+                border: none;
+                color: white;
+                transition: all 0.3s ease;
+            }
+
+            .btn-fmo-primary:hover {
+                box-shadow: 0 4px 12px rgba(214, 41, 28, 0.4);
+                transform: translateY(-2px);
+                color: white;
+            }
+        </style>
 </head>
+
 <body>
     <div class="wrapper">
         <%- include('../partials/sidebar') %>
 
-        <div id="content" class="w-100 bg-light p-4 fade-in">
-            
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="fw-bold text-fmo-gradient mb-0">
-                        <i class="bi bi-headset me-2 text-danger"></i>Registro de Casos Resueltos
-                    </h2>
-                    <p class="text-muted mt-1">Control de atención y soporte a usuarios finales.</p>
+            <div id="content" class="w-100 bg-light p-4 fade-in">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold text-fmo-gradient mb-0">
+                            <i class="bi bi-headset me-2 text-danger"></i>Registro de Casos Resueltos
+                        </h2>
+                        <p class="text-muted mt-1">Control de atención y soporte a usuarios finales.</p>
+                    </div>
+                    <div class="text-end text-muted small">
+                        <i class="bi bi-calendar-event me-1"></i> Fecha Actual:
+                        <span class="fw-bold" id="lblFechaHoy"></span>
+                    </div>
                 </div>
-                <div class="text-end text-muted small">
-                    <i class="bi bi-calendar-event me-1"></i> Fecha Actual: 
-                    <span class="fw-bold" id="lblFechaHoy"></span>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header card-header-fmo py-3">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Formulario de Atención</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="formCasos" autocomplete="off">
+
+                            <h6 class="text-secondary fw-bold border-bottom pb-2 mb-3">
+                                <i class="bi bi-person-badge me-1"></i>Datos del Usuario
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-2">
+                                    <label class="form-label fw-bold small text-muted">Ficha <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="inputFicha" placeholder="Ej: 123456"
+                                        min="1">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small text-muted">Nombre Completo <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="inputNombre"
+                                        placeholder="Nombre y Apellido del trabajador">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-muted">Gerencia / Departamento <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="inputGerencia"
+                                        placeholder="Ubicación administrativa">
+                                </div>
+                            </div>
+
+                            <h6 class="text-secondary fw-bold border-bottom pb-2 mb-3">
+                                <i class="bi bi-clipboard-check me-1"></i>Detalles del Servicio
+                            </h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold small text-muted">Fecha de Atención <span
+                                            class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="inputFecha">
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold small text-muted">Atendido Por <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="selectTecnico"
+                                        placeholder="Nombre del analista">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small text-muted">FMO Equipo</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-cpu"></i></span>
+                                        <input type="text" class="form-control" id="inputEquipo"
+                                            placeholder="Ej: 119-XXXX">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small text-muted">Descripción del Reporte /
+                                        Solución <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="txtReporte" rows="4"
+                                        placeholder="Describa el problema reportado y la solución aplicada..."></textarea>
+                                    <div class="form-text">Sea detallado con la solución técnica aplicada.</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <button type="button" class="btn btn-outline-secondary px-4"
+                                    onclick="limpiarFormulario()">
+                                    <i class="bi bi-eraser me-2"></i>Limpiar
+                                </button>
+                                <button type="button" class="btn btn-fmo-primary px-5 fw-bold" onclick="guardarCaso()">
+                                    <i class="bi bi-save me-2"></i>Registrar Caso
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
+
             </div>
-
-            <div class="card shadow-sm border-0">
-                <div class="card-header card-header-fmo py-3">
-                    <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Formulario de Atención</h5>
-                </div>
-                <div class="card-body p-4">
-                    <form id="formCasos" autocomplete="off">
-                        
-                        <h6 class="text-secondary fw-bold border-bottom pb-2 mb-3">
-                            <i class="bi bi-person-badge me-1"></i>Datos del Usuario
-                        </h6>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-2">
-                                <label class="form-label fw-bold small text-muted">Ficha <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="inputFicha" placeholder="Ej: 123456" min="1">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Nombre Completo <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="inputNombre" placeholder="Nombre y Apellido del trabajador">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small text-muted">Gerencia / Departamento <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="inputGerencia" placeholder="Ubicación administrativa">
-                            </div>
-                        </div>
-
-                        <h6 class="text-secondary fw-bold border-bottom pb-2 mb-3">
-                            <i class="bi bi-clipboard-check me-1"></i>Detalles del Servicio
-                        </h6>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold small text-muted">Fecha de Atención <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="inputFecha">
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold small text-muted">Atendido Por <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="selectTecnico" placeholder="Nombre del analista">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label fw-bold small text-muted">Descripción del Reporte / Solución <span class="text-danger">*</span></label>
-                                <textarea class="form-control" id="txtReporte" rows="4" placeholder="Describa el problema reportado y la solución aplicada..."></textarea>
-                                <div class="form-text">Sea detallado con la solución técnica aplicada.</div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="button" class="btn btn-outline-secondary px-4" onclick="limpiarFormulario()">
-                                <i class="bi bi-eraser me-2"></i>Limpiar
-                            </button>
-                            <button type="button" class="btn btn-fmo-primary px-5 fw-bold" onclick="guardarCaso()">
-                                <i class="bi bi-save me-2"></i>Registrar Caso
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-        </div>
     </div>
 
     <%- include('../partials/modal') %>
 
-    <script src="/js/utils/api.js"></script>
-    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="/js/scripts/casosResueltos.js"></script> </body>
+        <script src="/js/utils/api.js"></script>
+        <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+        <script src="/js/scripts/casosResueltos.js"></script>
+</body>
+
 </html>

@@ -51,6 +51,7 @@ public class ControlStockServiceImpl {
         stock.setMarca(dto.getMarca());
         stock.setCaracteristicas(dto.getCaracteristicas());
         stock.setSerial(dto.getSerial());
+        
 
         String cat = dto.getCategoria() != null ? dto.getCategoria().toUpperCase() : "DESCONOCIDO";
         stock.setCategoria(cat);
@@ -136,7 +137,7 @@ public class ControlStockServiceImpl {
                     " ya se encuentra asignado a otro equipo. Desvincúlelo primero.");
         }
         // 2. Lógica de Usuario (Buscar o Crear)
-        Usuario usuario = usuarioRepo.findByFicha(dto.getFichaUsuario())
+        Usuario usuario = usuarioRepo.findFirstByFicha(dto.getFichaUsuario())
                 .orElseGet(() -> {
                     // Si no existe, instanciamos uno nuevo y configuramos credenciales por defecto
                     Usuario u = new Usuario();
@@ -254,5 +255,19 @@ public class ControlStockServiceImpl {
             }
         }
         return dto;
+    }
+
+    // --- 7. NUEVO: LISTAR ASIGNACIONES POR FICHA ---
+    public List<RelacionStockResponseDTO> listarAsignacionesPorFicha(Integer ficha) {
+        // Reutilizamos el método que ya trae toda la info y filtramos (o podrías crear una query en Repo)
+        return listarRelacionesAsignadas().stream()
+                .filter(dto -> dto.getFicha() != null && dto.getFicha().equals(ficha))
+                .collect(Collectors.toList());
+    }
+
+    // --- 8. NUEVO: BUSCAR USUARIO PARA AUTOCOMPLETADO ---
+    public Usuario buscarUsuarioPorFicha(Integer ficha) {
+        // Retorna el usuario si existe, o null si no
+        return usuarioRepo.findFirstByFicha(ficha).orElse(null);
     }
 }

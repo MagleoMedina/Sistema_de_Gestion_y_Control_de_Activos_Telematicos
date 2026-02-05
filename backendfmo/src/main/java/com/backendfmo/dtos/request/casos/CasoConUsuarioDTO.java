@@ -15,4 +15,5 @@ public class CasoConUsuarioDTO {
     private String fecha;
     private String reporte;
     private String atendidoPor;
+    private String equipo;
 }

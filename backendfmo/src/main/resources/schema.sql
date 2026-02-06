@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS casos_resueltos(
 	fecha TEXT,
 	reporte TEXT,
 	atendido_por TEXT,
-	equipo
+	equipo TEXT,
 	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 

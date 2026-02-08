@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS "recibo_de_perifericos" (
 	FOREIGN KEY("encabezado_recibo") REFERENCES "encabezado_recibo"("id") ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY("perifericos") REFERENCES "perifericos"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS "recibo_perifericos" (
+CREATE TABLE IF NOT EXISTS "perifericos_del_equipo" (
 	"id"	INTEGER,
 	"recibo_de_equipos"	INTEGER,
 	"perifericos"	INTEGER,

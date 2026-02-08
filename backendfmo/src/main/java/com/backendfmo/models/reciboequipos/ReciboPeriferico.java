@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "recibo_perifericos")
+@Table(name = "perifericos_del_equipo")
 @Data
 public class ReciboPeriferico {
 

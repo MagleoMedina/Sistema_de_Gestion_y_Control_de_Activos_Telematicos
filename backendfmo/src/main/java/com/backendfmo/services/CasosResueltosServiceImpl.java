@@ -42,6 +42,7 @@ public class CasosResueltosServiceImpl {
         nuevoCaso.setFecha(dto.getFecha());
         nuevoCaso.setReporte(dto.getReporte());
         nuevoCaso.setAtendidoPor(dto.getAtendidoPor());
+        nuevoCaso.setEquipo(dto.getEquipo());
 
         CasosResueltos casoGuardado = repository.save(nuevoCaso);
 
@@ -59,12 +60,14 @@ public class CasosResueltosServiceImpl {
         dto.setFicha(user.getFicha());
         dto.setNombre(user.getNombre());
         dto.setGerencia(user.getGerencia());
+   
 
         // 2. Mapeo de datos del Caso
         dto.setId(entidad.getId());
         dto.setFecha(entidad.getFecha());
         dto.setReporte(entidad.getReporte());
         dto.setAtendidoPor(entidad.getAtendidoPor());
+        dto.setEquipo(entidad.getEquipo());
 
         return dto;
     }

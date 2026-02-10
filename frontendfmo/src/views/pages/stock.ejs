@@ -3,7 +3,7 @@
 
 <head>
     <%- include('../partials/head') %>
-    <title>Inventario y Stock</title>
+    <title>Inventario y Asignaciones</title>
     <style>
         /* --- PALETA FMO --- */
         :root {
@@ -37,44 +37,14 @@
             color: var(--fmo-red);
         }
 
-        /* Botones Circulares de Acción */
-        .btn-circle {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            border-radius: 50%;
-            text-align: center;
-            font-size: 14px;
-            line-height: 1.42857;
-            transition: transform 0.2s;
-        }
-        .btn-circle:hover { transform: scale(1.2); }
-
-        /* Badge de Stock Bajo (Amarillo FMO) */
-        .badge-low-stock {
-            background-color: var(--fmo-yellow);
-            color: #333;
-            font-weight: bold;
-            animation: pulse-yellow 2s infinite;
-        }
-        @keyframes pulse-yellow {
-            0% { box-shadow: 0 0 0 0 rgba(250, 177, 47, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(250, 177, 47, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(250, 177, 47, 0); }
-        }
-
-        /* Tabla Estilizada (Gradiente Rojo) */
+        /* Tabla Estilizada */
         .table-custom thead {
             background: linear-gradient(135deg, var(--fmo-red-dark), var(--fmo-orange-red));
             color: white;
         }
         .table-custom tbody tr:hover {
-            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+            background-color: #fff5f5;
         }
-
-        /* Textos y Botones Personalizados */
-        .text-fmo-primary { color: var(--fmo-red); }
-        .text-fmo-dark { color: #8a0a0a; }
 
         .btn-fmo {
             background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange-red));
@@ -87,7 +57,6 @@
             box-shadow: 0 4px 10px rgba(214, 41, 28, 0.3);
         }
 
-        /* Tabs Personalizados */
         .nav-tabs .nav-link.active {
             color: var(--fmo-red-dark);
             border-top: 3px solid var(--fmo-red);
@@ -108,38 +77,35 @@
             <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
                 <div>
                     <h4 class="m-0 fw-bold text-dark">
-                        <i class="bi bi-clipboard-data-fill" style="vertical-align: bottom;"></i>
-                        Control de Stock y Repuestos
+                        <i class="bi bi-box-seam-fill text-fmo-primary me-2"></i>Control de Inventario
                     </h4>
-                    <p class="text-muted small m-0">Gestiona las entradas y salidas de material.</p>
+                    <p class="text-muted small m-0">Gestión de componentes, periféricos y asignaciones.</p>
                 </div>
                 <button class="btn btn-fmo shadow-sm" onclick="abrirModalAgregar()">
-                    <i class="fas fa-plus"></i> <i class="bi bi-node-plus-fill" style="vertical-align: bottom; margin-right: 5px;"></i>Agregar Nuevo Item
+                    <i class="bi bi-plus-circle me-2"></i>Registrar Nuevo Item
                 </button>
             </div>
 
             <div class="row g-4 mb-4 fade-in">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="card stock-card bg-white shadow-sm p-3 h-100">
                         <div class="d-flex justify-content-between align-items-center position-relative z-1">
                             <div>
-                                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Total Items</h6>
-                                <h2 class="fw-bold text-primary mb-0" id="totalItems">0</h2>
+                                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Items Disponibles</h6>
+                                <h2 class="fw-bold text-primary mb-0" id="totalLibres">0</h2>
                             </div>
-                            <div class="icon-bg text-primary"><i class="bi bi-table" style = "color: #000;"></i></div>
+                            <div class="icon-bg text-primary"><i class="bi bi-check-circle" style="color: #0d6efd;"></i></div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card stock-card bg-danger text-white shadow-sm p-3 h-100">
+                <div class="col-md-6">
+                    <div class="card stock-card bg-white shadow-sm p-3 h-100" style="border-left-color: #198754;">
                         <div class="d-flex justify-content-between align-items-center position-relative z-1">
                             <div>
-                                <h6 class="text-white-50 text-uppercase fw-bold" style="font-size: 0.8rem;">Stock Crítico</h6>
-                                <h2 class="fw-bold text-white mb-0" id="totalCritico">0</h2>
+                                <h6 class="text-muted text-uppercase fw-bold" style="font-size: 0.8rem;">Items Asignados</h6>
+                                <h2 class="fw-bold text-success mb-0" id="totalAsignados">0</h2>
                             </div>
-                            <div class="icon-bg text-white">
-                                <i class="bi bi-exclamation-triangle-fill" style="color: yellow;"></i>
-                            </div>
+                            <div class="icon-bg text-success"><i class="bi bi-person-check-fill" style="color: #198754;"></i></div>
                         </div>
                     </div>
                 </div>
@@ -149,54 +115,103 @@
                 <div class="card-header bg-white border-bottom-0 pt-3 px-4">
                     <ul class="nav nav-tabs card-header-tabs" id="stockTabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active fw-bold" id="comp-tab" data-bs-toggle="tab" data-bs-target="#tab-componentes" type="button" role="tab">
-                                <i class="bi bi-pc-display-horizontal" style = "vertical-align: bottom;"></i>
-                                Componentes Internos
+                            <button class="nav-link active" id="stock-tab" data-bs-toggle="tab" data-bs-target="#tab-disponibles" type="button" onclick="cargarDisponibles()">
+                                <i class="bi bi-box-seam me-2"></i>Disponibles
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link fw-bold" id="peri-tab" data-bs-toggle="tab" data-bs-target="#tab-perifericos" type="button" role="tab">
-                                <i class="bi bi-keyboard" style="vertical-align: bottom; margin-right: 3px;"></i>Periféricos
+                            <button class="nav-link" id="asignados-tab" data-bs-toggle="tab" data-bs-target="#tab-asignados" type="button" onclick="cargarAsignados()">
+                                <i class="bi bi-person-badge me-2"></i>Asignados
                             </button>
                         </li>
                     </ul>
                 </div>
                 
                 <div class="card-body p-0">
-                    <div class="tab-content" id="stockTabsContent">
+                    <div class="tab-content">
                         
-                        <div class="tab-pane fade show active" id="tab-componentes" role="tabpanel">
+                        <div class="tab-pane fade show active" id="tab-disponibles">
+                            
+                            <div class="p-3 bg-light border-bottom">
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-3">
+                                        <label class="form-label small fw-bold text-muted">Tipo de Item</label>
+                                        <select class="form-select form-select-sm" id="filtroTipo" onchange="actualizarDropdownNombres()">
+                                            <option value="">Todos</option>
+                                            <option value="COMPONENTE">Componentes Internos</option>
+                                            <option value="PERIFERICO">Periféricos Externos</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label small fw-bold text-muted">Nombre del Item</label>
+                                        <select class="form-select form-select-sm" id="filtroNombre" disabled>
+                                            <option value="">Seleccione Tipo Primero...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-sm btn-fmo w-100" onclick="aplicarFiltrosDisponibles()">
+                                            <i class="bi bi-search me-1"></i>Buscar
+                                        </button>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button class="btn btn-sm btn-outline-secondary w-100" onclick="limpiarFiltros()" title="Restablecer">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="table-responsive">
                                 <table class="table table-custom align-middle mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Item</th>
-                                            <th>Marca / Caracteristicas</th>
-                                            <th class="text-center">Stock Actual</th>
+                                            <th>Categoría / Item</th>
+                                            <th>Detalles Técnicos</th>
+                                            <th>Serial</th>
                                             <th class="text-center">Estado</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tablaComponentes">
-                                    </tbody>
+                                    <tbody id="tablaDisponibles">
+                                        </tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <div class="tab-pane fade" id="tab-perifericos" role="tabpanel">
+                        <div class="tab-pane fade" id="tab-asignados">
+                            
+                            <div class="p-3 bg-light border-bottom">
+                                <div class="row g-2 align-items-center">
+                                    <div class="col-auto">
+                                        <label class="fw-bold text-muted small">Buscar por Ficha:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" id="inputBuscarFicha" class="form-control form-control-sm" placeholder="Ej: 12345">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-sm btn-primary" onclick="buscarAsignadosPorFicha()">
+                                            <i class="bi bi-search me-1"></i>Buscar
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="cargarAsignados()">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="table-responsive">
                                 <table class="table table-custom align-middle mb-0">
                                     <thead>
                                         <tr>
-                                            <th>Item</th>
-                                            <th>Marca / Caracteristicas</th>
-                                            <th class="text-center">Stock Actual</th>
-                                            <th class="text-center">Estado</th>
+                                            <th>Item / Serial</th>
+                                            <th>Asignado A</th>
+                                            <th>Ubicación (FMO)</th>
+                                            <th>Fecha</th>
                                             <th class="text-center">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tablaPerifericos">
-                                    </tbody>
+                                    <tbody id="tablaAsignados">
+                                        </tbody>
                                 </table>
                             </div>
                         </div>
@@ -211,71 +226,186 @@
     <div class="modal fade" id="modalStock" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-zip-fill" style="vertical-align: bottom; margin-right: 3px;"></i>Ingreso de Inventario</h5>
+                <div class="modal-header bg-gradient text-white" style="background: var(--fmo-red);">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-qr-code-scan me-2"></i>Registrar Item</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="formStock">
-                        
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Categoría:</label>
+                            <label class="form-label fw-bold small text-muted">Categoría</label>
                             <select class="form-select" id="selCategoria" onchange="cargarListaItems()">
-                                <option value="COMPONENTE">Componentes Internos (RAM, Disco, etc.)</option>
-                                <option value="PERIFERICO">Periféricos (Mouse, Teclado, etc.)</option>
+                                <option value="COMPONENTE">Componente Interno</option>
+                                <option value="PERIFERICO">Periférico Externo</option>
                             </select>
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Tipo de Artículo:</label>
-                            <select class="form-select" id="selReferencia" required>
-                                <option value="">Seleccione...</option>
-                            </select>
-                            <div class="form-text">Listado basado en la categoría seleccionada.</div>
+                            <label class="form-label fw-bold small text-muted">Tipo de Artículo</label>
+                            <select class="form-select" id="selReferencia" required></select>
                         </div>
-
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="form-label fw-bold">Marca:</label>
-                                <input type="text" class="form-control" id="inputMarca" placeholder="Ej: Kingston" required>
+                                <label class="form-label fw-bold small text-muted">Marca</label>
+                                <input type="text" class="form-control" id="inputMarca" placeholder="Ej: HP" required>
                             </div>
                             <div class="col-6">
-                                <label class="form-label fw-bold">Modelo/Caracteristicas:</label>
-                                <input type="text" class="form-control" id="inputModelo" placeholder="Ej: 8GB DDR4" required>
+                                <label class="form-label fw-bold small text-muted">Serial</label>
+                                <input type="text" class="form-control" id="inputSerial" placeholder="SN-12345" required>
                             </div>
                         </div>
-
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Cantidad Inicial:</label>
-                            <input type="number" class="form-control" id="inputCantidad" value="1" min="1" required>
+                            <label class="form-label fw-bold small text-muted">Características / Modelo</label>
+                            <textarea class="form-control" id="inputCaract" rows="2" placeholder="Ej: 16GB RAM, Negro, USB..."></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="guardarNuevoStock()">Guardar</button>
+                    <button type="button" class="btn btn-fmo" onclick="guardarNuevoStock()">Guardar Registro</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="modalAsignar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-danger text-white bg-gradient-fmo-danger">
-                    <h5 class="modal-title fw-bold">Confirmar Eliminación</h5>
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-check-fill me-2"></i>Asignar a Trabajador</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body text-center p-4">
-                    <div class="mb-3 text-danger">
-                        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
+                <div class="modal-body">
+                    <div class="alert alert-light border-start border-4 border-success">
+                        <strong id="lblItemAsignar"></strong> <br>
+                        <small class="text-muted" id="lblSerialAsignar"></small>
                     </div>
-                    <p class="fs-5">¿Está seguro de que desea eliminar este registro del inventario?</p>
-                    <small class="text-muted">Esta acción es irreversible y afectará los reportes.</small>
+                    <form id="formAsignar">
+                        <input type="hidden" id="hdnIdStockAsignar">
+                        <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Datos del Equipo y Fecha</h6>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">FMO Equipo</label>
+                                <input type="text" class="form-control" id="asigFmo" placeholder="Ej: 998877" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Fecha</label>
+                                <input type="date" class="form-control" id="asigFecha" required>
+                            </div>
+                        </div>
+                        <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Datos del Usuario</h6>
+                        <div class="row g-2 mb-2">
+                            <div class="col-4">
+                                <label class="form-label small fw-bold">Ficha</label>
+                                <input type="number" class="form-control" id="asigFicha" required>
+                            </div>
+                            <div class="col-8">
+                                <label class="form-label small fw-bold">Nombre Completo</label>
+                                <input type="text" class="form-control" id="asigNombre" required>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Gerencia</label>
+                                <input type="text" class="form-control" id="asigGerencia">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Extensión</label>
+                                <input type="text" class="form-control" id="asigExtension">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="ejecutarAsignacion()">Confirmar Asignación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVerRelacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: linear-gradient(to right, #0d6efd, #0dcaf0);">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Detalle de Asignación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted fw-bold">ITEM</small>
+                                <h5 class="mb-0 fw-bold text-dark" id="view_nombreItem"></h5>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted fw-bold">SERIAL</small>
+                                <div class="badge bg-dark fs-6 font-monospace" id="view_serial"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 class="text-primary fw-bold border-bottom pb-2 mb-3">Ubicación Actual</h6>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="small text-muted fw-bold">FMO Equipo</label>
+                            <p class="fs-5 fw-bold text-dark mb-0" id="view_fmo"></p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <label class="small text-muted fw-bold">Fecha Asignación</label>
+                            <p class="fs-6 mb-0" id="view_fecha"></p>
+                        </div>
+                        <div class="col-12"><hr class="my-1 text-muted opacity-25"></div>
+                        <div class="col-8">
+                            <label class="small text-muted fw-bold">Usuario Responsable</label>
+                            <p class="fw-bold text-dark mb-0" id="view_usuario"></p>
+                            <small class="text-muted" id="view_gerencia"></small>
+                        </div>
+                        <div class="col-4 text-end">
+                            <label class="small text-muted fw-bold">Ficha</label>
+                            <div class="fw-bold text-primary" id="view_ficha"></div>
+                            <small class="d-block mt-1">Ext: <span id="view_ext"></span></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDesvincular" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-link-45deg me-2"></i>Desvincular Item</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <p class="fs-5">¿Desea liberar el item con serial <strong id="lblSerialDesvincular"></strong>?</p>
+                    <p class="small text-muted">El item regresará al estado "Disponible" en el inventario.</p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger px-4" onclick="ejecutarEliminacionStock()">Sí, Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning fw-bold" onclick="ejecutarDesvinculacion()">Sí, Liberar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">Eliminar Definitivamente</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="fs-5">¿Borrar el registro del inventario?</p>
+                    <small class="text-danger">Esta acción no se puede deshacer.</small>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="ejecutarEliminacionDb()">Eliminar</button>
                 </div>
             </div>
         </div>

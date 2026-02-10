@@ -16,6 +16,10 @@ public interface EncabezadoReciboRepository extends JpaRepository<EncabezadoReci
     @Query("SELECT e FROM EncabezadoRecibo e JOIN FETCH e.usuarioRelacion WHERE e.fmoEquipo = :fmo")
     List<EncabezadoRecibo> buscarPorFmoConUsuario(@Param("fmo") String fmoEquipo);
 
+    //Listar por ficha del usuario
+    @Query("SELECT e FROM EncabezadoRecibo e JOIN FETCH e.usuarioRelacion u WHERE u.ficha = :ficha")
+    List<EncabezadoRecibo> buscarPorFicha(@Param ("ficha") Integer ficha);
+
     List<EncabezadoRecibo> findByFmoEquipo(String fmoEquipo);
 
     List<EncabezadoRecibo> findByFecha(String fecha);

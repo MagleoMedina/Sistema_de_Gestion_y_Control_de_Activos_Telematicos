@@ -1,0 +1,29 @@
+meta {
+  name: Crear Asignacion
+  type: http
+  seq: 6
+}
+
+post {
+  url: 127.0.0.1:8081/api/stock/asignar
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "idStock": 15,
+    "fmoEquipo": "FMO-999222",
+    "fecha": "2026-02-04",
+    
+    "fichaUsuario": 12345,
+    "nombreUsuario": "Carlos Perez",
+    "extension": "4500",
+    "gerencia": "Planta de Pellas"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

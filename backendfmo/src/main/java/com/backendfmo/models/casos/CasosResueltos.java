@@ -40,4 +40,7 @@ public class CasosResueltos {
     
     @Column(name = "atendido_por")
     private String atendidoPor;
+
+    @Column(name = "equipo")
+    private String equipo;
 }

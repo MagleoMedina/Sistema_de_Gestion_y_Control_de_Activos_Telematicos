@@ -88,7 +88,7 @@ async function ejecutarBusqueda() {
     }
     else if (criterio === 'tecnico') {
         const val = document.getElementById('inputGenerico').value.trim();
-        if (!val) return; // En tiempo real no mostramos error si está vacío, solo no buscamos
+        if (!val) return; 
         
         const safeVal = encodeURIComponent(val.replace(/\//g, '-'));
         url = `/casos/buscarPorTecnico/${safeVal}`;
@@ -105,7 +105,6 @@ async function ejecutarBusqueda() {
         url = `/casos/rango-fechas/${inicio}/${fin}`;
     }
 
-    // Spinner de carga (Solo si no es búsqueda en tiempo real muy rápida, pero útil igual)
     if(criterio !== 'tecnico') {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-danger"></div><p>Buscando...</p></td></tr>';
     }
@@ -151,6 +150,11 @@ function renderizarTabla(lista) {
         const reporteCorto = item.reporte.length > 50 
             ? item.reporte.substring(0, 50) + '...' 
             : item.reporte;
+        
+        // MOSTRAR EQUIPO SI EXISTE
+        const badgeEquipo = item.equipo 
+            ? `<span class="badge bg-white text-dark border ms-1"><i class="bi bi-cpu"></i> ${item.equipo}</span>`
+            : '';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -159,7 +163,10 @@ function renderizarTabla(lista) {
             <td>
                 <div class="d-flex flex-column">
                     <span class="fw-bold text-dark">${item.nombre || 'Desconocido'}</span>
-                    <span class="small text-muted"><i class="bi bi-person-badge"></i> ${item.ficha}</span>
+                    <div class="mt-1">
+                        <span class="small text-muted"><i class="bi bi-person-badge"></i> ${item.ficha}</span>
+                        ${badgeEquipo}
+                    </div>
                 </div>
             </td>
             <td class="small text-muted">${item.gerencia || 'N/A'}</td>
@@ -185,6 +192,12 @@ function verDetalle(index) {
     document.getElementById('modal_tecnico').textContent = item.atendidoPor;
     document.getElementById('modal_gerencia').textContent = item.gerencia;
     document.getElementById('modal_reporte').textContent = item.reporte;
+    
+    // ASIGNAR EL EQUIPO AL MODAL
+    const elEquipo = document.getElementById('modal_equipo');
+    if (elEquipo) {
+        elEquipo.textContent = item.equipo || "No registrado";
+    }
 
     new bootstrap.Modal(document.getElementById('modalDetalleCaso')).show();
 }

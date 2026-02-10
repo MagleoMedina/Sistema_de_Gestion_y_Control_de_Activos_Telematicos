@@ -4,14 +4,33 @@ function cambiarFiltro() {
     const divTexto = document.getElementById('containerInputTexto');
     const divFecha = document.getElementById('containerInputFecha');
     const divVacio = document.getElementById('containerVacio');
+    
+    // Elementos dinámicos
+    const lblTexto = document.getElementById('lblInputTexto');
+    const inputTexto = document.getElementById('inputBusquedaFmo');
 
     divTexto.style.display = 'none';
     divFecha.style.display = 'none';
     divVacio.style.display = 'none';
 
-    if (filtro === 'fmo') divTexto.style.display = 'block';
-    else if (filtro === 'fecha') divFecha.style.display = 'block';
-    else divVacio.style.display = 'block';
+    if (filtro === 'fmo') {
+        divTexto.style.display = 'block';
+        lblTexto.textContent = "Ingrese el FMO del equipo:";
+        inputTexto.placeholder = "Ej: 119000";
+        inputTexto.type = "text";
+    }
+    else if (filtro === 'ficha') {
+        divTexto.style.display = 'block';
+        lblTexto.textContent = "Ingrese la Ficha del Usuario:";
+        inputTexto.placeholder = "Ej: 12345";
+        inputTexto.type = "number"; // Ayuda en móviles
+    }
+    else if (filtro === 'fecha') {
+        divFecha.style.display = 'block';
+    }
+    else {
+        divVacio.style.display = 'block';
+    }
 }
 
 // --- 2. BÚSQUEDA ---
@@ -27,10 +46,17 @@ async function buscarEquipos() {
             mostrarModal("Campo Vacío", "Ingrese un FMO o Serial para buscar.", "warning");
             return;
         }
-
-        // --- OPCIÓN RECOMENDADA: Reemplazar la barra por un guion o espacio ---
         const val = valRaw.replace(/\//g, '-'); 
         url = `/buscarReciboEquipos/${encodeURIComponent(val)}`;
+    }
+    else if (filtro === 'ficha') {
+        const valRaw = document.getElementById('inputBusquedaFmo').value.trim();
+        if (!valRaw) {
+            mostrarModal("Campo Vacío", "Ingrese un número de Ficha.", "warning");
+            return;
+        }
+        // Endpoint específico para búsqueda por ficha
+        url = `/buscarReciboEquipos/ficha/${encodeURIComponent(valRaw)}`;
     }
     else if (filtro === 'fecha') {
         const val = document.getElementById('inputBusquedaFecha').value;
@@ -248,14 +274,13 @@ function renderSerialRows(containerId, dataList, minRows = 1) {
 }
 
 
-// --- 4. ACTUALIZAR ESTATUS (CORREGIDO) ---
+// --- 4. ACTUALIZAR ESTATUS ---
 let idParaActualizar = null;
 
 function abrirModalActualizar(idEncabezado) {
     idParaActualizar = idEncabezado;
     const modalEl = document.getElementById('modalActualizarEstatus');
     
-    // IMPORTANTE: Verificar si ya existe instancia para no duplicar listeners/backdrop
     let modal = bootstrap.Modal.getInstance(modalEl);
     if (!modal) {
         modal = new bootstrap.Modal(modalEl);
@@ -269,7 +294,6 @@ async function confirmarActualizacion() {
     const url = `/reciboDeEquipos/${idParaActualizar}/estatus`;
     const payload = { estatus: "Listo" };
 
-    // Referencia al modal para cerrarlo
     const modalEl = document.getElementById('modalActualizarEstatus');
     const modalInstance = bootstrap.Modal.getInstance(modalEl);
 
@@ -279,14 +303,11 @@ async function confirmarActualizacion() {
             body: JSON.stringify(payload)
         });
         
-        // 1. CERRAR EL MODAL PRIMERO
         if (modalInstance) modalInstance.hide();
 
         if (!res) return;
 
         if (res.ok) {
-            // 2. MOSTRAR NOTIFICACIÓN DESPUÉS DE CERRAR EL MODAL
-            // Usamos un pequeño timeout para asegurar que la animación del modal termine
             setTimeout(() => {
                 mostrarModal(`
                     <strong>¡Estatus Actualizado!</strong><br>

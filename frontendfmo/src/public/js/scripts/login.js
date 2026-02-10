@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isOnline) {
             statusContainer.classList.remove('status-off');
             statusContainer.classList.add('status-on');
-            statusText.innerText = "SERVIDOR: ONLINE";
+            statusText.innerText = "SERVIDOR: EN LÍNEA";
         } else {
             statusContainer.classList.remove('status-on');
             statusContainer.classList.add('status-off');
-            statusText.innerText = "SERVIDOR: OFFLINE";
+            statusText.innerText = "SERVIDOR: FUERA DE LÍNEA";
         }
     }
 
@@ -63,12 +63,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
             } catch (error) {
+                console.error("Error capturado:", error);
+
+                // --- LÓGICA DE MANEJO DE ERRORES ---
+                let titulo = "Error de Acceso";
+                let mensaje = error.message;
+                let subtexto = "<small>Verifique sus credenciales.</small>";
+
+                // Detectar si el servidor está caído (Error de red)
+                if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+                    titulo = "Servidor No Disponible";
+                    mensaje = "No se pudo establecer conexión con el sistema.";
+                    subtexto = "<small>El servidor parece estar apagado o fuera de línea. Intente más tarde.</small>";
+                }
+
                 mostrarModal(`
-    <strong>Error de Acceso</strong><br>
-    ${error.message} <br>
-    <small>Verifique sus credenciales.</small>
-`, 'error');
-                console.error(error);
+                    <strong>${titulo}</strong><br>
+                    ${mensaje} <br>
+                    ${subtexto}
+                `, 'error');
+
             } finally {
                 // Restaurar botón
                 btnLogin.innerText = originalText;
@@ -77,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
     // =========================================================
     // 3. LÓGICA DE MOSTRAR/OCULTAR CONTRASEÑA
     // =========================================================

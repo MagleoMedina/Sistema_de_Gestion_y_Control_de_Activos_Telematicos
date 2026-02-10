@@ -20,9 +20,10 @@ async function guardarCaso() {
     const fecha = document.getElementById('inputFecha').value;
     const atendidoPor = document.getElementById('selectTecnico').value;
     const reporte = document.getElementById('txtReporte').value.trim();
+    const equipo = document.getElementById('inputEquipo').value.trim();
 
     // 2. Validación de Campos Vacíos
-    if (!ficha || !nombre || !gerencia || !fecha || !atendidoPor || !reporte) {
+    if (!ficha || !nombre || !gerencia || !fecha || !atendidoPor || !reporte || !equipo) {
         mostrarModal(
             "Campos Incompletos", 
             "Todos los campos marcados con asterisco (<span class='text-danger'>*</span>) son obligatorios para procesar el registro.", 
@@ -45,7 +46,7 @@ async function guardarCaso() {
         ficha: parseInt(ficha),
         nombre: nombre,
         gerencia: gerencia, 
-        // Datos Caso
+        equipo: equipo,
         fecha: fecha,
         atendidoPor: atendidoPor,
         reporte: reporte

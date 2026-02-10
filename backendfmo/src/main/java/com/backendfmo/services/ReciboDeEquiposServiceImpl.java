@@ -2,6 +2,7 @@ package com.backendfmo.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,14 +42,38 @@ public class ReciboDeEquiposServiceImpl{
 
     @Transactional
     public List<BusquedaCompletaDTO> guardarUsuariosYRecibos(RegistroTotalDTO dto) {
-        // ... (Creación de Usuario) ...
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setUsuario(dto.getUsuario());
-        nuevoUsuario.setClave(dto.getClave());
-        nuevoUsuario.setFicha(dto.getFicha());
-        nuevoUsuario.setNombre(dto.getNombre());
-        nuevoUsuario.setExtension(dto.getExtension());
-        nuevoUsuario.setGerencia(dto.getGerencia());
+// --- 1. LÓGICA DE USUARIO (CREAR O ACTUALIZAR) ---
+        Usuario usuarioProcesar;
+        
+        // Buscamos si ya existe un usuario con esa ficha
+        // Usamos findFirstByFicha por seguridad si hay duplicados antiguos, o findByFicha si es único
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByFicha(dto.getFicha());
+
+        if (usuarioExistente.isPresent()) {
+            // A. CASO EXISTE: ACTUALIZAMOS SUS DATOS
+            usuarioProcesar = usuarioExistente.get();
+            
+            // Sobrescribimos con lo que viene del formulario (permite correcciones)
+            usuarioProcesar.setNombre(dto.getNombre());
+            usuarioProcesar.setExtension(dto.getExtension());
+            usuarioProcesar.setGerencia(dto.getGerencia());
+            
+            // Opcional: Actualizar clave/usuario si el DTO trae valores no nulos
+            if(dto.getUsuario() != null && !dto.getUsuario().isEmpty()) {
+                usuarioProcesar.setUsuario(dto.getUsuario());
+            }
+        } else {
+            // B. CASO NUEVO: CREAMOS DESDE CERO
+            usuarioProcesar = new Usuario();
+            usuarioProcesar.setFicha(dto.getFicha());
+            usuarioProcesar.setNombre(dto.getNombre());
+            usuarioProcesar.setExtension(dto.getExtension());
+            usuarioProcesar.setGerencia(dto.getGerencia());
+            
+        }
+
+        // Guardamos (Update o Insert)
+        usuarioProcesar = usuarioRepository.save(usuarioProcesar);
 
         if (dto.getRecibos() != null) {
             for (EncabezadoDTO encDto : dto.getRecibos()) {
@@ -194,10 +219,10 @@ public class ReciboDeEquiposServiceImpl{
                         encabezado.agregarEquipo(equipo);
                     }
                 }
-                nuevoUsuario.agregarRecibo(encabezado);
+                usuarioProcesar.agregarRecibo(encabezado);
             }
         }
-        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
+        Usuario usuarioGuardado = usuarioRepository.save(usuarioProcesar);
 
         // --- 2. CAMBIO: CONVERSIÓN FINAL A DTO ---
         // En lugar de devolver 'usuarioGuardado', convertimos la respuesta a DTOs planos
@@ -320,6 +345,25 @@ public class ReciboDeEquiposServiceImpl{
         // Al ejecutar esto, JPA busca la lista de equipos, perifericos, etc.,
         // y lanza los DELETE correspondientes automáticamente.
         encabezadoRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BusquedaCompletaDTO> buscarPorFicha (Integer ficha){
+        // 1. Buscamos por ficha
+        List<EncabezadoRecibo> listaEncabezados = encabezadoRepository.buscarPorFicha(ficha);
+
+        if (listaEncabezados.isEmpty()) {
+            throw new RuntimeException("No se encontró ningún recibo con la ficha: " + ficha);
+        }
+
+        List<BusquedaCompletaDTO> respuestaLista = new ArrayList<>();
+
+        // 2. Usamos el método auxiliar para convertir cada elemento
+        for (EncabezadoRecibo encabezado : listaEncabezados) {
+            respuestaLista.add(convertirEntidadADTO(encabezado));
+        }
+
+        return respuestaLista;
     }
 
     private BusquedaCompletaDTO convertirEntidadADTO(EncabezadoRecibo encabezado) {

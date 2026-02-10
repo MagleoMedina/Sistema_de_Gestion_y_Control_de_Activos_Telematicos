@@ -37,7 +37,7 @@
             color: white;
         }
         .table-custom tbody tr:hover {
-            background-color: #fff5f5; /* Fondo rosado muy pálido al hover */
+            background-color: #fff5f5;
         }
 
         /* Modal Header */
@@ -72,14 +72,14 @@
                             <select class="form-select" id="filtroSelect" onchange="cambiarFiltro()">
                                 <option value="todo">Listar Todo</option>
                                 <option value="serial">Serial</option>
+                                <option value="ficha">Ficha de Usuario</option>
                                 <option value="fecha">Fecha</option>
                             </select>
                         </div>
                         
                         <div class="col-md-7" id="containerInputSerial" style="display: none;">
-                            <label class="form-label small fw-bold text-fmo-title">Ingrese el FMO/Serial:</label>
-                            <input type="text" class="form-control" id="inputBusquedaSerial"
-                                placeholder="Ej: CN-A0jX3W... o FMO-123">
+                            <label class="form-label small fw-bold text-fmo-title" id="lblInputSerial">Ingrese el FMO/Serial:</label>
+                            <input type="text" class="form-control" id="inputBusquedaSerial" placeholder="Ej: CN-A0jX3W... o FMO-123">
                         </div>
                         
                         <div class="col-md-7" id="containerInputFecha" style="display: none;">

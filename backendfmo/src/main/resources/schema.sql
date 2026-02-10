@@ -74,9 +74,8 @@ CREATE TABLE IF NOT EXISTS "control_stock" (
 	"componentes_computadora_internos"	INTEGER,
 	"categoria"	TEXT,
 	"marca"	TEXT,
-	"cantidad"	INTEGER DEFAULT 0,
-	"fecha_actualizacion"	TEXT DEFAULT CURRENT_TIMESTAMP,
 	"caracteristicas"	TEXT,
+	"serial" TEXT UNIQUE,
 	PRIMARY KEY("id" AUTOINCREMENT),
 	FOREIGN KEY("componentes_computadora_internos") REFERENCES "componentes_computadora_internos"("id") ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY("perifericos") REFERENCES "perifericos"("id") ON UPDATE CASCADE ON DELETE CASCADE,
@@ -135,7 +134,7 @@ CREATE TABLE IF NOT EXISTS "recibo_de_perifericos" (
 	FOREIGN KEY("encabezado_recibo") REFERENCES "encabezado_recibo"("id") ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY("perifericos") REFERENCES "perifericos"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE TABLE IF NOT EXISTS "recibo_perifericos" (
+CREATE TABLE IF NOT EXISTS "perifericos_del_equipo" (
 	"id"	INTEGER,
 	"recibo_de_equipos"	INTEGER,
 	"perifericos"	INTEGER,
@@ -165,7 +164,7 @@ CREATE TABLE IF NOT EXISTS usuario (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	usuario TEXT,
 	clave TEXT,
-	ficha INTEGER,
+	ficha INTEGER UNIQUE,
 	nombre TEXT,
 	extension TEXT,
 	gerencia TEXT
@@ -182,7 +181,16 @@ CREATE TABLE IF NOT EXISTS casos_resueltos(
 	fecha TEXT,
 	reporte TEXT,
 	atendido_por TEXT,
+	equipo TEXT,
 	FOREIGN KEY(usuario) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS relacion_stock(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	control_stock INTEGER,
+	encabezado_recibo INTEGER,
+	FOREIGN KEY(control_stock) REFERENCES control_stock(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
@@ -199,8 +207,7 @@ INSERT INTO "aplicaciones" ("id","nombre") VALUES (2,'SAP');
 INSERT INTO "aplicaciones" ("id","nombre") VALUES (3,'AUTOCAD');
 INSERT INTO "aplicaciones" ("id","nombre") VALUES (4,'PROJECT');
 
-INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (1,'');
-INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (2,'');
+
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (3,'MEMORIA RAM');
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (4,'DISCO DURO');
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (5,'TARJETA MADRE');

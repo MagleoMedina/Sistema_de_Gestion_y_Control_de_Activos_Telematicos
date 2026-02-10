@@ -5,8 +5,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Iniciar Validaciones de Exclusividad
     initValidations();
-});
 
+    // 3. Listener para Ficha (Opcional, ya que lo agregamos en el HTML con onchange, 
+    // pero es buena práctica tenerlo aquí también por si acaso)
+    const inputFicha = document.getElementById('ficha');
+    if (inputFicha) {
+        inputFicha.addEventListener('change', buscarDatosUsuario);
+    }
+});
+// =========================================================
+// LÓGICA DE AUTOCOMPLETADO (USUARIO - UPSERT)
+// =========================================================
+async function buscarDatosUsuario() {
+    const fichaVal = document.getElementById('ficha').value;
+    
+    // Referencias usando tu nomenclatura existente
+    const elUsuario = document.getElementById('usuario'); // Este actúa como Nombre
+    const elGerencia = document.getElementById('gerencia');
+    const elExt = document.getElementById('ext');
+
+
+    if (!fichaVal) return;
+
+    // Feedback visual
+    const placeholderOriginal = elUsuario.placeholder;
+    elUsuario.placeholder = "Buscando...";
+    elUsuario.value = ""; 
+
+    try {
+        const res = await ApiService.fetchAutenticado(`/stock/usuario/${fichaVal}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            
+            // A. EXISTE: Autocompletar
+            elUsuario.value = data.nombre || "";
+            elGerencia.value = data.gerencia || "";
+            elExt.value = data.extension || "";
+            
+            mostrarModal("Usuario encontrado. Datos cargados.", "success");
+        } else {
+            // B. NUEVO: Limpiar para permitir escritura
+            elUsuario.value = "";
+            elGerencia.value = "";
+            elExt.value = "";
+            
+            elUsuario.placeholder = "Ingrese nombre del nuevo trabajador";
+        }
+    } catch (error) {
+        console.error("Error buscando usuario:", error);
+    } finally {
+        if(!elUsuario.value) elUsuario.placeholder = placeholderOriginal || "Nombre Apellido";
+    }
+}
 // --- LÓGICA DE VALIDACIÓN VISUAL (DINÁMICA) ---
 function initValidations() {
     const checkboxes = document.querySelectorAll('.peri-check');

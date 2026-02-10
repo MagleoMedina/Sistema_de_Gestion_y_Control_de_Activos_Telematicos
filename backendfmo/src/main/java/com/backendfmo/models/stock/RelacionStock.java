@@ -25,11 +25,11 @@ public class RelacionStock {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "stock_id")
+    @JoinColumn(name = "control_stock")
     private ControlStock stockId;
 
     @ManyToOne
-    @JoinColumn(name = "encabezado_id")
+    @JoinColumn(name = "encabezado_recibo")
     private EncabezadoRecibo encabezadoRelacion;
 
 

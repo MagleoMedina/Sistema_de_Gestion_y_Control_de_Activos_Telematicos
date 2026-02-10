@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS usuario (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	usuario TEXT,
 	clave TEXT,
-	ficha INTEGER,
+	ficha INTEGER UNIQUE,
 	nombre TEXT,
 	extension TEXT,
 	gerencia TEXT
@@ -220,5 +220,4 @@ INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (11,'PILA'
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (12,'WINDOWS');
 INSERT INTO "componentes_computadora_internos" ("id","nombre") VALUES (13,'CANAIMA');
 
-INSERT INTO usuario_sistema (username, clave, tipo) VALUES ('magleo2003', 'vegetta777', 'ADMIN');
 COMMIT;

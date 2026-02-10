@@ -36,7 +36,7 @@ public class Usuario {
     @Column(name = "clave")
     private String clave;
 
-    @Column(name = "ficha")
+    @Column(name = "ficha", unique = true)
     private Integer ficha;
 
     @Column(name = "nombre")

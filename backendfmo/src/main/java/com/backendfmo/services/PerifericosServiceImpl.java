@@ -2,6 +2,7 @@ package com.backendfmo.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +38,39 @@ public class PerifericosServiceImpl {
 
     @Transactional
     public Usuario registrarPerifericos(RegistroPerifericosDTO dto) {
-        // 1. Crear Usuario (Abuelo)
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setUsuario(dto.getUsuario());
-        nuevoUsuario.setGerencia(dto.getGerencia());
-        nuevoUsuario.setFicha(dto.getFicha());
-        nuevoUsuario.setExtension(dto.getExtension());
+
+        Usuario usuarioProcesar;
+
+        // Buscamos si ya existe un usuario con esa ficha
+        // Usamos findFirstByFicha por seguridad si hay duplicados antiguos, o
+        // findByFicha si es único
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByFicha(dto.getFicha());
+
+        if (usuarioExistente.isPresent()) {
+            // A. CASO EXISTE: ACTUALIZAMOS SUS DATOS
+            usuarioProcesar = usuarioExistente.get();
+
+            // Sobrescribimos con lo que viene del formulario (permite correcciones)
+            usuarioProcesar.setUsuario(dto.getUsuario());
+            usuarioProcesar.setExtension(dto.getExtension());
+            usuarioProcesar.setGerencia(dto.getGerencia());
+
+            // Opcional: Actualizar clave/usuario si el DTO trae valores no nulos
+            if (dto.getUsuario() != null && !dto.getUsuario().isEmpty()) {
+                usuarioProcesar.setUsuario(dto.getUsuario());
+            }
+        } else {
+            // B. CASO NUEVO: CREAMOS DESDE CERO
+            usuarioProcesar = new Usuario();
+            usuarioProcesar.setFicha(dto.getFicha());
+            usuarioProcesar.setUsuario(dto.getUsuario());
+            usuarioProcesar.setExtension(dto.getExtension());
+            usuarioProcesar.setGerencia(dto.getGerencia());
+
+        }
+
+        // Guardamos (Update o Insert)
+        usuarioProcesar = usuarioRepository.save(usuarioProcesar);
 
         // 2. Crear Encabezado (Padre)
         EncabezadoRecibo encabezado = new EncabezadoRecibo();
@@ -53,7 +81,7 @@ public class PerifericosServiceImpl {
         encabezado.setEntregadoPor(dto.getEntregadoPor());
         encabezado.setRecibidoPor(dto.getRecibidoPor());
         encabezado.setAsignadoA(dto.getAsignadoA());
-        
+
         encabezado.setEstatus(dto.getEstatus());
         encabezado.setFecha(dto.getFecha());
         encabezado.setFalla(dto.getFalla());
@@ -64,19 +92,20 @@ public class PerifericosServiceImpl {
         // 3. CASO A: PROCESAR COMPONENTES (Dropdown)
         if (dto.getComponentePerifericos() != null && !dto.getComponentePerifericos().isEmpty()) {
             for (ComponenteItemDTO itemDto : dto.getComponentePerifericos()) {
-                
+
                 // Buscar componente existente
                 ComponenteInterno componenteBD = componenteRepository.findById(itemDto.getIdComponente())
-                    .orElseThrow(() -> new RuntimeException("Componente no encontrado con ID: " + itemDto.getIdComponente()));
+                        .orElseThrow(() -> new RuntimeException(
+                                "Componente no encontrado con ID: " + itemDto.getIdComponente()));
 
                 // Crear nueva entidad por cada ítem
                 ReciboDePerifericos itemRecibo = new ReciboDePerifericos();
-                
+
                 itemRecibo.setComponenteRef(componenteBD);
                 itemRecibo.setFmoSerial(dto.getFmoSerial()); // Serial General
-                
+
                 // Si tienes columna 'otro' en la tabla, puedes dejarla null o vacía aquí
-                // itemRecibo.setOtro(null); 
+                // itemRecibo.setOtro(null);
 
                 encabezado.agregarPeriferico(itemRecibo);
             }
@@ -90,13 +119,14 @@ public class PerifericosServiceImpl {
 
                 // Buscar en catálogo
                 Periferico perifericoCatalogo = perifericoCatalogoRepository.findById(perifDto.getId())
-                     .orElseThrow(() -> new RuntimeException("Periférico no encontrado con ID: " + perifDto.getId()));
+                        .orElseThrow(
+                                () -> new RuntimeException("Periférico no encontrado con ID: " + perifDto.getId()));
 
                 ReciboDePerifericos itemRecibo = new ReciboDePerifericos();
-                
+
                 itemRecibo.setPerifericoRef(perifericoCatalogo);
                 itemRecibo.setFmoSerial(dto.getFmoSerial()); // Serial General
-                
+
                 encabezado.agregarPeriferico(itemRecibo);
             }
             itemProcesado = true;
@@ -105,27 +135,28 @@ public class PerifericosServiceImpl {
         // 5. CASO C: PROCESAR "OTRO" (Solo Texto)
         // Si no se procesaron componentes ni periféricos, Y hay texto en 'otro'
         if (!itemProcesado && dto.getOtro() != null && !dto.getOtro().trim().isEmpty()) {
-            
+
             ReciboDePerifericos itemRecibo = new ReciboDePerifericos();
-            
+
             itemRecibo.setFmoSerial(dto.getFmoSerial());
             itemRecibo.setOtro(dto.getOtro()); // Guardamos el texto manual
-            
-            // ComponenteRef y PerifericoRef quedarán en NULL, lo cual es correcto para "Otros"
-            
+
+            // ComponenteRef y PerifericoRef quedarán en NULL, lo cual es correcto para
+            // "Otros"
+
             encabezado.agregarPeriferico(itemRecibo);
         }
 
         // 6. VINCULAR Encabezado al Usuario
-        nuevoUsuario.agregarRecibo(encabezado);
+        usuarioProcesar.agregarRecibo(encabezado);
 
         // 7. GUARDAR
-        return usuarioRepository.save(nuevoUsuario);
+        return usuarioRepository.save(usuarioProcesar);
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<ReciboPerifericosDTO> buscarPorSerial(String fmoSerial) {
-        
+
         // 1. Buscar TODOS los registros que coincidan con el serial
         List<ReciboDePerifericos> resultados = perifericoRepository.findByFmoSerial(fmoSerial);
 
@@ -135,13 +166,13 @@ public class PerifericosServiceImpl {
 
         // 2. Convertir cada resultado encontrado en un DTO
         return resultados.stream()
-            .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
-            .collect(Collectors.toList());
+                .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
+                .collect(Collectors.toList());
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<ReciboPerifericosDTO> buscarPorFecha(String fecha) {
-        
+
         // 1. Buscar TODOS los registros que coincidan con el serial
         List<ReciboDePerifericos> resultados = perifericoRepository.findByFechaEncabezado(fecha);
 
@@ -151,13 +182,13 @@ public class PerifericosServiceImpl {
 
         // 2. Convertir cada resultado encontrado en un DTO
         return resultados.stream()
-            .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
-            .collect(Collectors.toList());
+                .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
+                .collect(Collectors.toList());
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<ReciboPerifericosDTO> listarTodoReciboPerifericos() {
-        
+
         // 1. Buscar TODOS los registros que coincidan con el serial
         List<ReciboDePerifericos> resultados = perifericoRepository.findAll();
 
@@ -167,15 +198,16 @@ public class PerifericosServiceImpl {
 
         // 2. Convertir cada resultado encontrado en un DTO
         return resultados.stream()
-            .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
-            .collect(Collectors.toList());
+                .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
+                .collect(Collectors.toList());
     }
 
-@Transactional(readOnly = true)
-    public List<ReciboPerifericosDTO> listarPorRangoDeFechas(String fechaInicio, String fechaFinalizacion){
-        
+    @Transactional(readOnly = true)
+    public List<ReciboPerifericosDTO> listarPorRangoDeFechas(String fechaInicio, String fechaFinalizacion) {
+
         // 1. Buscar TODOS los registros que coincidan con el serial
-        List<ReciboDePerifericos> resultados = perifericoRepository.findByFechaEncabezadoBetween(fechaInicio, fechaFinalizacion);
+        List<ReciboDePerifericos> resultados = perifericoRepository.findByFechaEncabezadoBetween(fechaInicio,
+                fechaFinalizacion);
 
         if (resultados.isEmpty()) {
             throw new RuntimeException("No se encontraron registros de periféricos con esa fecha.");
@@ -183,13 +215,13 @@ public class PerifericosServiceImpl {
 
         // 2. Convertir cada resultado encontrado en un DTO
         return resultados.stream()
-            .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
-            .collect(Collectors.toList());
+                .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
+                .collect(Collectors.toList());
     }
 
-@Transactional(readOnly = true)
+    @Transactional(readOnly = true)
     public List<ReciboPerifericosDTO> buscarPorFicha(Integer ficha) {
-        
+
         // 1. Buscar TODOS los registros que coincidan con el serial
         List<ReciboDePerifericos> resultados = perifericoRepository.findByFichaUsuario(ficha);
 
@@ -199,58 +231,58 @@ public class PerifericosServiceImpl {
 
         // 2. Convertir cada resultado encontrado en un DTO
         return resultados.stream()
-            .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
-            .collect(Collectors.toList());
+                .map(this::convertirADTO) // Llamamos a un método auxiliar para limpiar el código
+                .collect(Collectors.toList());
     }
 
-// Método auxiliar corregido
+    // Método auxiliar corregido
     private ReciboPerifericosDTO convertirADTO(ReciboDePerifericos perifericoHijo) {
         ReciboPerifericosDTO response = new ReciboPerifericosDTO();
-        
+
         // Obtener Padre (Encabezado)
         EncabezadoRecibo encabezado = perifericoHijo.getEncabezadoRelacion();
-        if (encabezado == null) return response; 
+        if (encabezado == null)
+            return response;
 
         // Obtener Abuelo (Usuario)
-        Usuario usuario = encabezado.getUsuarioRelacion(); 
+        Usuario usuario = encabezado.getUsuarioRelacion();
 
         // Mapear Datos del Usuario
         if (usuario != null) {
             // Asumiendo que el DTO tiene estos campos
             response.setNombre(usuario.getNombre());
-            response.setFicha(usuario.getFicha()); 
+            response.setFicha(usuario.getFicha());
             response.setUsuario(usuario.getUsuario());
             response.setExtension(usuario.getExtension());
             response.setGerencia(usuario.getGerencia());
-            
+
         }
-        
+
         // Mapear Datos del Encabezado
         response.setIdEncabezado(encabezado.getId());
         response.setSolicitudST(encabezado.getSolicitudST());
         response.setSolicitudDAET(encabezado.getSolicitudDAET());
         response.setEstatus(encabezado.getEstatus());
-        response.setFecha(encabezado.getFecha()); 
+        response.setFecha(encabezado.getFecha());
         response.setAsignadoA(encabezado.getAsignadoA());
         response.setRecibidoPor(encabezado.getRecibidoPor());
         response.setEntregadoPor(encabezado.getEntregadoPor());
         response.setFalla(encabezado.getFalla());
         response.setFmoEquipo(encabezado.getFmoEquipo());
-        
 
         List<ComponenteItemResponseDTO> listaComponentes = new ArrayList<>();
         List<PerifericoResponseDTO> listaCatalogo = new ArrayList<>();
-        
-        if (encabezado.getPerifericos() != null) { 
+
+        if (encabezado.getPerifericos() != null) {
             for (ReciboDePerifericos item : encabezado.getPerifericos()) {
-                
+
                 // CASO A: Es un Componente Interno (Disco, RAM, etc.)
                 if (item.getComponenteRef() != null) {
                     ComponenteItemResponseDTO itemDto = new ComponenteItemResponseDTO();
                     itemDto.setIdComponente(item.getComponenteRef().getId());
                     listaComponentes.add(itemDto);
-                } 
-                
+                }
+
                 // CASO B: Es un Periférico de Catálogo (Monitor, Teclado, etc.)
                 else if (item.getPerifericoRef() != null) {
                     PerifericoResponseDTO perDto = new PerifericoResponseDTO();
@@ -259,11 +291,11 @@ public class PerifericosServiceImpl {
                 }
             }
         }
-        
+
         // Asignamos las dos listas por separado
         response.setComponentePerifericos(listaComponentes);
         response.setPerifericos(listaCatalogo);
-        
+
         response.setFmoSerial(perifericoHijo.getFmoSerial());
         response.setOtro(perifericoHijo.getOtro());
 

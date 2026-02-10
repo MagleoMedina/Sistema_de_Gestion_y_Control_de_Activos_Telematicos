@@ -46,10 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- HELPER: OBTENER ROL ---
 function obtenerRolUsuario() {
-    const token = sessionStorage.getItem('jwt_token'); // Debug: Verificar token
+    const token = sessionStorage.getItem('jwt_token'); 
     if (!token) return 'SOPORTE';
     try {
-            // Decodificar el Payload del JWT (la segunda parte del string)
             const base64Url = token.split('.')[1];
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
@@ -57,12 +56,11 @@ function obtenerRolUsuario() {
             }).join(''));
 
             const payload = JSON.parse(jsonPayload);
-            //console.log("Payload del token:", payload);
-            return payload.tipo ||"SOPORTE"; // Retorna el rol o SOPORTE por defecto
+            return payload.tipo || "SOPORTE"; 
 
         } catch (e) {
             console.error("Error al leer rol del token:", e);
-            //return 'SOPORTE'; // Por seguridad, asumimos el rol más bajo si falla
+            return 'SOPORTE';
         }
 }
 
@@ -96,7 +94,7 @@ function actualizarDropdownNombres() {
 
     lista.forEach(item => {
         const opt = document.createElement('option');
-        opt.value = item.nombre; // Filtramos por nombre texto
+        opt.value = item.nombre; 
         opt.textContent = item.nombre;
         selectNombres.appendChild(opt);
     });
@@ -162,8 +160,9 @@ async function guardarNuevoStock() {
     try {
         const res = await ApiService.fetchAutenticado('/stock', { method: 'POST', body: JSON.stringify(payload) });
         if (res.ok) {
-            alert("Item registrado exitosamente."); // Alert simple para asegurar lectura antes de reload
-            window.location.reload(); // RECARGA PAGINA
+            // CAMBIO: Modal en lugar de alert
+            mostrarModal("Item registrado exitosamente.", 'success');
+            setTimeout(() => window.location.reload(), 1500); 
         } else {
             mostrarModal("Error al guardar. Verifique si el serial ya existe.", 'error');
         }
@@ -172,16 +171,24 @@ async function guardarNuevoStock() {
     }
 }
 
-// --- 4. CARGAR DISPONIBLES ---
+// --- 4. CARGAR DISPONIBLES (MODIFICADO PARA MANEJO DE ERRORES/VACIO) ---
 async function cargarDisponibles() {
     const tbody = document.getElementById('tablaDisponibles');
     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Cargando inventario...</td></tr>';
     try {
         const resStock = await ApiService.fetchAutenticado('/stock');
         const resAsig = await ApiService.fetchAutenticado('/stock/asignaciones');
-        if (!resStock.ok) throw new Error("Error al obtener inventario");
+        
+        // Manejo específico si el inventario está vacío (Backend retorna 404)
+        let dataStock = [];
+        if (resStock.status === 404) {
+            dataStock = []; // No es error, es que está vacío
+        } else if (!resStock.ok) {
+            throw new Error("Error al obtener inventario");
+        } else {
+            dataStock = await resStock.json();
+        }
 
-        const dataStock = await resStock.json();
         const dataAsig = resAsig.ok ? await resAsig.json() : [];
         const serialesAsignados = dataAsig.map(a => a.serial);
 
@@ -202,15 +209,15 @@ async function cargarDisponibles() {
 
 function renderTablaDisponibles(lista, tbody) {
     tbody.innerHTML = '';
-    const rol = obtenerRolUsuario(); // Verificamos rol
+    const rol = obtenerRolUsuario(); 
 
     if (lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay items que coincidan.</td></tr>';
+        // CAMBIO: Mensaje amigable en lugar de error
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">No se encontraron registros disponibles.</td></tr>';
         return;
     }
 
     lista.forEach(item => {
-        // Solo mostrar botón de eliminar si es ADMIN
         const btnEliminar = (rol === 'ADMIN') 
             ? `<button class="btn btn-sm btn-outline-danger ms-1" onclick="abrirEliminar(${item.id})" title="Borrar del Sistema"><i class="bi bi-trash3"></i></button>`
             : '';
@@ -278,7 +285,6 @@ function renderTablaAsignados(lista, tbody) {
     }
 
     lista.forEach(item => {
-        // Solo mostrar botón de desvincular si es ADMIN
         const btnDesvincular = (rol === 'ADMIN')
             ? `<button class="btn btn-sm btn-outline-warning" onclick="abrirDesvincular('${item.serial}')" title="Desvincular"><i class="bi bi-link-45deg"></i></button>`
             : '';
@@ -337,8 +343,9 @@ async function ejecutarAsignacion() {
     try {
         const res = await ApiService.fetchAutenticado('/stock/asignar', { method: 'POST', body: JSON.stringify(payload) });
         if (res.ok) {
-            alert("Equipo asignado correctamente.");
-            window.location.reload(); // RECARGA PAGINA
+            // CAMBIO: Modal y Reload
+            mostrarModal("Equipo asignado correctamente.", 'success');
+            setTimeout(() => window.location.reload(), 1500);
         } else {
             const txt = await res.text();
             mostrarModal(`Error: ${txt}`, 'error');
@@ -360,8 +367,9 @@ async function ejecutarDesvinculacion() {
     try {
         const res = await ApiService.fetchAutenticado(`/stock/desvincular/${safeSerial}`, { method: 'DELETE' });
         if (res.ok) {
-            alert("Item liberado correctamente.");
-            window.location.reload(); // RECARGA PAGINA
+            // CAMBIO: Modal y Reload
+            mostrarModal("Item liberado correctamente.", 'success');
+            setTimeout(() => window.location.reload(), 1500);
         } else {
             const txt = await res.text();
             mostrarModal(`No se pudo desvincular: ${txt}`, 'error');
@@ -381,8 +389,9 @@ async function ejecutarEliminacionDb() {
     try {
         const res = await ApiService.fetchAutenticado(`/stock/${tempIdEliminar}`, { method: 'DELETE' });
         if(res.ok) {
-            alert("Registro eliminado.");
-            window.location.reload(); // RECARGA PAGINA
+            // CAMBIO: Modal y Reload
+            mostrarModal("Registro eliminado.", 'success');
+            setTimeout(() => window.location.reload(), 1500);
         } else {
             mostrarModal("Error al eliminar. Verifique que no esté asignado.", 'error');
         }
@@ -404,12 +413,10 @@ function verDetalleAsignacion(item) {
 }
 
 function verRelacion(idStock) {
-    // Si necesitas llamar al endpoint GET /relacion/{id}
-    // En este flujo, ya tenemos los datos en el array de asignados, pero si lo usas, mantenlo así.
     ApiService.fetchAutenticado(`/stock/relacion/${idStock}`)
         .then(res => res.json())
         .then(data => {
-             verDetalleAsignacion(data); // Reutilizamos funcion visual
+             verDetalleAsignacion(data);
         })
         .catch(err => console.error(err));
 }

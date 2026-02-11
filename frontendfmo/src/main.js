@@ -1,9 +1,15 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
 
 // 1. Iniciar el servidor Express
 // Al requerir el archivo, el servidor comienza a escuchar en el puerto 3000
 const { PORT, HOST } = require('./server'); 
+
+
+/*
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+
+
+
 
 // 2. Configuración de Hot Reload
 // Esto recarga la ventana si cambias un HTML/EJS, 
@@ -50,3 +56,12 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
+
+*/
+
+// --- NUEVA LÓGICA PARA MODO NAVEGADOR ---
+console.log(`\n=======================================================`);
+console.log(`Sistema ejecutándose en MODO WEB (Electron deshabilitado)`);
+console.log(`👉 Abre tu navegador de preferencia y visita:`);
+console.log(`   http://${HOST}:${PORT}`);
+console.log(`=======================================================\n`);

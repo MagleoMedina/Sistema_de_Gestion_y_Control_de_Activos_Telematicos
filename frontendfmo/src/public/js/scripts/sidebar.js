@@ -7,54 +7,58 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.remove('no-transition');
     }, 50);
 
-    // 2. Toggle Sidebar (Colapsar/Expandir)
+    // 2. Toggle Sidebar (Colapsar/Expandir con el botón de hamburguesa)
     toggleBtn.addEventListener('click', () => {
         sidebar.classList.toggle('collapsed');
         const estadoActual = sidebar.classList.contains('collapsed');
         localStorage.setItem('sidebar-collapsed', estadoActual);
 
         if(estadoActual) {
-            // Cerrar submenú si se colapsa la barra
-            const submenu = document.getElementById('submenuRecibos');
-            if(submenu && submenu.classList.contains('show')) {
-                new bootstrap.Collapse(submenu, { toggle: false }).hide();
-            }
+            cerrarSubmenus(); // Helper para limpiar submenús abiertos
         }
     });
 
-    // 3. Funciones de Auto-Expandir al hacer clic
+    // 3. Funciones de Auto-Expandir al hacer clic en secciones principales
     const btnRecibos = document.getElementById('btnGrupoRecibos');
+    const btnCasos = document.getElementById('btnGrupoCasos'); // <--- NUEVO: Botón de Atención Usuario
     const btnPerfil = document.getElementById('dropdownUser1');
 
+    // A. Grupo Recibos
     if(btnRecibos) {
         btnRecibos.addEventListener('click', () => {
-            if (sidebar.classList.contains('collapsed')) {
-                sidebar.classList.remove('collapsed');
-                localStorage.setItem('sidebar-collapsed', 'false');
-            }
+            expandirSidebarSiEstaContraido();
         });
     }
+
+    // B. Grupo Casos (Atención Usuario) - NUEVA LÓGICA SOLICITADA
+    if(btnCasos) {
+        btnCasos.addEventListener('click', () => {
+            expandirSidebarSiEstaContraido();
+        });
+    }
+
+    // C. Perfil de Usuario
     if(btnPerfil){
         btnPerfil.addEventListener('click', () => {
-            if (sidebar.classList.contains('collapsed')) {
-                sidebar.classList.remove('collapsed');
-                localStorage.setItem('sidebar-collapsed', 'false');
-            }
+            expandirSidebarSiEstaContraido();
         });
+    }
+
+    function expandirSidebarSiEstaContraido() {
+        if (sidebar.classList.contains('collapsed')) {
+            sidebar.classList.remove('collapsed');
+            localStorage.setItem('sidebar-collapsed', 'false');
+        }
     }
 
     // 4. LÓGICA DE DATOS DE USUARIO (ROL Y NOMBRE)
     if (typeof ApiService !== 'undefined') {
-        
-        // A. Obtener Rol y Nombre
-        // Nota: Asumimos que ApiService tiene estos métodos. Si no, usamos el fallback del token.
         const rolUsuario = ApiService.obtenerRol();
         let nombreUsuario = "Usuario";
 
         if (typeof ApiService.obtenerUsuario === 'function') {
             nombreUsuario = ApiService.obtenerUsuario();
         } else {
-            // Fallback: Decodificar token manualmente si el método no existe en ApiService
             const token = sessionStorage.getItem('jwt_token');
             if (token) {
                 try {
@@ -64,13 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // B. Aplicar Nombre al Sidebar
         const lblUser = document.getElementById('lblUsuarioSidebar');
         if (lblUser && nombreUsuario) {
             lblUser.textContent = nombreUsuario;
         }
 
-        // C. Aplicar Permisos de Admin
         if (rolUsuario === 'ADMIN') {
             document.querySelectorAll('.admin-only').forEach(el => {
                 el.style.setProperty('display', 'block', 'important');
@@ -80,7 +82,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. ACTIVACIÓN INTELIGENTE DEL MENÚ POR URL
     activarLinkPorUrl();
+
+    // =========================================================
+    // 6. AUTO-COLAPSO (TIMER DE 5 SEGUNDOS) - NUEVA LÓGICA
+    // =========================================================
+    let collapseTimer;
+
+    // Cuando el mouse entra al sidebar, cancelamos el timer (usuario interactuando)
+    sidebar.addEventListener('mouseenter', () => {
+        if (collapseTimer) {
+            clearTimeout(collapseTimer);
+            collapseTimer = null;
+        }
+    });
+
+    // Cuando el mouse sale, iniciamos la cuenta regresiva
+    sidebar.addEventListener('mouseleave', () => {
+        // Solo iniciamos si NO está colapsado ya
+        if (!sidebar.classList.contains('collapsed')) {
+            collapseTimer = setTimeout(() => {
+                // Acción tras 5 segundos
+                sidebar.classList.add('collapsed');
+                localStorage.setItem('sidebar-collapsed', 'true');
+                cerrarSubmenus(); // Cerramos acordeones para limpieza visual
+            }, 5000); // 5000 ms = 5 segundos
+        }
+    });
 });
+
+/**
+ * Cierra todos los submenús (acordeones) abiertos.
+ * Útil al colapsar el sidebar para que no queden abiertos internamente.
+ */
+function cerrarSubmenus() {
+    const submenus = document.querySelectorAll('.collapse.show'); // Busca los abiertos
+    submenus.forEach(submenu => {
+        // Usamos la API de Bootstrap para cerrarlos limpiamente
+        new bootstrap.Collapse(submenu, { toggle: false }).hide();
+    });
+}
 
 /**
  * Busca qué link coincide con la URL actual y lo activa.
@@ -94,10 +134,8 @@ function activarLinkPorUrl() {
         const href = link.getAttribute('href');
         
         if (href && href !== '#' && (currentPath === href || currentPath.startsWith(href))) {
-            
             link.classList.add('active');
 
-            // Abrir el acordeón si es necesario
             const parentCollapse = link.closest('.collapse');
             if (parentCollapse) {
                 parentCollapse.classList.add('show');

@@ -17,6 +17,8 @@ import com.backendfmo.repository.CasosResueltosRepository;
 import com.backendfmo.repository.UsuarioRepository;
 import com.backendfmo.dtos.request.casos.CasoConUsuarioDTO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class CasosResueltosServiceImpl {
 
@@ -26,6 +28,8 @@ public class CasosResueltosServiceImpl {
     @Autowired
     private UsuarioRepository usuarioRepository; // Para validar la existencia del usuario
 
+    // 1. Declarar el Logger para esta clase
+    private static final Logger logger = LoggerFactory.getLogger(CasosResueltosServiceImpl.class);
     @Transactional
     public CasoConUsuarioDTO guardarCasoConNuevoUsuario(CasoConUsuarioDTO dto) {
         // 1. Crear y guardar el Usuario primero
@@ -64,6 +68,8 @@ public class CasosResueltosServiceImpl {
         nuevoCaso.setAtendidoPor(dto.getAtendidoPor());
         nuevoCaso.setEquipo(dto.getEquipo());
 
+        logger.info("Guardando caso resuelto para usuario con ficha: {}", usuarioProcesar.getFicha());
+
         CasosResueltos casoGuardado = repository.save(nuevoCaso);
 
         // 3. Retornar el DTO de respuesta
@@ -98,7 +104,7 @@ public class CasosResueltosServiceImpl {
         if (casos.isEmpty()) {
             throw new RuntimeException("No se encontraron casos resueltos.");
         }
-
+        logger.info("Listando todos los casos resueltos, total: {}", casos.size());
         return casos.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -112,6 +118,7 @@ public class CasosResueltosServiceImpl {
             throw new RuntimeException("No se encontraron casos resueltos para la fecha: " + fecha);
         }
         // 2. Convertimos la lista de entidades a una lista de DTOs para la respuesta
+        logger.info("Listando casos resueltos por fecha: {}, total: {}", fecha, entidades.size());
         return entidades.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -124,6 +131,7 @@ public class CasosResueltosServiceImpl {
         if (entidades.isEmpty()) {
             throw new RuntimeException("No se encontraron casos resueltos para el técnico: " + tecnico);
         }
+        logger.info("Listando casos resueltos por técnico: {}, total: {}", tecnico, entidades.size());
         return entidades.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -149,6 +157,7 @@ public class CasosResueltosServiceImpl {
             throw new RuntimeException(
                     "No se encontraron casos resueltos en el rango de fechas: " + inicio + " - " + fin);
         }
+        logger.info("Listando casos resueltos por rango de fechas: {} - {}, total: {}", inicio, fin, entidades.size());
         return entidades.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -163,6 +172,7 @@ public class CasosResueltosServiceImpl {
 
         try {
             // 2. Ejecutar la eliminación
+            logger.info("Eliminando caso resuelto con ID: {}", id);
             repository.deleteById(id);
             return true;
         } catch (Exception e) {
@@ -182,6 +192,7 @@ public class CasosResueltosServiceImpl {
         }
 
         // 2. Convertir y retornar la lista de DTOs
+        logger.info("Listando casos resueltos por ficha de usuario: {}, total: {}", ficha, entidades.size());
         return entidades.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -230,6 +241,7 @@ public class CasosResueltosServiceImpl {
             }
 
             writer.flush();
+            logger.info("Reporte CSV generado exitosamente para el rango de fechas: {} - {}, total casos: {}", fechaInicio, fechaFin, casos.size());
             return new ByteArrayInputStream(out.toByteArray());
 
         } catch (Exception e) {

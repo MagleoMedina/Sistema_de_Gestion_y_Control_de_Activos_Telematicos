@@ -21,8 +21,13 @@ import com.backendfmo.repository.PerifericoRepository;
 import com.backendfmo.repository.UsuarioRepository;
 import com.backendfmo.repository.RelacionStockRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ControlStockServiceImpl {
+
+    private static final Logger logger = LoggerFactory.getLogger(ControlStockServiceImpl.class);
 
     @Autowired
     private ControlStockRepository stockRepo;
@@ -33,12 +38,23 @@ public class ControlStockServiceImpl {
     @Autowired
     private PerifericoRepository perifericosRepo;
 
+        @Autowired
+    private UsuarioRepository usuarioRepo; // Necesario para buscar por ficha
+
+    @Autowired
+    private EncabezadoReciboRepository encabezadoRepo; // Para guardar el recibo
+
+    @Autowired
+    private RelacionStockRepository relacionStockRepo; // Para guardar la unión
+
     // --- 1. LISTAR STOCK COMPLETO ---
 
     public List<StockDTO> listarStock() {
         if (stockRepo.count() == 0) {
             throw new RuntimeException("No hay items en el stock");
         }
+
+        logger.info("Listando todo el stock, total items: {}", stockRepo.count());
         return stockRepo.findAll().stream().map(this::convertirADTO).collect(Collectors.toList());
     }
 
@@ -79,13 +95,16 @@ public class ControlStockServiceImpl {
         }
 
         // 3. Guardar el Stock
+        logger.info("Guardando nuevo item en stock: Marca '{}', Serial '{}', Categoría '{}'", stock.getMarca(), stock.getSerial(), stock.getCategoria());
         return stockRepo.save(stock);
     }
 
     public void eliminarItem(Long id) {
         ControlStock stock = stockRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item de stock no encontrado"));
-        stockRepo.delete(stock);
+        
+                logger.info("Eliminando item de stock con ID: {}", id);
+                stockRepo.delete(stock);
     }
 
     // --- HELPER: CONVERTIR ENTIDAD A DTO ---
@@ -108,15 +127,6 @@ public class ControlStockServiceImpl {
         }
         return dto;
     }
-
-    @Autowired
-    private UsuarioRepository usuarioRepo; // Necesario para buscar por ficha
-
-    @Autowired
-    private EncabezadoReciboRepository encabezadoRepo; // Para guardar el recibo
-
-    @Autowired
-    private RelacionStockRepository relacionStockRepo; // Para guardar la unión
 
     // --- 3. ASIGNAR STOCK A UN EQUIPO (CREANDO USUARIO SI NO EXISTE) ---
     @Transactional
@@ -170,6 +180,7 @@ public class ControlStockServiceImpl {
         relacion.setEncabezadoRelacion(recibo);
 
         // Guardamos la relación final
+        logger.info("Asignando item '{}' con serial '{}' al equipo '{}', usuario '{}'", stock.getNombreItem(), stock.getSerial(), dto.getFmoEquipo(), usuario.getNombre());
         relacionStockRepo.save(relacion);
     }
 
@@ -218,6 +229,7 @@ public class ControlStockServiceImpl {
         // 3. Eliminar la relación
         // Al borrar el registro de la tabla intermedia, el item queda "libre"
         // y el check "existsByStockId" dará false en el futuro.
+        logger.info("Desvinculando item con serial '{}' del equipo '{}'", stock.getSerial(), relacion.getEncabezadoRelacion().getFmoEquipo());
         relacionStockRepo.delete(relacion);
     }
 
@@ -254,12 +266,14 @@ public class ControlStockServiceImpl {
                 dto.setGerencia(u.getGerencia());
             }
         }
+        logger.info("Obteniendo detalle de asignación para item con serial '{}'", stock.getSerial());
         return dto;
     }
 
     // --- 7. NUEVO: LISTAR ASIGNACIONES POR FICHA ---
     public List<RelacionStockResponseDTO> listarAsignacionesPorFicha(Integer ficha) {
         // Reutilizamos el método que ya trae toda la info y filtramos (o podrías crear una query en Repo)
+        logger.info("Listando asignaciones para usuario con ficha '{}'", ficha);
         return listarRelacionesAsignadas().stream()
                 .filter(dto -> dto.getFicha() != null && dto.getFicha().equals(ficha))
                 .collect(Collectors.toList());

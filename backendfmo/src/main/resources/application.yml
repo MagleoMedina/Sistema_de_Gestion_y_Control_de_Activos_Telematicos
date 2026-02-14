@@ -11,3 +11,10 @@ spring:
   datasource:
     url: jdbc:sqlite:src/main/java/com/backendfmo/db/test.db
     driver-class-name: org.sqlite.JDBC
+logging:
+  file:
+    name: auditoria-sistema.log
+  level:
+    root: INFO
+  pattern:
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'

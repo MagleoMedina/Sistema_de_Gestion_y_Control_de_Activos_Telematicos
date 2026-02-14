@@ -1,0 +1,180 @@
+2026-02-14 11:50:17 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - Starting BackendFmoApplication using Java 21.0.9 with PID 43866 (/home/magleo/Documentos/Codes/fmo/backendfmo/target/classes started by magleo in /home/magleo/Documentos/Codes/fmo/backendfmo)
+2026-02-14 11:50:17 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-14 11:50:17 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-14 11:50:17 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-14 11:50:18 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-14 11:50:18 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 75 ms. Found 12 JPA repository interfaces.
+2026-02-14 11:50:19 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-02-14 11:50:19 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-14 11:50:19 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-14 11:50:19 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1612 ms
+2026-02-14 11:50:19 [restartedMain] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-14 11:50:19 [restartedMain] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.0.Final
+2026-02-14 11:50:20 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-14 11:50:20 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:src/main/java/com/backendfmo/db/test.db]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.50.3
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-14 11:50:21 [restartedMain] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-14 11:50:21 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:50:21 [restartedMain] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-14 11:50:21 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-02-14 11:50:22 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-02-14 11:50:22 [restartedMain] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-14 11:50:23 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-14 11:50:23 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api'
+2026-02-14 11:50:23 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - Started BackendFmoApplication in 6.371 seconds (process running for 6.872)
+2026-02-14 11:50:45 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-14 11:50:45 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-14 11:50:45 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2026-02-14 11:50:48 [http-nio-8081-exec-3] INFO  c.backendfmo.config.AuthController - Usuario 'magleo2003' autenticado con rol 'ADMIN'
+2026-02-14 11:50:48 [http-nio-8081-exec-5] INFO  c.b.services.ContadorServiceImpl - Contando equipos atendidos con estatus 'Listo'
+2026-02-14 11:50:48 [http-nio-8081-exec-7] INFO  c.b.services.ContadorServiceImpl - Contando periféricos atendidos con estatus 'Listo'
+2026-02-14 11:50:48 [http-nio-8081-exec-9] INFO  c.b.services.ContadorServiceImpl - Contando DAET atendidas con estatus 'Listo'
+2026-02-14 11:50:49 [http-nio-8081-exec-1] INFO  c.b.services.ContadorServiceImpl - Contando casos resueltos
+2026-02-14 11:51:56 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-14 11:51:56 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-14 11:51:56 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:57:02 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - Starting BackendFmoApplication using Java 21.0.9 with PID 46945 (/home/magleo/Documentos/Codes/fmo/backendfmo/target/classes started by magleo in /home/magleo/Documentos/Codes/fmo/backendfmo)
+2026-02-14 11:57:02 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-14 11:57:02 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-02-14 11:57:02 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-02-14 11:57:02 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-14 11:57:02 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 82 ms. Found 12 JPA repository interfaces.
+2026-02-14 11:57:03 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-02-14 11:57:03 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-14 11:57:03 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-14 11:57:03 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1627 ms
+2026-02-14 11:57:04 [restartedMain] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-14 11:57:04 [restartedMain] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.0.Final
+2026-02-14 11:57:04 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-14 11:57:04 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:src/main/java/com/backendfmo/db/test.db]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.50.3
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-14 11:57:05 [restartedMain] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-14 11:57:05 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:57:05 [restartedMain] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-14 11:57:06 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-02-14 11:57:06 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-02-14 11:57:07 [restartedMain] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-14 11:57:07 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-14 11:57:07 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api'
+2026-02-14 11:57:07 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - Started BackendFmoApplication in 6.269 seconds (process running for 6.79)
+2026-02-14 11:57:14 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-14 11:57:14 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-14 11:57:14 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-14 11:57:15 [http-nio-8081-exec-2] INFO  c.b.services.ContadorServiceImpl - Contando equipos atendidos con estatus 'Listo'
+2026-02-14 11:57:15 [http-nio-8081-exec-4] INFO  c.b.services.ContadorServiceImpl - Contando periféricos atendidos con estatus 'Listo'
+2026-02-14 11:57:15 [http-nio-8081-exec-6] INFO  c.b.services.ContadorServiceImpl - Contando DAET atendidas con estatus 'Listo'
+2026-02-14 11:57:15 [http-nio-8081-exec-8] INFO  c.b.services.ContadorServiceImpl - Contando casos resueltos
+2026-02-14 11:57:24 [http-nio-8081-exec-1] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '1' a DTO completo
+2026-02-14 11:57:24 [http-nio-8081-exec-1] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '2' a DTO completo
+2026-02-14 11:57:24 [http-nio-8081-exec-1] INFO  c.b.s.ReciboDeEquiposServiceImpl - Encontrados 2 recibos en total
+2026-02-14 11:57:27 [http-nio-8081-exec-3] INFO  c.b.s.ReciboDeEquiposServiceImpl - Actualizando estatus del recibo con ID '1' a 'Listo'
+2026-02-14 11:57:27 [http-nio-8081-exec-3] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '1' a DTO completo
+2026-02-14 11:57:27 [http-nio-8081-exec-4] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '1' a DTO completo
+2026-02-14 11:57:27 [http-nio-8081-exec-4] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '2' a DTO completo
+2026-02-14 11:57:27 [http-nio-8081-exec-4] INFO  c.b.s.ReciboDeEquiposServiceImpl - Encontrados 2 recibos en total
+2026-02-14 11:57:29 [File Watcher] INFO  o.s.b.d.a.LocalDevToolsAutoConfiguration$RestartingClassPathChangeChangedEventListener - Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-02-14 11:57:29 [Thread-1] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-14 11:57:29 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-14 11:57:29 [Thread-1] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:57:29 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - Starting BackendFmoApplication using Java 21.0.9 with PID 46945 (/home/magleo/Documentos/Codes/fmo/backendfmo/target/classes started by magleo in /home/magleo/Documentos/Codes/fmo/backendfmo)
+2026-02-14 11:57:29 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-14 11:57:29 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-14 11:57:29 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 28 ms. Found 12 JPA repository interfaces.
+2026-02-14 11:57:29 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-02-14 11:57:29 [restartedMain] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-14 11:57:29 [restartedMain] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-14 11:57:29 [restartedMain] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 390 ms
+2026-02-14 11:57:29 [restartedMain] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-14 11:57:29 [restartedMain] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-14 11:57:29 [restartedMain] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:src/main/java/com/backendfmo/db/test.db]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.50.3
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-14 11:57:30 [restartedMain] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-14 11:57:30 [restartedMain] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:57:30 [restartedMain] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-02-14 11:57:30 [restartedMain] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-02-14 11:57:30 [restartedMain] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-14 11:57:30 [restartedMain] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-14 11:57:30 [restartedMain] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api'
+2026-02-14 11:57:30 [restartedMain] INFO  c.backendfmo.BackendFmoApplication - Started BackendFmoApplication in 1.401 seconds (process running for 29.643)
+2026-02-14 11:57:30 [restartedMain] INFO  o.s.b.d.a.ConditionEvaluationDeltaLoggingListener - Condition evaluation unchanged
+2026-02-14 11:58:18 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-14 11:58:18 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-14 11:58:18 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:59:54 [main] INFO  c.backendfmo.BackendFmoApplication - Starting BackendFmoApplication using Java 21.0.9 with PID 48187 (/home/magleo/Documentos/Codes/fmo/backendfmo/target/classes started by magleo in /home/magleo/Documentos/Codes/fmo/backendfmo)
+2026-02-14 11:59:54 [main] INFO  c.backendfmo.BackendFmoApplication - No active profile set, falling back to 1 default profile: "default"
+2026-02-14 11:59:55 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-02-14 11:59:55 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 79 ms. Found 12 JPA repository interfaces.
+2026-02-14 11:59:55 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-02-14 11:59:55 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-02-14 11:59:55 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-02-14 11:59:56 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1411 ms
+2026-02-14 11:59:56 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-02-14 11:59:56 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.0.Final
+2026-02-14 11:59:56 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-02-14 11:59:56 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:src/main/java/com/backendfmo/db/test.db]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.50.3
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-02-14 11:59:58 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-02-14 11:59:58 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-02-14 11:59:58 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-02-14 11:59:58 [main] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-02-14 11:59:58 [main] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-02-14 11:59:59 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-02-14 11:59:59 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-02-14 11:59:59 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api'
+2026-02-14 11:59:59 [main] INFO  c.backendfmo.BackendFmoApplication - Started BackendFmoApplication in 5.749 seconds (process running for 6.096)
+2026-02-14 12:00:06 [http-nio-8081-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-02-14 12:00:06 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-02-14 12:00:06 [http-nio-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-02-14 12:00:13 [http-nio-8081-exec-4] INFO  c.backendfmo.config.AuthController - Usuario 'magleo2003' autenticado con rol 'ADMIN'
+2026-02-14 12:00:13 [http-nio-8081-exec-6] INFO  c.b.services.ContadorServiceImpl - Contando equipos atendidos con estatus 'Listo'
+2026-02-14 12:00:14 [http-nio-8081-exec-8] INFO  c.b.services.ContadorServiceImpl - Contando periféricos atendidos con estatus 'Listo'
+2026-02-14 12:00:14 [http-nio-8081-exec-10] INFO  c.b.services.ContadorServiceImpl - Contando DAET atendidas con estatus 'Listo'
+2026-02-14 12:00:14 [http-nio-8081-exec-2] INFO  c.b.services.ContadorServiceImpl - Contando casos resueltos
+2026-02-14 12:00:23 [http-nio-8081-exec-6] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '1' a DTO completo
+2026-02-14 12:00:23 [http-nio-8081-exec-6] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '2' a DTO completo
+2026-02-14 12:00:23 [http-nio-8081-exec-6] INFO  c.b.s.ReciboDeEquiposServiceImpl - Encontrados 2 recibos en total
+2026-02-14 12:00:25 [http-nio-8081-exec-8] INFO  c.b.s.ReciboDeEquiposServiceImpl - Actualizando estatus del recibo con ID '2' a 'Listo'
+2026-02-14 12:00:25 [http-nio-8081-exec-8] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '2' a DTO completo
+2026-02-14 12:00:25 [http-nio-8081-exec-9] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '1' a DTO completo
+2026-02-14 12:00:25 [http-nio-8081-exec-9] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '2' a DTO completo
+2026-02-14 12:00:25 [http-nio-8081-exec-9] INFO  c.b.s.ReciboDeEquiposServiceImpl - Encontrados 2 recibos en total

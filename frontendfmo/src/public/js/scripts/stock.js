@@ -93,6 +93,8 @@ function actualizarDropdownNombres() {
     const lista = (tipo === 'COMPONENTE') ? listaComponentesDB : listaPerifericosDB;
 
     lista.forEach(item => {
+        if (tipo === 'COMPONENTE' && (item.nombre || "").toUpperCase().includes("WINDOWS")) return;
+        if (tipo === 'COMPONENTE' && (item.nombre || "").toUpperCase().includes("CANAIMA")) return;
         const opt = document.createElement('option');
         opt.value = item.nombre; 
         opt.textContent = item.nombre;

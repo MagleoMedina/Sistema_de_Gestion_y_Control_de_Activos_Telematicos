@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,17 +29,36 @@ public class CasosResueltosServiceImpl {
     @Transactional
     public CasoConUsuarioDTO guardarCasoConNuevoUsuario(CasoConUsuarioDTO dto) {
         // 1. Crear y guardar el Usuario primero
-        Usuario nuevoUsuario = new Usuario();
+    Usuario usuarioProcesar;
+        
+        // Buscamos si ya existe un usuario con esa ficha
+        // Usamos findFirstByFicha por seguridad si hay duplicados antiguos, o findByFicha si es único
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByFicha(dto.getFicha());
 
-        nuevoUsuario.setFicha(dto.getFicha());
-        nuevoUsuario.setNombre(dto.getNombre());
-        nuevoUsuario.setGerencia(dto.getGerencia());
+        if (usuarioExistente.isPresent()) {
+            // A. CASO EXISTE: ACTUALIZAMOS SUS DATOS
+            usuarioProcesar = usuarioExistente.get();
+            
+            // Sobrescribimos con lo que viene del formulario (permite correcciones)
+            usuarioProcesar.setNombre(dto.getNombre());
+            usuarioProcesar.setFicha(dto.getFicha());
+            usuarioProcesar.setGerencia(dto.getGerencia());
 
-        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
+        } else {
+            // B. CASO NUEVO: CREAMOS DESDE CERO
+            usuarioProcesar = new Usuario();
+            usuarioProcesar.setFicha(dto.getFicha());
+            usuarioProcesar.setNombre(dto.getNombre());
+            usuarioProcesar.setGerencia(dto.getGerencia());
+            
+        }
+
+        // Guardamos (Update o Insert)
+        usuarioProcesar = usuarioRepository.save(usuarioProcesar);
 
         // 2. Crear y guardar el Caso asociado al usuario recién creado
         CasosResueltos nuevoCaso = new CasosResueltos();
-        nuevoCaso.setUsuario(usuarioGuardado); // Asociación directa
+        nuevoCaso.setUsuario(usuarioProcesar); // Asociación directa
         nuevoCaso.setFecha(dto.getFecha());
         nuevoCaso.setReporte(dto.getReporte());
         nuevoCaso.setAtendidoPor(dto.getAtendidoPor());

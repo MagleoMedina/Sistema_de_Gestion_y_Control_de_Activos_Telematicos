@@ -41,9 +41,9 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 // Permitimos OPTIONS explícitamente (por si acaso, aunque el bean de arriba lo maneja)
-                //.requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/login", "/crearUsuarioSistema", "/status").permitAll()
-                .requestMatchers("/**").permitAll()
+                //.requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess

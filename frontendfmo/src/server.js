@@ -123,7 +123,7 @@ app.get('/casos/buscar', (req, res) => {
 });
 // Iniciar servidor
 const server = app.listen(PORT, HOST, () => {
-    console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
+    //console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
 });
 
 module.exports = { server, PORT, HOST, BACKEND_URL };

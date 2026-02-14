@@ -74,4 +74,4 @@ async function guardarCaso() {
         console.error(error);
         mostrarModal("Error de Conexión", "Ocurrió un fallo al intentar contactar con el servidor.", "error");
     }
-}b
+}

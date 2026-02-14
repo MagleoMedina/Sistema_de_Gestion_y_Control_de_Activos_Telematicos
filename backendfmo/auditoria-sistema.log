@@ -178,3 +178,6 @@
 2026-02-14 12:00:25 [http-nio-8081-exec-9] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '1' a DTO completo
 2026-02-14 12:00:25 [http-nio-8081-exec-9] INFO  c.b.s.ReciboDeEquiposServiceImpl - Convertido recibo con ID '2' a DTO completo
 2026-02-14 12:00:25 [http-nio-8081-exec-9] INFO  c.b.s.ReciboDeEquiposServiceImpl - Encontrados 2 recibos en total
+2026-02-14 16:17:56 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-02-14 16:17:56 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-02-14 16:17:56 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'

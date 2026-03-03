@@ -126,4 +126,8 @@ const server = app.listen(PORT, HOST, () => {
     //console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
 });
 
+app.get('/registrar-pasante', (req, res) => {
+    res.render('pages/registro-pasantes', { title: 'Registrar Pasante' });
+});
+
 module.exports = { server, PORT, HOST, BACKEND_URL };

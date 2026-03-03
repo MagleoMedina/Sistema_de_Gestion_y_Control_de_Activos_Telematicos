@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.backendfmo.models.casos.CasosResueltos;
+import com.backendfmo.models.pasantes.Pasante;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -14,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -69,5 +71,10 @@ public class Usuario {
         casosResueltos.add(casoResuelto);
         casoResuelto.setUsuario(this);
     }
+
+    // Relación 1 a 1: Un Usuario puede ser un Pasante
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "usuario-pasante") // Para evitar ciclos infinitos en JSON
+    private Pasante pasante;
 
 }

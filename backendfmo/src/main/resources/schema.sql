@@ -193,6 +193,29 @@ CREATE TABLE IF NOT EXISTS relacion_stock(
 	FOREIGN KEY(encabezado_recibo) REFERENCES encabezado_recibo(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+-- Tabla para Institutos / Universidades
+CREATE TABLE IF NOT EXISTS instituto (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre_instituto TEXT NOT NULL
+);
+
+-- Tabla Pasante (Hija de Usuario)
+CREATE TABLE IF NOT EXISTS pasante (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuario_id INTEGER UNIQUE NOT NULL, -- Relación 1 a 1 con Usuario
+    instituto_id INTEGER NOT NULL,      -- Relación N a 1 con Instituto
+    informe TEXT,                       -- Ruta del archivo PDF
+    fotografia TEXT,                    -- Ruta del archivo PNG/JPG
+    fecha_inicio TEXT,
+    fecha_finalizacion TEXT,
+    area_asignada TEXT,
+    fecha_de_nacimiento TEXT,
+    titulo_pretendido TEXT,
+	cedula TEXT,
+    FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (instituto_id) REFERENCES instituto(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
 INSERT INTO "perifericos" ("id","nombre") VALUES (2,'TECLADO');
 INSERT INTO "perifericos" ("id","nombre") VALUES (3,'MOUSE');

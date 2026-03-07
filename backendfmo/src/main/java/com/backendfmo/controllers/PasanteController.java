@@ -1,5 +1,6 @@
 package com.backendfmo.controllers;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backendfmo.dtos.request.pasantes.PasanteRegistroDTO;
+import com.backendfmo.dtos.request.pasantes.PasanteResponseDTO;
 import com.backendfmo.repository.PasanteRepository;
 import com.backendfmo.services.PasanteServiceImpl;
 
@@ -47,10 +49,21 @@ public class PasanteController {
         }
     }
 
-    @GetMapping("/listarPasantes")
+    //@GetMapping("/listarPasantes")
     public ResponseEntity<?> listarTodo (){
 
         return ResponseEntity.ok(pasanteRepository.findAll());
+    }
+
+    @GetMapping("/listarPasantes")
+    public ResponseEntity<?> obtenerTodos() {
+        try {
+            List<PasanteResponseDTO> lista = pasanteService.obtenerTodosLosPasantes();
+            return ResponseEntity.ok(lista);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
 

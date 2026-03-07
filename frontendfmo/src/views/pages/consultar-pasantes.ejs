@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head') %>
+    <title>Consultar Pasantes | FMO</title>
+    <style>
+        /* --- PALETA FMO --- */
+        :root {
+            --fmo-red: #d6291c;
+            --fmo-orange: #fa812f;
+            --fmo-red-dark: #dd0303;
+        }
+
+        /* Estilos de la tabla */
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--fmo-red-dark), var(--fmo-orange));
+            color: white;
+        }
+        .table-custom tbody tr:hover {
+            background-color: #fff5f5;
+        }
+
+        /* Miniatura de Foto en Tabla */
+        .foto-miniatura {
+            width: 45px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--fmo-red);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .foto-miniatura:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(214, 41, 28, 0.3);
+        }
+
+        /* Modal de Detalles (Estilo Lectura) */
+        .readonly-field {
+            background-color: #f8f9fa !important;
+            border: 1px solid #e9ecef;
+            font-weight: 500;
+            color: #495057;
+        }
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--fmo-orange);
+            margin-bottom: 15px;
+            display: inline-block;
+            padding-bottom: 3px;
+        }
+
+        .btn-fmo-outline {
+            color: var(--fmo-red);
+            border-color: var(--fmo-red);
+        }
+        .btn-fmo-outline:hover {
+            background-color: var(--fmo-red);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('../partials/sidebar') %>
+
+        <div id="content" class="w-100 bg-light p-3 fade-in" style="overflow-y: auto;">
+            <div class="container-fluid">
+                
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <div>
+                        <h4 class="fw-bold m-0 text-dark"><i class="bi bi-people-fill me-2" style="color: var(--fmo-red);"></i>Directorio de Pasantes</h4>
+                        <small class="text-muted">Consulta y gestión del personal pasante activo e histórico</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="inputBusqueda" class="form-control form-control-sm" placeholder="Buscar por ficha o nombre..." style="max-width: 250px;">
+                        <a href="/pasantes/registro" class="btn btn-sm text-white shadow-sm" style="background: var(--fmo-red);">
+                            <i class="bi bi-plus-circle me-1"></i>Nuevo Pasante
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle mb-0 table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" width="5%">#</th>
+                                    <th class="text-center" width="10%">Foto</th>
+                                    <th width="10%">Ficha</th>
+                                    <th width="25%">Nombre Completo</th>
+                                    <th width="25%">Título Pretendido</th>
+                                    <th class="text-center" width="25%">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaPasantes">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">Cargando registros...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDetalles" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, var(--fmo-red-dark), var(--fmo-orange));">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-badge me-2"></i>Expediente del Pasante</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    
+                    <div class="d-flex align-items-center mb-4 bg-white p-3 rounded-3 shadow-sm border-start border-4" style="border-color: var(--fmo-red) !important;">
+                        <img src="" id="detFoto" class="rounded-circle border border-3 me-3" style="width: 80px; height: 80px; object-fit: cover; border-color: var(--fmo-orange) !important;">
+                        <div>
+                            <h5 class="fw-bold mb-0 text-dark" id="detNombre">Cargando...</h5>
+                            <div class="text-muted small mt-1">
+                                <i class="bi bi-card-text me-1"></i> C.I: <strong class="text-dark" id="detCedula">---</strong>
+                                <i class="bi bi-person-vcard me-1"></i> Ficha: <strong class="text-primary" id="detFicha">---</strong> | 
+                                <i class="bi bi-telephone me-1"></i> Ext: <span id="detExt">---</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <span class="section-label">Datos Académicos</span>
+                            <div class="mb-2">
+                                <small class="text-muted fw-bold d-block">Instituto / Universidad</small>
+                                <div class="p-2 rounded-2 readonly-field" id="detInstituto"></div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted fw-bold d-block">Título Pretendido</small>
+                                <div class="p-2 rounded-2 readonly-field" id="detTitulo"></div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted fw-bold d-block">Fecha de Nacimiento</small>
+                                <div class="p-2 rounded-2 readonly-field" id="detNacimiento"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <span class="section-label">Detalles de Pasantía</span>
+                            <div class="mb-2">
+                                <small class="text-muted fw-bold d-block">Gerencia Asignada</small>
+                                <div class="p-2 rounded-2 readonly-field" id="detGerencia"></div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted fw-bold d-block">Área Específica</small>
+                                <div class="p-2 rounded-2 readonly-field" id="detArea"></div>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <small class="text-muted fw-bold d-block">Inicio</small>
+                                    <div class="p-2 rounded-2 readonly-field text-center" id="detInicio"></div>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted fw-bold d-block">Culminación</small>
+                                    <div class="p-2 rounded-2 readonly-field text-center" id="detFin"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-white">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar Expediente</button>
+                    <button type="button" class="btn text-white" style="background: var(--fmo-red);" id="btnDescargarInformeModal">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Ver Informe
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalFoto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-header border-0 justify-content-end p-0 mb-2">
+                    <button type="button" class="btn-close btn-close-white fs-4" data-bs-dismiss="modal" style="opacity: 1; text-shadow: 0 0 5px black;"></button>
+                </div>
+                <div class="modal-body text-center p-0">
+                    <img src="" id="visorFoto" class="img-fluid rounded-4 shadow-lg" style="max-height: 80vh; border: 4px solid white;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../partials/modal') %>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/scripts/consultarPasantes.js"></script>
+</body>
+</html>

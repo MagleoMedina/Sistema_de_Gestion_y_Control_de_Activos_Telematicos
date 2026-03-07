@@ -5,6 +5,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if(fechaInicioInput) fechaInicioInput.value = today;
 });
 
+async function getBackendUrl() {
+    if (BASE_URL) return BASE_URL;
+    const res = await fetch('/config/backend-url');
+    const data = await res.json();
+    BASE_URL = data.BACKEND_URL;
+    return BASE_URL;
+}
+
 // --- 1. Previsualización de Imagen ---
 function mostrarPreview(input) {
     if (input.files && input.files[0]) {
@@ -39,10 +47,10 @@ async function guardarPasante() {
     const cedula = document.getElementById('cedula').value; // NUEVO CAMPO
     const instituto = document.getElementById('instituto').value;
 
-    if (!ficha || !nombre || !cedula || !instituto) {
-        mostrarModal("Por favor complete los campos obligatorios: Ficha, Cédula, Nombre e Instituto.", "warning");
-        return;
-    }
+   // if (!ficha || !nombre || !cedula || !instituto) {
+    //    mostrarModal("Por favor complete los campos obligatorios: Ficha, Cédula, Nombre e Instituto.", "warning");
+    //    return;
+    //}
 
     // A. Construir el Objeto JSON con los datos de texto
     const datosPasante = {
@@ -87,7 +95,7 @@ async function guardarPasante() {
         // obteniendo el token primero.
         const token = sessionStorage.getItem('jwt_token');
 
-        const response = await fetch('/registrarPasante', {
+        const response = await fetch(await getBackendUrl() + '/registrarPasante', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`

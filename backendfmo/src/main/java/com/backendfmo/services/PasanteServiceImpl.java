@@ -5,7 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backendfmo.dtos.request.pasantes.PasanteRegistroDTO;
+import com.backendfmo.dtos.request.pasantes.PasanteResponseDTO;
 import com.backendfmo.models.pasantes.Instituto;
 import com.backendfmo.models.pasantes.Pasante;
 import com.backendfmo.models.reciboequipos.Usuario;
@@ -124,5 +126,39 @@ public class PasanteServiceImpl {
         // Antes devolvíamos: rutaArchivo.toString() (Ruta absoluta /home/magleo...)
         // Ahora devolvemos: nombreFinal (Solo el archivo "9950_foto_X.png")
         return nombreFinal; 
+    }
+
+    public List<PasanteResponseDTO> obtenerTodosLosPasantes() {
+        List<Pasante> pasantes = pasanteRepository.findAll();
+        
+        return pasantes.stream().map(p -> {
+            PasanteResponseDTO dto = new PasanteResponseDTO();
+            
+            // Mapeo directo de Pasante
+            dto.setId(p.getId());
+            dto.setCedula(p.getCedula()); // Asegúrate de que tu modelo Pasante tenga getCedula()
+            dto.setRutaInforme(p.getRutaInforme());
+            dto.setRutaFotografia(p.getRutaFotografia());
+            dto.setFechaInicio(p.getFechaInicio());
+            dto.setFechaFinalizacion(p.getFechaFinalizacion());
+            dto.setAreaAsignada(p.getAreaAsignada());
+            dto.setFechaNacimiento(p.getFechaNacimiento());
+            dto.setTituloPretendido(p.getTituloPretendido());
+
+            // Mapeo del Instituto
+            if (p.getInstituto() != null) {
+                dto.setNombreInstituto(p.getInstituto().getNombreInstituto());
+            }
+
+            // Mapeo del Usuario
+            if (p.getUsuario() != null) {
+                dto.setFicha(p.getUsuario().getFicha());
+                dto.setNombre(p.getUsuario().getNombre());
+                dto.setExtension(p.getUsuario().getExtension());
+                dto.setGerencia(p.getUsuario().getGerencia());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

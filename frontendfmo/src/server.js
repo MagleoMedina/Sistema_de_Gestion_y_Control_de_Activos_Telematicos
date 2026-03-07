@@ -130,4 +130,8 @@ app.get('/registrar-pasante', (req, res) => {
     res.render('pages/registro-pasantes', { title: 'Registrar Pasante' });
 });
 
+app.get('/consultar-pasante', (req, res) => {
+    res.render('pages/consultar-pasantes', { title: 'Consultar Pasantes' });
+});
+
 module.exports = { server, PORT, HOST, BACKEND_URL };

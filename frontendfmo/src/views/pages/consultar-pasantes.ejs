@@ -79,7 +79,7 @@
                     </div>
                     <div class="d-flex gap-2">
                         <input type="text" id="inputBusqueda" class="form-control form-control-sm" placeholder="Buscar por ficha o nombre..." style="max-width: 250px;">
-                        <a href="/pasantes/registro" class="btn btn-sm text-white shadow-sm" style="background: var(--fmo-red);">
+                        <a href="/registrar-pasante" class="btn btn-sm text-white shadow-sm" style="background: var(--fmo-red);">
                             <i class="bi bi-plus-circle me-1"></i>Nuevo Pasante
                         </a>
                     </div>
@@ -190,6 +190,122 @@
                 </div>
                 <div class="modal-body text-center p-0">
                     <img src="" id="visorFoto" class="img-fluid rounded-4 shadow-lg" style="max-height: 80vh; border: 4px solid white;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <i class="bi bi-trash3 text-danger mb-3 d-block" style="font-size: 3rem;"></i>
+                    <h5 class="fw-bold">¿Está seguro de eliminar a este pasante?</h5>
+                    <p class="text-muted">Se eliminará el registro de <strong id="lblNombreEliminar"></strong>, junto con su fotografía y su informe en formato PDF. Esta acción <b>no se puede deshacer</b>.</p>
+                    <input type="hidden" id="idPasanteEliminar">
+                </div>
+                <div class="modal-footer bg-light justify-content-center">
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger px-4" onclick="confirmarEliminacion()"><i class="bi bi-trash-fill me-2"></i>Sí, Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, var(--fmo-orange), #d6291c);">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-pencil-square me-2"></i>Editar Datos del Pasante</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <form id="formEditarPasante">
+                        <input type="hidden" id="editId">
+                        
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <span class="section-label">Datos Personales</span>
+                                <div class="row g-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Ficha</label>
+                                        <input type="number" class="form-control" id="editFicha" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Cédula</label>
+                                        <input type="text" class="form-control" id="editCedula">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Nombre Completo</label>
+                                        <input type="text" class="form-control" id="editNombre" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Fecha Nacimiento</label>
+                                        <input type="date" class="form-control" id="editNacimiento">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Extensión / Tlf</label>
+                                        <input type="text" class="form-control" id="editExt">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <span class="section-label">Académicos y Pasantía</span>
+                                <div class="row g-2">
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Instituto / Universidad</label>
+                                        <input type="text" class="form-control" id="editInstituto" list="listaInstitutosEdit" autocomplete="off">
+                                        <datalist id="listaInstitutosEdit"></datalist>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label small fw-bold text-muted">Título Pretendido</label>
+                                        <input type="text" class="form-control" id="editTitulo">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Gerencia</label>
+                                        <input type="text" class="form-control bg-white" id="editGerencia" readonly>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Área Asignada (Depto)</label>
+                                        <input type="text" class="form-control" id="editArea" list="listaDepartamentosEdit" autocomplete="off">
+                                        <datalist id="listaDepartamentosEdit"></datalist>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Inicio</label>
+                                        <input type="date" class="form-control" id="editInicio">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Finalización</label>
+                                        <input type="date" class="form-control" id="editFin">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <span class="section-label">Actualizar Archivos (Opcional - Dejar vacío para conservar los actuales)</span>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Nueva Fotografía</label>
+                                        <input type="file" class="form-control" id="editFoto" accept="image/*">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-bold text-muted">Nuevo Informe PDF</label>
+                                        <input type="file" class="form-control" id="editInforme" accept="application/pdf">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-white">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn text-white" style="background: var(--fmo-orange);" onclick="guardarEdicion()">
+                        <i class="bi bi-save-fill me-1"></i> Guardar Cambios
+                    </button>
                 </div>
             </div>
         </div>

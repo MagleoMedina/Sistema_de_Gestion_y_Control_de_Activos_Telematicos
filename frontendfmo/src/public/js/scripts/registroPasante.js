@@ -1,9 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // Establecer fecha de inicio a hoy por defecto
     const today = new Date().toISOString().split('T')[0];
     const fechaInicioInput = document.getElementById('fechaInicio');
     if(fechaInicioInput) fechaInicioInput.value = today;
+
+    // Cargar listas desplegables dinámicas
+    await cargarInstitutos();
+    await cargarDepartamentos();
 });
+
 
 async function getBackendUrl() {
     if (BASE_URL) return BASE_URL;
@@ -11,6 +16,68 @@ async function getBackendUrl() {
     const data = await res.json();
     BASE_URL = data.BACKEND_URL;
     return BASE_URL;
+}
+
+// --- CARGAR INSTITUTOS ---
+async function cargarInstitutos() {
+    try {
+        const token = sessionStorage.getItem('jwt_token');
+        const baseUrl = await getBackendUrl();
+        const res = await fetch(`${baseUrl}/institutos`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+            const institutos = await res.json();
+            const datalist = document.getElementById('listaInstitutos');
+            datalist.innerHTML = ''; // Limpiar
+            
+            institutos.forEach(inst => {
+                const option = document.createElement('option');
+                option.value = inst.nombreInstituto;
+                datalist.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error("Error cargando institutos", error);
+    }
+}
+
+// --- CARGAR DEPARTAMENTOS ---
+async function cargarDepartamentos() {
+    try {
+        const token = sessionStorage.getItem('jwt_token');
+        const baseUrl = await getBackendUrl();
+        
+        const res = await fetch(`${baseUrl}/estructura/gerencias`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            const gerencias = await res.json();
+            
+            // Obtenemos el nombre de la gerencia que está fija en el input
+            const nombreGerenciaActual = document.getElementById('gerencia').value;
+            
+            // Filtramos para buscar solo los departamentos de ESA gerencia
+            const gerenciaFiltro = gerencias.find(g => 
+                g.nombre.toLowerCase() === nombreGerenciaActual.toLowerCase()
+            );
+            
+            const datalist = document.getElementById('listaDepartamentos');
+            datalist.innerHTML = ''; // Limpiar
+            
+            if (gerenciaFiltro && gerenciaFiltro.departamentos) {
+                gerenciaFiltro.departamentos.forEach(dep => {
+                    const option = document.createElement('option');
+                    option.value = dep.nombre;
+                    datalist.appendChild(option);
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Error cargando departamentos", error);
+    }
 }
 
 // --- 1. Previsualización de Imagen ---
@@ -41,14 +108,35 @@ function mostrarNombreArchivo(input) {
 // --- 3. Guardar Pasante (FormData Multipart) ---
 async function guardarPasante() {
     
+
     // Validaciones Básicas
     const ficha = document.getElementById('ficha').value;
     const nombre = document.getElementById('nombre').value;
     const cedula = document.getElementById('cedula').value; // NUEVO CAMPO
     const instituto = document.getElementById('instituto').value;
 
-   if (!ficha || !nombre || !cedula || !instituto) {
-       mostrarModal("Por favor complete los campos obligatorios: Ficha, Cédula, Nombre e Instituto.", "warning");
+    if (!ficha || !nombre || !cedula || !instituto) {
+        mostrarModal("Por favor complete los campos obligatorios: Ficha, Cédula, Nombre e Instituto.", "warning");
+        return;
+    }
+
+    // Validar que se haya subido una foto
+    const fotoInput = document.getElementById('inputFoto');
+    if (!fotoInput.files[0]) {
+        mostrarModal("Debe subir una fotografía del pasante.", "warning");
+        return;
+    }
+
+    // Validar que se haya subido un archivo PDF
+    const informeInput = document.getElementById('inputInforme');
+    if (!informeInput.files[0]) {
+        mostrarModal("Debe subir el informe en formato PDF.", "warning");
+        return;
+    }
+    // Validar que el archivo sea PDF
+    const informeFile = informeInput.files[0];
+    if (informeFile && informeFile.type !== "application/pdf") {
+        mostrarModal("El informe debe estar en formato PDF.", "warning");
         return;
     }
 
@@ -75,15 +163,8 @@ async function guardarPasante() {
     formData.append('datos', JSON.stringify(datosPasante));
 
     // 2. Agregar Archivos (si existen)
-    const fotoInput = document.getElementById('inputFoto');
-    if (fotoInput.files[0]) {
-        formData.append('fotografia', fotoInput.files[0]);
-    }
-
-    const informeInput = document.getElementById('inputInforme');
-    if (informeInput.files[0]) {
-        formData.append('informe', informeInput.files[0]);
-    }
+    formData.append('fotografia', fotoInput.files[0]);
+    formData.append('informe', informeInput.files[0]);
 
     // C. Enviar al Backend
     try {

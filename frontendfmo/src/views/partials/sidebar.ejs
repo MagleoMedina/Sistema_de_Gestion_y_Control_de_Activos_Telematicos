@@ -17,13 +17,13 @@
         overflow: hidden;
     }
 
-    /* --- 2. SIDEBAR --- */
+    /* --- 2. SIDEBAR (Base y Desktop) --- */
     #sidebar {
         min-width: var(--sidebar-width);
         max-width: var(--sidebar-width);
         transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         flex-shrink: 0;
-        z-index: 1000;
+        z-index: 1050; /* Z-index alto para mobile */
         overflow-x: hidden;
         white-space: nowrap;
         background-color: var(--sidebar-bg) !important;
@@ -33,24 +33,69 @@
 
     .no-transition { transition: none !important; }
 
-    /* Estado Colapsado */
-    #sidebar.collapsed {
-        min-width: var(--sidebar-collapsed-width);
-        max-width: var(--sidebar-collapsed-width);
+    /* Estado Colapsado en Desktop */
+    @media (min-width: 769px) {
+        #sidebar.collapsed {
+            min-width: var(--sidebar-collapsed-width);
+            max-width: var(--sidebar-collapsed-width);
+        }
+        #sidebar.collapsed .link-text,
+        #sidebar.collapsed .dropdown-toggle::after,
+        #sidebar.collapsed .sidebar-title span {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+        #sidebar.collapsed .nav-link, 
+        #sidebar.collapsed .dropdown-toggle {
+            justify-content: center !important;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        #sidebar.collapsed .icon-container { margin-right: 0 !important; }
+        #sidebar.collapsed .collapse { display: none !important; }
+        
+        /* Dropdown Flotante para submenús cuando está colapsado */
+        #sidebar.collapsed .dropdown-menu {
+            position: fixed !important;
+            left: 75px !important;
+            bottom: 20px !important;
+            top: auto !important;
+            width: auto !important;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #2c3034;
+        }
     }
 
-    /* Ocultar textos y flechas */
-    #sidebar.collapsed .link-text,
-    #sidebar.collapsed .dropdown-toggle::after,
-    #sidebar.collapsed .sidebar-title span {
-        opacity: 0;
-        pointer-events: none;
-        display: none;
+    /* --- RESPONSIVIDAD (MOBILE) --- */
+    @media (max-width: 768px) {
+        #sidebar {
+            position: fixed;
+            height: 100vh;
+            left: -260px; /* Escondido por defecto a la izquierda */
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+        
+        /* Esta clase se la agregaremos con JS cuando toquen el botón en mobile */
+        #sidebar.mobile-open {
+            left: 0;
+        }
+        
+        /* Overlay oscuro detrás del menú en mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+        .sidebar-overlay.active {
+            display: block;
+        }
     }
 
     /* --- ESTILOS DE NAVEGACIÓN FMO --- */
-    
-    /* Contenedor de iconos */
     .icon-container {
         display: flex;
         justify-content: center;
@@ -59,73 +104,41 @@
         width: 30px;
         margin-right: 0.5rem;
         font-size: 1.2rem;
-        color: var(--fmo-orange); /* Color de icono por defecto */
+        color: var(--fmo-orange);
         transition: color 0.3s;
     }
 
-    /* Link Base */
     .nav-pills .nav-link {
         color: #e0e0e0;
         margin-bottom: 4px;
         transition: all 0.2s ease;
-        border-radius: 8px; /* Bordes más suaves */
+        border-radius: 8px;
     }
 
-    /* Link Hover (Efecto suave rojo) */
     .nav-pills .nav-link:hover {
-        background-color: rgba(214, 41, 28, 0.15); /* Rojo transparente */
+        background-color: rgba(214, 41, 28, 0.15);
         color: white;
         transform: translateX(3px);
     }
-    .nav-pills .nav-link:hover .icon-container {
-        color: #fff;
-    }
+    .nav-pills .nav-link:hover .icon-container { color: #fff; }
 
-    /* --- ESTADO ACTIVO (Gradiante FMO) --- */
     .nav-pills .nav-link.active {
         background: var(--fmo-gradient) !important;
         color: white !important;
-        box-shadow: 0 4px 15px rgba(221, 3, 3, 0.4); /* Sombra roja */
+        box-shadow: 0 4px 15px rgba(221, 3, 3, 0.4);
     }
-    .nav-pills .nav-link.active .icon-container {
-        color: white !important;
-    }
+    .nav-pills .nav-link.active .icon-container { color: white !important; }
 
-    /* --- HEADER DEL SIDEBAR --- */
-    .sidebar-title i {
-        color: var(--fmo-red); /* Icono herramienta en rojo */
-    }
+    .sidebar-title i { color: var(--fmo-red); }
     
     .toggle-btn {
-        background: none; border: none; color: white;
+        background: none;
+        border: none; color: white;
         font-size: 1.5rem; cursor: pointer; padding: 0 10px;
         transition: transform 0.3s; line-height: 1;
     }
     .toggle-btn:hover { color: var(--fmo-orange); }
 
-    /* --- AJUSTES DE COLAPSADO --- */
-    #sidebar.collapsed .nav-link, 
-    #sidebar.collapsed .dropdown-toggle {
-        justify-content: center !important; 
-        padding-left: 0;
-        padding-right: 0;
-    }
-    #sidebar.collapsed .icon-container { margin-right: 0 !important; }
-    #sidebar.collapsed .collapse { display: none !important; }
-
-    /* Dropdown Flotante */
-    #sidebar.collapsed .dropdown-menu {
-        position: fixed !important;
-        left: 75px !important;
-        bottom: 20px !important;
-        top: auto !important;
-        width: auto !important;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255,255,255,0.1);
-        background: #2c3034;
-    }
-
-    /* --- OTROS --- */
     .admin-only { display: none !important; }
     
     #content {
@@ -145,12 +158,17 @@
     .submenu-link.active {
         background-color: rgba(214, 41, 28, 0.2) !important;
         border-left-color: var(--fmo-orange) !important;
-        background-image: none !important; /* Quitar degradado completo en submenús */
+        background-image: none !important;
         box-shadow: none !important;
     }
 
     .bi { vertical-align: text-bottom; }
 </style>
+
+<button id="mobileToggleBtn" class="btn d-md-none shadow" style="position: fixed; top: 15px; left: 15px; z-index: 1030; background: var(--fmo-red); color: white; border: none;">
+    <i class="bi bi-list fs-4"></i>
+</button>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div id="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white h-100 no-transition">
     
@@ -170,18 +188,11 @@
         
         <li class="nav-item mb-1">
             <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#submenuRecibos" 
-                    aria-expanded="false"
-                    id="btnGrupoRecibos">
-                
-                <span class="icon-container">
-                    <i class="bi bi-clipboard-data"></i>
-                </span>
+                    data-bs-toggle="collapse" data-bs-target="#submenuRecibos" aria-expanded="false" id="btnGrupoRecibos">
+                <span class="icon-container"><i class="bi bi-clipboard-data"></i></span>
                 <span class="link-text flex-grow-1 text-start">Recibos</span>
                 <span class="dropdown-toggle"></span> 
             </button>
-            
             <div class="collapse" id="submenuRecibos">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                     <li>
@@ -212,17 +223,55 @@
                 <span class="link-text">Consultar Recibos</span>
             </a>
         </li>
-                <li>
-            <a href="/registrar-pasante" class="nav-link text-white d-flex align-items-center">
-                <span class="icon-container"><i class="bi bi-search"></i></span>
-                <span class="link-text">Registrar Pasante</span>
-            </a>
+
+        <li class="nav-item mb-1">
+            <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
+                    data-bs-toggle="collapse" data-bs-target="#submenuPasantes" aria-expanded="false" id="btnGrupoPasantes">
+                <span class="icon-container"><i class="bi bi-mortarboard-fill"></i></span>
+                <span class="link-text flex-grow-1 text-start">Pasantes</span>
+                <span class="dropdown-toggle"></span> 
+            </button>
+            <div class="collapse" id="submenuPasantes">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                        <a href="/registrar-pasante" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-person-plus-fill"></i></span>
+                            <span class="link-text">Registrar Pasante</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/consultar-pasante" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-search"></i></span>
+                            <span class="link-text">Consultar Pasantes</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
-            <li>
-            <a href="/consultar-pasante" class="nav-link text-white d-flex align-items-center">
-                <span class="icon-container"><i class="bi bi-search"></i></span>
-                <span class="link-text">Consultar Pasante</span>
-            </a>
+
+        <li class="nav-item mb-1">
+            <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
+                    data-bs-toggle="collapse" data-bs-target="#submenuCasos" aria-expanded="false" id="btnGrupoCasos">
+                <span class="icon-container"><i class="bi bi-person-lines-fill"></i></span>
+                <span class="link-text flex-grow-1 text-start">Atención Usuario</span>
+                <span class="dropdown-toggle"></span> 
+            </button>
+            <div class="collapse" id="submenuCasos">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                        <a href="/casos/crear" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-plus-circle"></i></span>
+                            <span class="link-text">Registrar Caso</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/casos/buscar" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-search"></i></span>
+                            <span class="link-text">Consultar Casos</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </li>
 
         <li>
@@ -249,36 +298,11 @@
                 <span class="link-text">Eliminar Registros</span>
             </a>
         </li>
-        <li class="nav-item mb-1">
-            <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
-                    data-bs-toggle="collapse" 
-                    data-bs-target="#submenuCasos" 
-                    aria-expanded="false"
-                    id="btnGrupoCasos">
-                
-                <span class="icon-container">
-                    <i class="bi bi-person-lines-fill"></i>
-                </span>
-                <span class="link-text flex-grow-1 text-start">Atención Usuario</span>
-                <span class="dropdown-toggle"></span> 
-            </button>
-            
-            <div class="collapse" id="submenuCasos">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li>
-                        <a href="/casos/crear" class="nav-link text-white submenu-link">
-                            <span class="icon-container"><i class="bi bi-plus-circle"></i></span>
-                            <span class="link-text">Registrar Caso</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/casos/buscar" class="nav-link text-white submenu-link">
-                            <span class="icon-container"><i class="bi bi-search"></i></span>
-                            <span class="link-text">Consultar Casos</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <li class="admin-only">
+            <a href="/gestion-estructura" class="nav-link text-white d-flex align-items-center">
+                <span class="icon-container"><i class="bi bi-building"></i></span>
+                <span class="link-text">Gerencias</span>
+            </a>
         </li>
     </ul>
     
@@ -296,5 +320,4 @@
     </div>
 </div>
 
-<script src="/js/utils/api.js"></script>
 <script src="/js/scripts/sidebar.js"></script>

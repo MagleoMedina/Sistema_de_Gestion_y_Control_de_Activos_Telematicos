@@ -1,192 +1,312 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
+  <head>
     <%- include('../partials/head') %>
     <title>Registro de Pasantes | FMO</title>
     <style>
-        /* --- ESTILOS ESPECÍFICOS (Paleta FMO) --- */
-        :root {
-            --fmo-red: #d6291c;
-            --fmo-orange: #fa812f;
-        }
+      /* --- ESTILOS ESPECÍFICOS (Paleta FMO) --- */
+      :root {
+        --fmo-red: #d6291c;
+        --fmo-orange: #fa812f;
+      }
 
-        .header-title {
-            color: var(--fmo-red);
-            border-bottom: 2px solid var(--fmo-orange);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
+      .header-title {
+        color: var(--fmo-red);
+        border-bottom: 2px solid var(--fmo-orange);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
 
-        .section-label {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 15px;
-            margin-top: 10px;
-            display: block;
-        }
+      .section-label {
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 15px;
+        margin-top: 10px;
+        display: block;
+      }
 
-        /* Input de archivo personalizado */
-        .file-upload-wrapper {
-            position: relative;
-            border: 2px dashed #ddd;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s;
-            background: #f9f9f9;
-        }
-        .file-upload-wrapper:hover {
-            border-color: var(--fmo-orange);
-            background: #fffdf9;
-        }
-        
-        /* Previsualización de Foto */
-        #previewFoto {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid var(--fmo-red);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+      /* Input de archivo personalizado */
+      .file-upload-wrapper {
+        position: relative;
+        border: 2px dashed #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        background: #f9f9f9;
+      }
+      .file-upload-wrapper:hover {
+        border-color: var(--fmo-orange);
+        background: #fffdf9;
+      }
 
-        .btn-fmo-gradient {
-            background: linear-gradient(to right, var(--fmo-red), var(--fmo-orange));
-            color: white;
-            border: none;
-        }
-        .btn-fmo-gradient:hover {
-            background: linear-gradient(to right, #b91d12, #e06d1f);
-            color: white;
-            transform: translateY(-1px);
-        }
+      /* Previsualización de Foto */
+      #previewFoto {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid var(--fmo-red);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-fmo-gradient {
+        background: linear-gradient(
+          to right,
+          var(--fmo-red),
+          var(--fmo-orange)
+        );
+        color: white;
+        border: none;
+      }
+      .btn-fmo-gradient:hover {
+        background: linear-gradient(to right, #b91d12, #e06d1f);
+        color: white;
+        transform: translateY(-1px);
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <div class="wrapper">
-        <%- include('../partials/sidebar') %>
+      <%- include('../partials/sidebar') %>
 
-        <div id="content" class="w-100 bg-light p-3 fade-in" style="overflow-y: auto;">
-            <div class="container-fluid" style="max-width: 900px;">
-                
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h4 class="fw-bold m-0 text-dark"><i class="bi bi-mortarboard-fill me-2" style="color: var(--fmo-red);"></i>Gestión de Pasantes</h4>
-                        <small class="text-muted">Ingreso de nuevo personal pasante</small>
-                    </div>
-                    <button class="btn btn-fmo-gradient shadow-sm px-4 rounded-pill" onclick="guardarPasante()">
-                        <i class="bi bi-save-fill me-2"></i>Registrar Pasante
-                    </button>
-                </div>
-
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        
-                        <form id="formPasante" enctype="multipart/form-data">
-                            
-                            <span class="section-label"><i class="bi bi-person-lines-fill me-1"></i>Datos Personales</span>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-2 text-center">
-                                    <div class="mb-2">
-                                        <img src="#" id="previewFoto" alt="Foto">
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary w-100" onclick="document.getElementById('inputFoto').click()">
-                                        <i class="bi bi-camera"></i> Subir
-                                    </button>
-                                    <input type="file" id="inputFoto" class="d-none" accept="image/*" onchange="mostrarPreview(this)">
-                                </div>
-                                
-                                <div class="col-md-10">
-                                    <div class="row g-3">
-                                        <div class="col-md-3">
-                                            <label class="form-label small fw-bold text-muted">Ficha</label>
-                                            <input type="number" class="form-control" id="ficha" placeholder="Ej: 9900" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label small fw-bold text-muted">Cédula</label>
-                                            <input type="text" class="form-control" id="cedula" placeholder="V-12345678">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-muted">Nombre Completo</label>
-                                            <input type="text" class="form-control" id="nombre" placeholder="Nombre Apellido" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted">Fecha Nacimiento</label>
-                                            <input type="date" class="form-control" id="fechaNacimiento">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted">Teléfono / Ext.</label>
-                                            <input type="text" class="form-control" id="extension" placeholder="0414-XXXXXXX">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label small fw-bold text-muted">Gerencia</label>
-                                            <input type="text" class="form-control" id="gerencia" value="Gerencia de Telemática">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <span class="section-label"><i class="bi bi-building me-1"></i>Información Académica</span>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">Instituto / Universidad</label>
-                                    <input type="text" class="form-control" id="instituto" placeholder="Ej: UNEG, UCAB, UNEXPO" list="listaInstitutos">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">Carrera / Título Pretendido</label>
-                                    <input type="text" class="form-control" id="titulo" placeholder="Ej: Ingeniería Informática">
-                                </div>
-                            </div>
-
-                            <span class="section-label"><i class="bi bi-calendar-range me-1"></i>Detalles de Pasantía</span>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">Fecha Inicio</label>
-                                    <input type="date" class="form-control" id="fechaInicio">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">Fecha Finalización</label>
-                                    <input type="date" class="form-control" id="fechaFin">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted">Área Asignada</label>
-                                    <select class="form-select" id="areaAsignada">
-                                        <option value="Soporte Técnico">Soporte Técnico</option>
-                                        <option value="Desarrollo de Software">Desarrollo de Software</option>
-                                        <option value="Redes y Comunicaciones">Redes y Comunicaciones</option>
-                                        <option value="Administrativo">Administrativo</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <span class="section-label"><i class="bi bi-file-earmark-pdf me-1"></i>Documentación</span>
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <div class="file-upload-wrapper" onclick="document.getElementById('inputInforme').click()" style="cursor: pointer;">
-                                        <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
-                                        <h6 class="mt-2 text-dark">Haga clic para subir el Informe Final (PDF)</h6>
-                                        <small class="text-muted d-block" id="lblNombreInforme">Ningun archivo seleccionado</small>
-                                        <input type="file" id="inputInforme" class="d-none" accept="application/pdf" onchange="mostrarNombreArchivo(this)">
-                                    </div>
-                                </div>
-                            </div>
-
-                        </form>
-                    </div>
-                </div>
+      <div
+        id="content"
+        class="w-100 bg-light p-3 fade-in"
+        style="overflow-y: auto"
+      >
+        <div class="container-fluid" style="max-width: 900px">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h4 class="fw-bold m-0 text-dark">
+                <i
+                  class="bi bi-mortarboard-fill me-2"
+                  style="color: var(--fmo-red)"
+                ></i
+                >Gestión de Pasantes
+              </h4>
+              <small class="text-muted"
+                >Ingreso de nuevo personal pasante</small
+              >
             </div>
+            <button
+              class="btn btn-fmo-gradient shadow-sm px-4 rounded-pill"
+              onclick="guardarPasante()"
+            >
+              <i class="bi bi-save-fill me-2"></i>Registrar Pasante
+            </button>
+          </div>
+
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+              <form id="formPasante" enctype="multipart/form-data">
+                <span class="section-label"
+                  ><i class="bi bi-person-lines-fill me-1"></i>Datos
+                  Personales</span
+                >
+                <div class="row g-3 mb-4">
+                  <div class="col-md-2 text-center">
+                    <div class="mb-2">
+                      <img src="img/placeholder.jpeg" id="previewFoto" alt="Foto" />
+                    </div>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary w-100"
+                      onclick="document.getElementById('inputFoto').click()"
+                    >
+                      <i class="bi bi-camera"></i> Subir
+                    </button>
+                    <input
+                      type="file"
+                      id="inputFoto"
+                      class="d-none"
+                      accept="image/*"
+                      onchange="mostrarPreview(this)"
+                    />
+                  </div>
+
+                  <div class="col-md-10">
+                    <div class="row g-3">
+                      <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted"
+                          >Ficha</label
+                        >
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="ficha"
+                          placeholder="Ej: 9900"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted"
+                          >Cédula</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="cedula"
+                          placeholder="V-12345678"
+                        />
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted"
+                          >Nombre Completo</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="nombre"
+                          placeholder="Nombre Apellido"
+                          required
+                        />
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted"
+                          >Fecha Nacimiento</label
+                        >
+                        <input
+                          type="date"
+                          class="form-control"
+                          id="fechaNacimiento"
+                        />
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted"
+                          >Teléfono / Ext.</label
+                        >
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="extension"
+                          placeholder="0414-XXXXXXX"
+                        />
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted"
+                          >Gerencia</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="gerencia"
+                          value="Gerencia de Telemática"
+                          readonly
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <span class="section-label"
+                  ><i class="bi bi-building me-1"></i>Información
+                  Académica</span
+                >
+                <div class="row g-3 mb-4">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted"
+                      >Instituto / Universidad</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="instituto"
+                      placeholder="Ej: UNEG, UCAB, UNEXPO"
+                      list="listaInstitutos"
+                      autocomplete="off"
+                    />
+                    <datalist id="listaInstitutos"></datalist>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold text-muted"
+                      >Carrera / Título Pretendido</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="titulo"
+                      placeholder="Ej: Ingeniería Informática"
+                    />
+                  </div>
+                </div>
+
+                <span class="section-label"
+                  ><i class="bi bi-calendar-range me-1"></i>Detalles de
+                  Pasantía</span
+                >
+                <div class="row g-3 mb-4">
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted"
+                      >Fecha Inicio</label
+                    >
+                    <input type="date" class="form-control" id="fechaInicio" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted"
+                      >Fecha Finalización</label
+                    >
+                    <input type="date" class="form-control" id="fechaFin" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted"
+                      >Área Asignada (Depto)</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="areaAsignada"
+                      placeholder="Ej: Soporte Técnico"
+                      list="listaDepartamentos"
+                      autocomplete="off"
+                    />
+                    <datalist id="listaDepartamentos"></datalist>
+                  </div>
+                </div>
+
+                <span class="section-label"
+                  ><i class="bi bi-file-earmark-pdf me-1"></i
+                  >Documentación</span
+                >
+                <div class="row g-3">
+                  <div class="col-12">
+                    <div
+                      class="file-upload-wrapper"
+                      onclick="document.getElementById('inputInforme').click()"
+                      style="cursor: pointer"
+                    >
+                      <i class="bi bi-cloud-arrow-up fs-1 text-muted"></i>
+                      <h6 class="mt-2 text-dark">
+                        Haga clic para subir el Informe Final (PDF)
+                      </h6>
+                      <small class="text-muted d-block" id="lblNombreInforme"
+                        >Ningun archivo seleccionado</small
+                      >
+                      <input
+                        type="file"
+                        id="inputInforme"
+                        class="d-none"
+                        accept="application/pdf"
+                        onchange="mostrarNombreArchivo(this)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <%- include('../partials/modal') %>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/utils/api.js"></script>
     <script src="/js/scripts/registroPasante.js"></script>
-</body>
+  </body>
 </html>

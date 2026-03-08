@@ -129,5 +129,3 @@ const ApiService = {
 if (typeof window !== 'undefined') {
     window.ApiService = ApiService;
 }
-
-console.log("API Backend URL:", BASE_URL);

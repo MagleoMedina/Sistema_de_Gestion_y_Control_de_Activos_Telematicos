@@ -1,55 +1,68 @@
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('sidebarToggle');
+    const toggleBtn = document.getElementById('sidebarToggle'); // El botón de ADENTRO
+    const mobileToggleBtn = document.getElementById('mobileToggleBtn'); // NUEVO: El botón de AFUERA
+    const overlay = document.getElementById('sidebarOverlay');
     
     // 1. Reactivar animaciones tras la carga
     setTimeout(() => {
         sidebar.classList.remove('no-transition');
     }, 50);
 
-    // 2. Toggle Sidebar (Colapsar/Expandir con el botón de hamburguesa)
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('collapsed');
-        const estadoActual = sidebar.classList.contains('collapsed');
-        localStorage.setItem('sidebar-collapsed', estadoActual);
+    // 2. Toggle Sidebar (Comportamiento Desktop vs Mobile)
+    
+    // Si tocan el botón flotante de AFUERA (Solo visible en móviles)
+    if (mobileToggleBtn) {
+        mobileToggleBtn.addEventListener('click', () => {
+            sidebar.classList.add('mobile-open');
+            if (overlay) overlay.classList.add('active');
+        });
+    }
 
-        if(estadoActual) {
-            cerrarSubmenus(); // Helper para limpiar submenús abiertos
+    // Si tocan el botón de ADENTRO del menú
+    toggleBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            // En móvil, este botón sirve para CERRAR el menú
+            sidebar.classList.remove('mobile-open');
+            if (overlay) overlay.classList.remove('active');
+        } else {
+            // Comportamiento normal en Computadora
+            sidebar.classList.toggle('collapsed');
+            const estadoActual = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebar-collapsed', estadoActual);
+
+            if(estadoActual) {
+                cerrarSubmenus(); 
+            }
         }
     });
 
+    // 2.1 Cerrar sidebar al hacer clic en el fondo oscuro (Solo Mobile)
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+        });
+    }
+
     // 3. Funciones de Auto-Expandir al hacer clic en secciones principales
     const btnRecibos = document.getElementById('btnGrupoRecibos');
-    const btnCasos = document.getElementById('btnGrupoCasos'); // <--- NUEVO: Botón de Atención Usuario
+    const btnCasos = document.getElementById('btnGrupoCasos'); 
+    const btnPasantes = document.getElementById('btnGrupoPasantes'); // NUEVO: Botón de Pasantes
     const btnPerfil = document.getElementById('dropdownUser1');
 
-    // A. Grupo Recibos
-    if(btnRecibos) {
-        btnRecibos.addEventListener('click', () => {
-            expandirSidebarSiEstaContraido();
-        });
-    }
-
-    // B. Grupo Casos (Atención Usuario) - NUEVA LÓGICA SOLICITADA
-    if(btnCasos) {
-        btnCasos.addEventListener('click', () => {
-            expandirSidebarSiEstaContraido();
-        });
-    }
-
-    // C. Perfil de Usuario
-    if(btnPerfil){
-        btnPerfil.addEventListener('click', () => {
-            expandirSidebarSiEstaContraido();
-        });
-    }
-
     function expandirSidebarSiEstaContraido() {
-        if (sidebar.classList.contains('collapsed')) {
+        // Solo aplica en Desktop, en mobile siempre está expandido cuando se ve
+        if (window.innerWidth > 768 && sidebar.classList.contains('collapsed')) {
             sidebar.classList.remove('collapsed');
             localStorage.setItem('sidebar-collapsed', 'false');
         }
     }
+
+    if(btnRecibos) btnRecibos.addEventListener('click', expandirSidebarSiEstaContraido);
+    if(btnCasos) btnCasos.addEventListener('click', expandirSidebarSiEstaContraido);
+    if(btnPasantes) btnPasantes.addEventListener('click', expandirSidebarSiEstaContraido);
+    if(btnPerfil) btnPerfil.addEventListener('click', expandirSidebarSiEstaContraido);
 
     // 4. LÓGICA DE DATOS DE USUARIO (ROL Y NOMBRE)
     if (typeof ApiService !== 'undefined') {
@@ -84,11 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
     activarLinkPorUrl();
 
     // =========================================================
-    // 6. AUTO-COLAPSO (TIMER DE 5 SEGUNDOS) - NUEVA LÓGICA
+    // 6. AUTO-COLAPSO (TIMER DE 5 SEGUNDOS)
     // =========================================================
     let collapseTimer;
 
-    // Cuando el mouse entra al sidebar, cancelamos el timer (usuario interactuando)
+    // Cuando el mouse entra al sidebar, cancelamos el timer
     sidebar.addEventListener('mouseenter', () => {
         if (collapseTimer) {
             clearTimeout(collapseTimer);
@@ -98,26 +111,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cuando el mouse sale, iniciamos la cuenta regresiva
     sidebar.addEventListener('mouseleave', () => {
-        // Solo iniciamos si NO está colapsado ya
-        if (!sidebar.classList.contains('collapsed')) {
+        // Aseguramos que el auto-colapso solo ocurra en PC (pantallas grandes)
+        if (window.innerWidth > 768 && !sidebar.classList.contains('collapsed')) {
             collapseTimer = setTimeout(() => {
-                // Acción tras 5 segundos
                 sidebar.classList.add('collapsed');
                 localStorage.setItem('sidebar-collapsed', 'true');
-                cerrarSubmenus(); // Cerramos acordeones para limpieza visual
-            }, 5000); // 5000 ms = 5 segundos
+                cerrarSubmenus(); 
+            }, 5000); 
         }
     });
 });
 
 /**
  * Cierra todos los submenús (acordeones) abiertos.
- * Útil al colapsar el sidebar para que no queden abiertos internamente.
  */
 function cerrarSubmenus() {
-    const submenus = document.querySelectorAll('.collapse.show'); // Busca los abiertos
+    const submenus = document.querySelectorAll('.collapse.show'); 
     submenus.forEach(submenu => {
-        // Usamos la API de Bootstrap para cerrarlos limpiamente
         new bootstrap.Collapse(submenu, { toggle: false }).hide();
     });
 }
@@ -133,7 +143,10 @@ function activarLinkPorUrl() {
     links.forEach(link => {
         const href = link.getAttribute('href');
         
-        if (href && href !== '#' && (currentPath === href || currentPath.startsWith(href))) {
+        // --- CAMBIO AQUÍ: Validación más estricta ---
+        // Ahora exigimos que la URL sea EXACTAMENTE igual (currentPath === href)
+        // O si usamos startsWith, nos aseguramos de que termine ahí o siga con un slash (ej. /casos/crear)
+        if (href && href !== '#' && (currentPath === href || currentPath.startsWith(href + '/'))) {
             link.classList.add('active');
 
             const parentCollapse = link.closest('.collapse');

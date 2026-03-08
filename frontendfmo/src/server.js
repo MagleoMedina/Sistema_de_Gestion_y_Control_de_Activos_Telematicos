@@ -133,5 +133,8 @@ app.get('/registrar-pasante', (req, res) => {
 app.get('/consultar-pasante', (req, res) => {
     res.render('pages/consultar-pasantes', { title: 'Consultar Pasantes' });
 });
+app.get('/gestion-estructura', (req, res) => {
+    res.render('pages/gestion-estructura');
+});
 
 module.exports = { server, PORT, HOST, BACKEND_URL };

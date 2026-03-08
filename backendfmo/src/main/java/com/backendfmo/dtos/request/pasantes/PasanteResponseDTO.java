@@ -12,13 +12,15 @@ public class PasanteResponseDTO {
     private String rutaFotografia;
     private String fechaInicio;
     private String fechaFinalizacion;
-    private String areaAsignada;
     private String fechaNacimiento;
     private String tituloPretendido;
 
     // Datos del Instituto (Aplanado)
     private String nombreInstituto;
 
+// --- NUEVOS CAMPOS APLANADOS ---
+    private String departamentoAsignado; // Nombre del departamento
+    private String gerenciaAsignada;     // Nombre de la gerencia padre
     // Datos del Usuario (Aplanados)
     private Integer ficha;
     private String nombre;

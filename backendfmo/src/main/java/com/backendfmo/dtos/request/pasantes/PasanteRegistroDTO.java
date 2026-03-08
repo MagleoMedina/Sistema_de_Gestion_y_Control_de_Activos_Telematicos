@@ -8,13 +8,13 @@ public class PasanteRegistroDTO {
     private Integer ficha;
     private String nombre;
     private String extension;
-    private String gerencia; // Generalmente "Gerencia de Telemática" para pasantes ahí
+    private String gerencia; // Texto, ej: "Gerencia de Telemática"
 
     // Datos del Pasante
-    private String nombreInstituto; // Lo buscamos o creamos
+    private String nombreInstituto; 
     private String fechaInicio;
     private String fechaFinalizacion;
-    private String areaAsignada;
+    private String areaAsignada; // Texto, ej: "Soporte Técnico" (será el Departamento)
     private String fechaNacimiento;
     private String tituloPretendido;
     private String cedula;

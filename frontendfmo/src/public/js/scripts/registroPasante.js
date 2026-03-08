@@ -47,10 +47,10 @@ async function guardarPasante() {
     const cedula = document.getElementById('cedula').value; // NUEVO CAMPO
     const instituto = document.getElementById('instituto').value;
 
-   // if (!ficha || !nombre || !cedula || !instituto) {
-    //    mostrarModal("Por favor complete los campos obligatorios: Ficha, Cédula, Nombre e Instituto.", "warning");
-    //    return;
-    //}
+   if (!ficha || !nombre || !cedula || !instituto) {
+       mostrarModal("Por favor complete los campos obligatorios: Ficha, Cédula, Nombre e Instituto.", "warning");
+        return;
+    }
 
     // A. Construir el Objeto JSON con los datos de texto
     const datosPasante = {

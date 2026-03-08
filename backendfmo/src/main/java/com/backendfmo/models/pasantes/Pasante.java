@@ -52,8 +52,10 @@ public class Pasante {
     @Column(name = "fecha_finalizacion")
     private String fechaFinalizacion;
 
-    @Column(name = "area_asignada")
-    private String areaAsignada;
+    // --- NUEVA RELACIÓN: Reemplaza al String area_asignada ---
+    @ManyToOne
+    @JoinColumn(name = "area_asignada", referencedColumnName = "id")
+    private Departamento departamento;
 
     @Column(name = "fecha_de_nacimiento")
     private String fechaNacimiento;

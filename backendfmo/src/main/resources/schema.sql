@@ -208,12 +208,25 @@ CREATE TABLE IF NOT EXISTS pasante (
     fotografia TEXT,                    -- Ruta del archivo PNG/JPG
     fecha_inicio TEXT,
     fecha_finalizacion TEXT,
-    area_asignada TEXT,
+    area_asignada INTEGER,
     fecha_de_nacimiento TEXT,
     titulo_pretendido TEXT,
 	cedula TEXT,
     FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (instituto_id) REFERENCES instituto(id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (instituto_id) REFERENCES instituto(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (area_asignada) REFERENCES departamento(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "gerencia" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"nombre" TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "departamento" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"nombre" TEXT NOT NULL,
+	"gerencia_id" INTEGER NOT NULL,
+	FOREIGN KEY (gerencia_id) REFERENCES gerencia(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');

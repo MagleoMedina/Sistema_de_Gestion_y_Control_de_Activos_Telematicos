@@ -15,9 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.backendfmo.dtos.request.pasantes.PasanteRegistroDTO;
 import com.backendfmo.dtos.request.pasantes.PasanteResponseDTO;
+import com.backendfmo.models.pasantes.Departamento;
+import com.backendfmo.models.pasantes.Gerencia;
 import com.backendfmo.models.pasantes.Instituto;
 import com.backendfmo.models.pasantes.Pasante;
 import com.backendfmo.models.reciboequipos.Usuario;
+import com.backendfmo.repository.DepartamentoRepository;
+import com.backendfmo.repository.GerenciaRepository;
 import com.backendfmo.repository.InstitutoRepository;
 import com.backendfmo.repository.PasanteRepository;
 import com.backendfmo.repository.UsuarioRepository;
@@ -34,10 +38,16 @@ public class PasanteServiceImpl {
     @Autowired
     private InstitutoRepository institutoRepository;
 
+    @Autowired
+    private DepartamentoRepository departamentoRepository; // <-- NUEVO REPOSITORIO
+
+    @Autowired
+    private GerenciaRepository gerenciaRepository;
+    
     private final Path rootFoto;
     private final Path rootInforme;
 
-    public PasanteServiceImpl() {
+   public PasanteServiceImpl() {
         String projectRoot = System.getProperty("user.dir");
         Path basePath = Paths.get(projectRoot, "src", "main", "resources", "pasantes");
         this.rootFoto = basePath.resolve("fotografia");
@@ -60,7 +70,6 @@ public class PasanteServiceImpl {
         usuario.setNombre(dto.getNombre());
         usuario.setExtension(dto.getExtension());
         usuario.setGerencia(dto.getGerencia());
-        
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
         // 2. GESTIÓN DE INSTITUTO
@@ -71,29 +80,45 @@ public class PasanteServiceImpl {
                     return institutoRepository.save(i);
                 });
 
-        // --- 3. MANEJO DE ARCHIVOS (LÓGICA ACTUALIZADA) ---
+        // --- 3. GESTIÓN DINÁMICA DE GERENCIA Y DEPARTAMENTO ---
         
-        // A. Limpiamos el nombre: "Yuriannys Garcia" -> "YuriannysGarcia" (sin espacios)
-        String nombreSinEspacios = usuarioGuardado.getNombre().replaceAll("\\s+", "");
+        // A. Buscar o crear la Gerencia
+        Gerencia gerencia = gerenciaRepository.findByNombreIgnoreCase(dto.getGerencia())
+                .orElseGet(() -> {
+                    Gerencia g = new Gerencia();
+                    g.setNombre(dto.getGerencia());
+                    return gerenciaRepository.save(g);
+                });
 
-        // B. Construimos el nombre base: "9950_foto_YuriannysGarcia"
+        // B. Buscar o crear el Departamento (vinculado a esa Gerencia)
+        Departamento departamento = departamentoRepository.findByNombreIgnoreCaseAndGerencia(dto.getAreaAsignada(), gerencia)
+                .orElseGet(() -> {
+                    Departamento d = new Departamento();
+                    d.setNombre(dto.getAreaAsignada());
+                    d.setGerencia(gerencia); // Relación crucial
+                    return departamentoRepository.save(d);
+                });
+        // --------------------------------------------------------
+
+        // 4. MANEJO DE ARCHIVOS
+        String nombreSinEspacios = usuarioGuardado.getNombre().replaceAll("\\s+", "");
         String nombreBaseFoto = usuarioGuardado.getFicha() + "_foto_" + nombreSinEspacios;
         String nombreBaseInforme = usuarioGuardado.getFicha() + "_informe_" + nombreSinEspacios;
 
-        // C. Llamamos a guardar (Ahora pasamos el nombre completo deseado)
         String rutaFoto = guardarArchivo(fotoFile, rootFoto, nombreBaseFoto);
         String rutaInforme = guardarArchivo(informeFile, rootInforme, nombreBaseInforme);
-        // --------------------------------------------------
 
-        // 4. CREACIÓN DEL PASANTE
+        // 5. CREACIÓN DEL PASANTE
         Pasante pasante = pasanteRepository.findById(usuarioGuardado.getId().longValue()) 
                           .orElse(new Pasante());
 
         pasante.setUsuario(usuarioGuardado);
         pasante.setInstituto(instituto);
+        pasante.setDepartamento(departamento); // Asignamos el departamento que creamos o encontramos
+        
+        pasante.setCedula(dto.getCedula());
         pasante.setFechaInicio(dto.getFechaInicio());
         pasante.setFechaFinalizacion(dto.getFechaFinalizacion());
-        pasante.setAreaAsignada(dto.getAreaAsignada());
         pasante.setFechaNacimiento(dto.getFechaNacimiento());
         pasante.setTituloPretendido(dto.getTituloPretendido());
 
@@ -103,62 +128,58 @@ public class PasanteServiceImpl {
         return pasanteRepository.save(pasante);
     }
 
-    // --- FUNCIÓN ACTUALIZADA ---
     private String guardarArchivo(MultipartFile file, Path rutaBase, String nombreCompletoSinExtension) throws IOException {
         if (file == null || file.isEmpty()) return null;
-
         if (!Files.exists(rutaBase)) {
             Files.createDirectories(rutaBase);
         }
-
         String originalFilename = file.getOriginalFilename();
         String extension = "";
         if (originalFilename != null && originalFilename.contains(".")) {
             extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         }
-
         String nombreFinal = nombreCompletoSinExtension + extension;
         Path rutaArchivo = rutaBase.resolve(nombreFinal);
-
         Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
-
-        // --- CAMBIO CLAVE ---
-        // Antes devolvíamos: rutaArchivo.toString() (Ruta absoluta /home/magleo...)
-        // Ahora devolvemos: nombreFinal (Solo el archivo "9950_foto_X.png")
         return nombreFinal; 
     }
 
     public List<PasanteResponseDTO> obtenerTodosLosPasantes() {
         List<Pasante> pasantes = pasanteRepository.findAll();
+        return pasantes.stream().map(this::convertirEntidadADTO).collect(Collectors.toList());
+    }
+
+    public PasanteResponseDTO convertirEntidadADTO(Pasante p) {
+        PasanteResponseDTO dto = new PasanteResponseDTO();
         
-        return pasantes.stream().map(p -> {
-            PasanteResponseDTO dto = new PasanteResponseDTO();
-            
-            // Mapeo directo de Pasante
-            dto.setId(p.getId());
-            dto.setCedula(p.getCedula()); // Asegúrate de que tu modelo Pasante tenga getCedula()
-            dto.setRutaInforme(p.getRutaInforme());
-            dto.setRutaFotografia(p.getRutaFotografia());
-            dto.setFechaInicio(p.getFechaInicio());
-            dto.setFechaFinalizacion(p.getFechaFinalizacion());
-            dto.setAreaAsignada(p.getAreaAsignada());
-            dto.setFechaNacimiento(p.getFechaNacimiento());
-            dto.setTituloPretendido(p.getTituloPretendido());
+        dto.setId(p.getId());
+        dto.setCedula(p.getCedula()); 
+        dto.setRutaInforme(p.getRutaInforme());
+        dto.setRutaFotografia(p.getRutaFotografia());
+        dto.setFechaInicio(p.getFechaInicio());
+        dto.setFechaFinalizacion(p.getFechaFinalizacion());
+        dto.setFechaNacimiento(p.getFechaNacimiento());
+        dto.setTituloPretendido(p.getTituloPretendido());
 
-            // Mapeo del Instituto
-            if (p.getInstituto() != null) {
-                dto.setNombreInstituto(p.getInstituto().getNombreInstituto());
+        if (p.getInstituto() != null) {
+            dto.setNombreInstituto(p.getInstituto().getNombreInstituto());
+        }
+
+        if (p.getDepartamento() != null) {
+            dto.setDepartamentoAsignado(p.getDepartamento().getNombre());
+            // Como la tabla pasante ahora guarda el departamento, podemos obtener la gerencia en cascada:
+            if (p.getDepartamento().getGerencia() != null) {
+                dto.setGerenciaAsignada(p.getDepartamento().getGerencia().getNombre());
             }
+        }
 
-            // Mapeo del Usuario
-            if (p.getUsuario() != null) {
-                dto.setFicha(p.getUsuario().getFicha());
-                dto.setNombre(p.getUsuario().getNombre());
-                dto.setExtension(p.getUsuario().getExtension());
-                dto.setGerencia(p.getUsuario().getGerencia());
-            }
+        if (p.getUsuario() != null) {
+            dto.setFicha(p.getUsuario().getFicha());
+            dto.setNombre(p.getUsuario().getNombre());
+            dto.setExtension(p.getUsuario().getExtension());
+            // Si quieres también puedes enviar la gerencia guardada en el usuario, pero ya la enviamos desde el departamento arriba.
+        }
 
-            return dto;
-        }).collect(Collectors.toList());
+        return dto;
     }
 }

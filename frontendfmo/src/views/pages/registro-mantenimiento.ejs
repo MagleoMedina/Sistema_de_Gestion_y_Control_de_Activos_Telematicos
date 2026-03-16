@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head') %>
+    <title>Registro Tabular de Mantenimiento | FMO</title>
+    <style>
+        :root {
+            --fmo-red: #d6291c;
+            --fmo-orange: #fa812f;
+        }
+
+        /* --- ESTILOS DE LA TABLA TIPO EXCEL --- */
+        .table-responsive {
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            background: white;
+            overflow-x: auto; 
+        }
+
+        .table-excel {
+            margin-bottom: 0;
+            min-width: 1200px; 
+        }
+
+        .table-excel thead {
+            background: linear-gradient(135deg, var(--fmo-red), var(--fmo-orange));
+            color: white;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-excel th, .table-excel td {
+            vertical-align: middle;
+            border: 1px solid #dee2e6;
+        }
+
+        .table-excel td {
+            padding: 0 !important;
+            position: relative;
+        }
+
+        .table-excel input, .table-excel select {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 0;
+            padding: 10px 8px;
+            font-size: 0.9rem;
+            background: transparent;
+            box-shadow: none !important;
+        }
+
+        .table-excel input:focus, .table-excel select:focus {
+            outline: 2px solid var(--fmo-red);
+            outline-offset: -2px;
+            background: #fffdf9;
+            z-index: 2;
+            position: relative;
+        }
+
+        .col-num { width: 50px; text-align: center; font-weight: bold; padding: 10px !important; background: #f8f9fa; }
+        .col-ficha { min-width: 90px; }
+        .col-usuario { min-width: 150px; }
+        .col-depto { min-width: 150px; }
+        .col-fmo { min-width: 130px; } /* MOVIDO AL LADO DE DEPTO */
+        .col-tipo { min-width: 110px; }
+        .col-marca { min-width: 120px; }
+        .col-modelo { min-width: 120px; }
+        .col-so { min-width: 100px; }
+        .col-obs { min-width: 180px; }
+        .col-accion { width: 50px; text-align: center; padding: 0 !important; }
+
+        .btn-add-row {
+            border: 2px dashed var(--fmo-orange);
+            color: var(--fmo-orange);
+            font-weight: bold;
+            background: white;
+            transition: all 0.2s;
+        }
+        .btn-add-row:hover { background: #fff5f0; }
+
+        /* --- ESTILOS DE FOTOS GLOBALES --- */
+        .section-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .file-upload-wrapper {
+            position: relative;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+            background: #f9f9f9;
+            cursor: pointer;
+        }
+        .file-upload-wrapper:hover {
+            border-color: var(--fmo-orange);
+            background: #fffdf9;
+        }
+        #previewContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        .img-preview-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid var(--fmo-red);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .img-preview-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <%- include('../partials/sidebar') %>
+
+        <div id="content" class="w-100 bg-light p-3 fade-in" style="overflow-y: auto;">
+            <div class="container-fluid">
+                
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <div>
+                        <h4 class="fw-bold m-0 text-dark"><i class="bi bi-table me-2" style="color: var(--fmo-red);"></i>Planilla de Mantenimiento</h4>
+                        <small class="text-muted">Registro de equipos en lote</small>
+                    </div>
+                    <button class="btn text-white shadow-sm px-4 rounded-pill" style="background: linear-gradient(135deg, var(--fmo-red), var(--fmo-orange));" onclick="procesarLote()">
+                        <i class="bi bi-cloud-arrow-up-fill me-2"></i>Guardar Planilla
+                    </button>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 mb-3">
+                    <div class="card-body p-3">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-muted">Gerencia Intervenida</label>
+                                <input type="text" class="form-control" id="globalGerencia" list="listaGerencias" placeholder="Ej: Gerencia de Telemática" required>
+                                <datalist id="listaGerencias"></datalist>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label small fw-bold text-muted">Fecha del Mantenimiento</label>
+                                <input type="date" class="form-control" id="globalFecha" required>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label small fw-bold text-muted">Analista</label>
+                                <input type="text" class="form-control bg-light" id="globalAnalista">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-excel">
+                        <thead>
+                            <tr>
+                                <th class="col-num">N°</th>
+                                <th class="col-ficha">Ficha</th>
+                                <th class="col-usuario">Usuario</th>
+                                <th class="col-depto">Depto</th>
+                                <th class="col-fmo">FMO/Serial</th>
+                                <th class="col-tipo">CPU/IMP</th>
+                                <th class="col-marca">Marca</th>
+                                <th class="col-modelo">Modelo</th>
+                                <th class="col-so">S.O.</th>
+                                <th class="col-obs">Observaciones</th>
+                                <th class="col-accion"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaLote">
+                            </tbody>
+                    </table>
+                </div>
+
+                <button class="btn btn-add-row w-100 mt-3 py-2 rounded-3 mb-4" onclick="agregarFila()">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Añadir Equipo a la Planilla
+                </button>
+
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <span class="section-label"><i class="bi bi-camera-fill me-1"></i>Evidencia Fotográfica del Lote (Opcional)</span>
+                        <div class="file-upload-wrapper" onclick="document.getElementById('inputFotos').click()">
+                            <i class="bi bi-images fs-1 text-muted"></i>
+                            <h6 class="mt-2 text-dark">Haga clic para subir fotografías</h6>
+                            <small class="text-muted d-block">Las imágenes adjuntas se guardarán como evidencia general de este mantenimiento.</small>
+                            <input type="file" id="inputFotos" class="d-none" accept="image/*" multiple onchange="mostrarMiniaturas(this)">
+                        </div>
+                        <div id="previewContainer"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <datalist id="listaDepartamentos"></datalist>
+    <datalist id="listaMarcas"></datalist>
+    <datalist id="listaModelos"></datalist>
+
+    <%- include('../partials/modal') %>
+    <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/js/utils/api.js"></script>
+    <script src="/js/scripts/registroMantenimiento.js"></script>
+</body>
+</html>

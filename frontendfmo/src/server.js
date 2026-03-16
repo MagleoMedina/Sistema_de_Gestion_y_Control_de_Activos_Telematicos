@@ -137,4 +137,9 @@ app.get('/gestion-estructura', (req, res) => {
     res.render('pages/gestion-estructura');
 });
 
+// En Express
+app.get('/registro-mantenimiento', (req, res) => {
+    res.render('pages/registro-mantenimiento');
+});
+
 module.exports = { server, PORT, HOST, BACKEND_URL };

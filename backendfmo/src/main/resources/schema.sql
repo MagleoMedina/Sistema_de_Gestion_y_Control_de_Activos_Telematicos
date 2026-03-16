@@ -229,6 +229,59 @@ CREATE TABLE IF NOT EXISTS "departamento" (
 	FOREIGN KEY (gerencia_id) REFERENCES gerencia(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+
+
+CREATE TABLE IF NOT EXISTS "marca" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"nombre" TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "modelo" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"marca_id" INTEGER NOT NULL,
+	"nombre" TEXT NOT NULL,
+	FOREIGN KEY (marca_id) REFERENCES marca(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "dispositivo" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"fmo" TEXT NOT NULL,
+	"modelo_id" INTEGER NOT NULL,
+	"tipo" text NOT NULL,
+	FOREIGN KEY (modelo_id) REFERENCES modelo(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+CREATE TABLE IF NOT EXISTS "mantenimiento" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"gerencia_id" INTEGER NOT NULL,
+	"analista" TEXT NOT NULL,
+	"fecha" TEXT NOT NULL,
+	FOREIGN KEY (gerencia_id) REFERENCES gerencia(id) ON UPDATE CASCADE ON DELETE CASCADE
+); 
+
+CREATE TABLE IF NOT EXISTS "mantenimiento_departamento" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"mantenimiento_id" INTEGER NOT NULL,
+	"usuario_id" INTEGER NOT NULL,
+	"departamento_id" INTEGER NOT NULL,
+	"dispositivo_id" INTEGER NOT NULL,
+	"so" TEXT NOT NULL,
+	"observaciones" TEXT,
+	FOREIGN KEY (mantenimiento_id) REFERENCES mantenimiento(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (usuario_id) REFERENCES usuario(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (departamento_id) REFERENCES departamento(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (dispositivo_id) REFERENCES dispositivo(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "mantenimiento_fotos"(
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"mantenimiento_id" INTEGER NOT NULL,
+	"foto_path" TEXT NOT NULL,
+	FOREIGN KEY (mantenimiento_id) REFERENCES mantenimiento(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
 INSERT INTO "perifericos" ("id","nombre") VALUES (2,'TECLADO');
 INSERT INTO "perifericos" ("id","nombre") VALUES (3,'MOUSE');

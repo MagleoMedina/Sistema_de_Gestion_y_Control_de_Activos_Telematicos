@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.backendfmo.dtos.request.pasantes.PasanteRegistroDTO;
 import com.backendfmo.dtos.request.pasantes.PasanteResponseDTO;
-import com.backendfmo.repository.PasanteRepository;
 import com.backendfmo.services.PasanteServiceImpl;
 
 import jakarta.validation.Valid;
@@ -29,8 +28,7 @@ public class PasanteController {
     @Autowired
     private PasanteServiceImpl pasanteService;
 
-    @Autowired
-    private PasanteRepository pasanteRepository;
+
 
     @PostMapping(value = "/registrarPasante", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registrarPasante(

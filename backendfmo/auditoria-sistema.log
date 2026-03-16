@@ -699,3 +699,91 @@ io.jsonwebtoken.MalformedJwtException: JWT strings must contain exactly 2 period
 2026-03-08 14:45:20 [http-nio-127.0.0.1-8081-exec-10] INFO  c.b.s.UsuarioSistemaServiceImpl - Obteniendo todos los usuarios del sistema, total: 2
 2026-03-08 14:48:57 [http-nio-127.0.0.1-8081-exec-7] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2
 2026-03-08 14:49:00 [http-nio-127.0.0.1-8081-exec-3] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2
+2026-03-16 10:57:11 [main] INFO  c.backendfmo.BackendFmoApplication - Starting BackendFmoApplication using Java 25.0.2 with PID 25487 (/home/magleoisgay/Documentos/fmo/backendfmo/target/classes started by magleoisgay in /home/magleoisgay/Documentos/fmo/backendfmo)
+2026-03-16 10:57:11 [main] INFO  c.backendfmo.BackendFmoApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-16 10:57:16 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-16 10:57:16 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 107 ms. Found 22 JPA repository interfaces.
+2026-03-16 10:57:17 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-03-16 10:57:17 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-03-16 10:57:17 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-03-16 10:57:17 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 5848 ms
+2026-03-16 10:57:18 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-16 10:57:18 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.0.Final
+2026-03-16 10:57:19 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-16 10:57:20 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:src/main/java/com/backendfmo/db/test.db]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.50.3
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-16 10:57:21 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-16 10:57:21 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-16 10:57:21 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-16 10:57:22 [main] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-03-16 10:57:22 [main] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-03-16 10:57:23 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-16 10:57:24 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-03-16 10:57:24 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api'
+2026-03-16 10:57:24 [main] INFO  c.backendfmo.BackendFmoApplication - Started BackendFmoApplication in 14.463 seconds (process running for 15.65)
+2026-03-16 10:57:41 [http-nio-127.0.0.1-8081-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-16 10:57:41 [http-nio-127.0.0.1-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-03-16 10:57:41 [http-nio-127.0.0.1-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-03-16 10:58:07 [http-nio-127.0.0.1-8081-exec-2] INFO  c.backendfmo.config.AuthController - Usuario 'magleo2003' autenticado con rol 'ADMIN'
+2026-03-16 10:58:08 [http-nio-127.0.0.1-8081-exec-4] INFO  c.b.services.ContadorServiceImpl - Contando equipos atendidos con estatus 'Listo'
+2026-03-16 10:58:08 [http-nio-127.0.0.1-8081-exec-6] INFO  c.b.services.ContadorServiceImpl - Contando periféricos atendidos con estatus 'Listo'
+2026-03-16 10:58:08 [http-nio-127.0.0.1-8081-exec-8] INFO  c.b.services.ContadorServiceImpl - Contando DAET atendidas con estatus 'Listo'
+2026-03-16 10:58:08 [http-nio-127.0.0.1-8081-exec-10] INFO  c.b.services.ContadorServiceImpl - Contando casos resueltos
+2026-03-16 11:07:57 [http-nio-127.0.0.1-8081-exec-10] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.HttpMediaTypeNotSupportedException: Content-Type 'application/json' is not supported]
+2026-03-16 11:08:30 [http-nio-127.0.0.1-8081-exec-2] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.HttpMediaTypeNotSupportedException: Content-Type 'application/json' is not supported]
+2026-03-16 11:16:20 [SpringApplicationShutdownHook] INFO  o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-03-16 11:16:20 [tomcat-shutdown] INFO  o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-03-16 11:16:20 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-16 11:39:41 [main] INFO  c.backendfmo.BackendFmoApplication - Starting BackendFmoApplication using Java 25.0.2 with PID 37862 (/home/magleoisgay/Documentos/fmo/backendfmo/target/classes started by magleoisgay in /home/magleoisgay/Documentos/fmo/backendfmo)
+2026-03-16 11:39:41 [main] INFO  c.backendfmo.BackendFmoApplication - No active profile set, falling back to 1 default profile: "default"
+2026-03-16 11:39:45 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-03-16 11:39:45 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 431 ms. Found 22 JPA repository interfaces.
+2026-03-16 11:39:47 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8081 (http)
+2026-03-16 11:39:47 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-03-16 11:39:47 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-03-16 11:39:47 [main] INFO  o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 6008 ms
+2026-03-16 11:39:48 [main] INFO  org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-03-16 11:39:48 [main] INFO  org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.2.0.Final
+2026-03-16 11:39:49 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-03-16 11:39:49 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:sqlite:src/main/java/com/backendfmo/db/test.db]
+	Database driver: SQLite JDBC
+	Database dialect: SQLiteDialect
+	Database version: 3.50.3
+	Default catalog/schema: undefined/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: SERIALIZABLE [default SERIALIZABLE]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-03-16 11:39:51 [main] INFO  org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-03-16 11:39:51 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-03-16 11:39:51 [main] INFO  o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-03-16 11:39:52 [main] INFO  o.s.s.c.a.a.c.InitializeAuthenticationProviderBeanManagerConfigurer$InitializeAuthenticationProviderManagerConfigurer - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-03-16 11:39:52 [main] WARN  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-03-16 11:39:53 [main] WARN  o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-03-16 11:39:54 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 1 endpoint beneath base path '/actuator'
+2026-03-16 11:39:54 [main] INFO  o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8081 (http) with context path '/api'
+2026-03-16 11:39:54 [main] INFO  c.backendfmo.BackendFmoApplication - Started BackendFmoApplication in 14.693 seconds (process running for 15.578)
+2026-03-16 11:40:19 [http-nio-127.0.0.1-8081-exec-1] INFO  o.a.c.c.C.[.[localhost].[/api] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-16 11:40:19 [http-nio-127.0.0.1-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-03-16 11:40:19 [http-nio-127.0.0.1-8081-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-03-16 12:55:08 [http-nio-127.0.0.1-8081-exec-6] INFO  c.b.s.UsuarioSistemaServiceImpl - Obteniendo todos los usuarios del sistema, total: 2
+2026-03-16 13:13:50 [http-nio-127.0.0.1-8081-exec-6] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2
+2026-03-16 13:13:51 [http-nio-127.0.0.1-8081-exec-9] INFO  c.b.s.UsuarioSistemaServiceImpl - Obteniendo todos los usuarios del sistema, total: 2
+2026-03-16 13:13:52 [http-nio-127.0.0.1-8081-exec-2] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2
+2026-03-16 13:13:56 [http-nio-127.0.0.1-8081-exec-7] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2
+2026-03-16 13:42:34 [http-nio-127.0.0.1-8081-exec-3] INFO  c.b.s.UsuarioSistemaServiceImpl - Obteniendo todos los usuarios del sistema, total: 2
+2026-03-16 13:42:36 [http-nio-127.0.0.1-8081-exec-9] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2
+2026-03-16 13:47:39 [http-nio-127.0.0.1-8081-exec-8] INFO  c.b.services.ControlStockServiceImpl - Listando todo el stock, total items: 2

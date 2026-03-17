@@ -2,6 +2,7 @@ package com.backendfmo.models.pasantes;
 
 import com.backendfmo.models.reciboequipos.Usuario;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,6 +56,7 @@ public class Pasante {
     // --- NUEVA RELACIÓN: Reemplaza al String area_asignada ---
     @ManyToOne
     @JoinColumn(name = "area_asignada", referencedColumnName = "id")
+    @JsonIgnore
     private Departamento departamento;
 
     @Column(name = "fecha_de_nacimiento")

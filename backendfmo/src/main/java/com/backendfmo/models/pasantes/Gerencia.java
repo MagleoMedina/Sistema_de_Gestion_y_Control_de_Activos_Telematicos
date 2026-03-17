@@ -2,6 +2,8 @@ package com.backendfmo.models.pasantes;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,5 +31,6 @@ public class Gerencia {
     private String nombre;
 
     @OneToMany(mappedBy = "gerencia", cascade = CascadeType.ALL)
+    @JsonManagedReference  
     private List<Departamento> departamentos;
 }

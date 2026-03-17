@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import com.backendfmo.dtos.request.estructura.EstructuraDTOs.NombreRequestDTO;
+import com.backendfmo.models.pasantes.Gerencia;
+import com.backendfmo.repository.GerenciaRepository;
 import com.backendfmo.services.EstructuraServiceImpl;
 
 @RestController
@@ -22,6 +26,9 @@ public class EstructuraController {
 
     @Autowired
     private EstructuraServiceImpl estructuraService;
+
+    @Autowired
+    private GerenciaRepository gerenciaRepository;
 
     // ==========================================
     // ENDPOINTS DE GERENCIAS
@@ -95,6 +102,16 @@ public class EstructuraController {
             return ResponseEntity.ok(estructuraService.obtenerTodasGerencias());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/gerencias/buscar/{termino}")
+    public ResponseEntity<?> buscarGerenciaDinamica(@PathVariable String termino) {
+        try {
+            List<Gerencia> coincidencias = gerenciaRepository.findByNombreContainingIgnoreCase(termino);
+            return ResponseEntity.ok(coincidencias);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

@@ -9,20 +9,23 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Override
+@Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Obtenemos la ruta dinámica de la PC actual
+        // Obtenemos la ruta raíz del proyecto
         String projectRoot = System.getProperty("user.dir");
         
-        // Construimos la ruta absoluta hacia donde guardaste las fotos
-        // OJO: Usamos "file:///" para decirle que es un archivo del sistema
-        String rutaPasantes = Paths.get(projectRoot, "src", "main", "resources", "pasantes").toUri().toString();
+        // 1. Construimos la ruta física hacia la carpeta de PASANTES
+        String rutaPasantes = Paths.get(projectRoot, "src", "main", "resources", "pasantes").toUri().toString() + "/";
 
-        // Configuración:
-        // Cuando alguien pida: http://localhost:8081/recursos-pasantes/fotografia/foto.png
-        // Spring buscará en:   /home/usuario/proyecto/src/main/resources/pasantes/fotografia/foto.png
-        
+        // 2. Construimos la ruta física hacia la carpeta de MANTENIMIENTOS
+        String rutaMantenimientos = Paths.get(projectRoot, "src", "main", "resources", "mantenimientos").toUri().toString() + "/";
+
+        // Mapeo 1: Todo lo que empiece por /recursos-pasantes/ busca en la carpeta pasantes
         registry.addResourceHandler("/recursos-pasantes/**")
                 .addResourceLocations(rutaPasantes);
+                
+        // Mapeo 2: Todo lo que empiece por /mantenimientos/ busca en la carpeta mantenimientos
+        registry.addResourceHandler("/mantenimientos/**")
+                .addResourceLocations(rutaMantenimientos);
     }
 }

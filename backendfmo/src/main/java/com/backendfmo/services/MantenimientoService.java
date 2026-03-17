@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backendfmo.dtos.request.mantenimiento.MantenimientoRegistroDTO;
+import com.backendfmo.dtos.request.mantenimiento.MantenimientoResponseDTO;
 import com.backendfmo.models.mantenimiento.*;
 import com.backendfmo.models.pasantes.*;
 import com.backendfmo.models.reciboequipos.Usuario;
@@ -136,5 +137,73 @@ public class MantenimientoService {
                 }
             }
         }
+    }
+
+    // ==========================================
+    // MÉTODOS DE CONSULTA (GET)
+    // ==========================================
+    @Transactional(readOnly = true)
+    public List<MantenimientoResponseDTO> obtenerTodos() {
+        if (mantenimientoRepository.count() == 0) {
+            throw new RuntimeException("No hay registros de mantenimiento disponibles");
+        }
+        
+        return mantenimientoRepository.findAll()
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+    @Transactional(readOnly = true)
+    public List<MantenimientoResponseDTO> obtenerPorFecha(String fecha) {
+        return mantenimientoRepository.findByFecha(fecha)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+    @Transactional(readOnly = true)
+    public List<MantenimientoResponseDTO> obtenerPorGerencia(String gerencia) {
+        return mantenimientoRepository.findByGerenciaNombreContainingIgnoreCase(gerencia)
+                .stream()
+                .map(this::convertirADTO)
+                .toList();
+    }
+
+    // ==========================================
+    // MÉTODO AUXILIAR: Entidad -> DTO
+    // ==========================================
+    private MantenimientoResponseDTO convertirADTO(Mantenimiento m) {
+        MantenimientoResponseDTO dto = new MantenimientoResponseDTO();
+        
+        dto.setId(m.getId());
+        dto.setFecha(m.getFecha());
+        dto.setAnalista(m.getAnalista());
+        dto.setGerencia(m.getGerencia().getNombre());
+
+        // Como guardamos 1 equipo por cada registro de mantenimiento, tomamos el primer detalle
+        if (m.getDetalles() != null && !m.getDetalles().isEmpty()) {
+            MantenimientoDepartamento detalle = m.getDetalles().get(0);
+            
+            dto.setFicha(detalle.getUsuario().getFicha());
+            dto.setNombreUsuario(detalle.getUsuario().getNombre());
+            dto.setDepartamento(detalle.getDepartamento().getNombre());
+            
+            dto.setFmo(detalle.getDispositivo().getFmo());
+            dto.setTipoDispositivo(detalle.getDispositivo().getTipo());
+            dto.setMarca(detalle.getDispositivo().getModelo().getMarca().getNombre());
+            dto.setModelo(detalle.getDispositivo().getModelo().getNombre());
+            
+            dto.setSo(detalle.getSo());
+            dto.setObservaciones(detalle.getObservaciones());
+        }
+
+        // Mapear los nombres de los archivos de fotos
+        if (m.getFotos() != null) {
+            List<String> rutasFotos = m.getFotos().stream()
+                    .map(MantenimientoFoto::getFotoPath)
+                    .toList();
+            dto.setFotos(rutasFotos);
+        }
+
+        return dto;
     }
 }

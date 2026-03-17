@@ -2,7 +2,11 @@ package com.backendfmo.models.mantenimiento;
 
 import java.util.List;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import com.backendfmo.models.pasantes.Gerencia;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -26,6 +30,7 @@ public class Mantenimiento {
 
     @ManyToOne
     @JoinColumn(name = "gerencia_id", nullable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Gerencia gerencia;
 
     @Column(nullable = false)
@@ -35,8 +40,10 @@ public class Mantenimiento {
     private String fecha;
 
     @OneToMany(mappedBy = "mantenimiento", cascade = CascadeType.ALL)
+    @JsonManagedReference  
     private List<MantenimientoDepartamento> detalles;
 
     @OneToMany(mappedBy = "mantenimiento", cascade = CascadeType.ALL)
+    @JsonManagedReference  
     private List<MantenimientoFoto> fotos;
 }

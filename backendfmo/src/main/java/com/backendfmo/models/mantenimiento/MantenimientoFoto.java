@@ -1,5 +1,7 @@
 package com.backendfmo.models.mantenimiento;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +22,7 @@ public class MantenimientoFoto {
 
     @ManyToOne
     @JoinColumn(name = "mantenimiento_id", nullable = false)
+    @JsonIgnore
     private Mantenimiento mantenimiento;
 
     @Column(name = "foto_path", nullable = false)

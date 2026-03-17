@@ -2,6 +2,7 @@ package com.backendfmo.models.mantenimiento;
 
 import com.backendfmo.models.pasantes.Departamento;
 import com.backendfmo.models.reciboequipos.Usuario;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,18 +24,22 @@ public class MantenimientoDepartamento {
 
     @ManyToOne
     @JoinColumn(name = "mantenimiento_id", nullable = false)
+    @JsonIgnore
     private Mantenimiento mantenimiento;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnore
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "departamento_id", nullable = false)
+    @JsonIgnore
     private Departamento departamento;
 
     @ManyToOne
     @JoinColumn(name = "dispositivo_id", nullable = false)
+    @JsonIgnore
     private Dispositivo dispositivo;
 
     @Column(nullable = false)

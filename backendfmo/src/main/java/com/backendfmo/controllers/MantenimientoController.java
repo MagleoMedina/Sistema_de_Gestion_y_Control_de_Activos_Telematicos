@@ -1,6 +1,7 @@
 package com.backendfmo.controllers;
 
 import com.backendfmo.dtos.request.mantenimiento.MantenimientoRegistroDTO;
+import com.backendfmo.dtos.request.mantenimiento.MantenimientoResponseDTO;
 import com.backendfmo.services.MantenimientoService;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,41 @@ public class MantenimientoController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("{\"error\": \"Error al registrar: " + e.getMessage() + "\"}");
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> obtenerTodos() {
+        try {
+            return ResponseEntity.ok(mantenimientoService.obtenerTodos());
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            
+            return ResponseEntity.status(404).body(e.getMessage());
+        }catch (Exception e) {
+            //e.printStackTrace();
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/busqueda/fecha/{fecha}")
+    public ResponseEntity<List<MantenimientoResponseDTO>> obtenerPorFecha(@PathVariable String fecha) {
+        try {
+            return ResponseEntity.ok(mantenimientoService.obtenerPorFecha(fecha));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/busqueda/gerencia/{gerencia}")
+    public ResponseEntity<List<MantenimientoResponseDTO>> obtenerPorGerencia(@PathVariable String gerencia) {
+        try {
+            return ResponseEntity.ok(mantenimientoService.obtenerPorGerencia(gerencia));
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

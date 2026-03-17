@@ -1,5 +1,7 @@
 package com.backendfmo.models.mantenimiento;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +25,7 @@ public class Dispositivo {
 
     @ManyToOne
     @JoinColumn(name = "modelo_id", nullable = false)
+    @JsonIgnore
     private Modelo modelo;
 
     @Column(nullable = false)

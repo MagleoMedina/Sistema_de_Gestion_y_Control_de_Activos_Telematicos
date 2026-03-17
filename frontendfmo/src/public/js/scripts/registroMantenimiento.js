@@ -1,8 +1,7 @@
-let fotosLote = []; // Almacenará todas las fotos acumuladas
-let estructuraGlobal = []; // Almacena las Gerencias y sus Departamentos
+let fotosLote = []; 
+let estructuraGlobal = []; 
 
 async function getBackendUrl() {
-    // Verificación segura para evitar que la página se rompa si BASE_URL no existe
     if (typeof BASE_URL !== 'undefined' && BASE_URL) return BASE_URL;
     const res = await fetch('/config/backend-url');
     const data = await res.json();
@@ -11,53 +10,67 @@ async function getBackendUrl() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Establecer fecha por defecto y analista en la cabecera
+    // 1. Establecer fecha por defecto y analista
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('globalFecha').value = today;
 
+    let nombreAnalista = "Analista FMO";
     if (typeof ApiService !== 'undefined') {
-        document.getElementById('globalAnalista').value = ApiService.obtenerUsuario() || "Analista FMO";
+        if (typeof ApiService.obtenerUsuario === 'function') {
+            nombreAnalista = ApiService.obtenerUsuario();
+        } else {
+            const token = sessionStorage.getItem('jwt_token');
+            if (token) {
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    nombreAnalista = payload.sub || payload.username || "Analista FMO";
+                } catch (e) { console.error("Error leyendo token", e); }
+            }
+        }
     }
+    document.getElementById('globalAnalista').value = nombreAnalista;
 
-    // 2. Cargar estructura organizativa desde el backend
+    // 2. Cargar TODAS las gerencias al iniciar la página
     await cargarEstructura();
 
-    // 3. Detectar cuando el usuario escriba la gerencia para cargar sus departamentos
-    const inputGerencia = document.getElementById('globalGerencia');
-    if (inputGerencia) {
-        inputGerencia.addEventListener('input', (e) => {
+    // 3. Detectar cuando se SELECCIONE una gerencia para cargar sus departamentos
+    const selectGerencia = document.getElementById('globalGerencia');
+    if (selectGerencia) {
+        selectGerencia.addEventListener('change', (e) => {
             actualizarDatalistDepartamentos(e.target.value);
         });
     }
     
-    // 4. Agregar la primera fila en blanco por defecto
+    // 4. Agregar la primera fila en blanco
     agregarFila();
 });
 
 // ==========================================
-// CARGAR DATALISTS DINÁMICAMENTE
+// CARGAR ESTRUCTURA COMPLETA
 // ==========================================
 async function cargarEstructura() {
     try {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
         
-        // Hacemos un fetch directo para evitar errores de prefijos en ApiService
-        // Si tu controlador usa "/api", cámbialo a `${BACKEND_URL}/api/estructura/gerencias`
+        // Llamamos al endpoint que trae todas las gerencias
         const res = await fetch(`${BACKEND_URL}/estructura/gerencias`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (res.ok) {
             estructuraGlobal = await res.json();
-            const datalistG = document.getElementById('listaGerencias');
-            datalistG.innerHTML = ''; 
+            const selectG = document.getElementById('globalGerencia');
             
-            // Llenamos la lista de gerencias
+            // Limpiamos y dejamos la opción por defecto
+            selectG.innerHTML = '<option value="" disabled selected>Seleccione una Gerencia...</option>';
+            
+            // Llenamos el Select
             estructuraGlobal.forEach(g => {
                 const option = document.createElement('option');
                 option.value = g.nombre;
-                datalistG.appendChild(option);
+                option.textContent = g.nombre; // El texto visible en la lista
+                selectG.appendChild(option);
             });
         }
     } catch (error) {
@@ -65,17 +78,18 @@ async function cargarEstructura() {
     }
 }
 
+// ==========================================
+// CARGAR DATALISTS SECUNDARIOS (DEPARTAMENTOS)
+// ==========================================
 function actualizarDatalistDepartamentos(nombreGerencia) {
     const datalistD = document.getElementById('listaDepartamentos');
-    datalistD.innerHTML = ''; // Limpiamos los departamentos anteriores
+    datalistD.innerHTML = ''; 
     
     if(!nombreGerencia) return;
 
-    // Buscamos la gerencia que el usuario acaba de escribir
-    const gerenciaFiltro = estructuraGlobal.find(g => g.nombre.toLowerCase() === nombreGerencia.trim().toLowerCase());
+    const gerenciaFiltro = estructuraGlobal.find(g => g.nombre.toLowerCase() === nombreGerencia.toLowerCase());
     
     if (gerenciaFiltro && gerenciaFiltro.departamentos) {
-        // Llenamos el datalist solo con los departamentos de ESA gerencia
         gerenciaFiltro.departamentos.forEach(d => {
             const option = document.createElement('option');
             option.value = d.nombre;
@@ -171,7 +185,7 @@ function agregarFila() {
     tbody.appendChild(tr);
     actualizarNumeros();
 
-    // --- MAGIA: EVENTO PARA AUTOCOMPLETAR USUARIO POR FICHA ---
+    // --- EVENTO PARA AUTOCOMPLETAR USUARIO POR FICHA ---
     const inputFicha = tr.querySelector('.in-ficha');
     const inputUsuario = tr.querySelector('.in-usuario');
 
@@ -183,22 +197,19 @@ function agregarFila() {
             const token = sessionStorage.getItem('jwt_token');
             const BACKEND_URL = await getBackendUrl();
             
-            // Llama al endpoint de consultar usuario por ficha
-            const res = await fetch(`${BACKEND_URL}/usuarios/ficha/${fichaVal}`, {
+            const res = await fetch(`${BACKEND_URL}/stock/usuario/${fichaVal}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
             if (res.ok) {
                 const usuarioDB = await res.json();
                 if (usuarioDB && usuarioDB.nombre) {
-                    // Autocompleta el nombre y hace un pequeño destello verde para confirmar
                     inputUsuario.value = usuarioDB.nombre;
                     inputUsuario.style.backgroundColor = '#e8f5e9'; 
                     setTimeout(() => inputUsuario.style.backgroundColor = 'transparent', 1500);
                 }
             }
         } catch (error) {
-            // Falla silenciosamente si no lo encuentra, permitiendo al analista escribir el nombre a mano
             console.log("Ficha nueva, proceda a escribir el nombre.");
         }
     });
@@ -276,10 +287,9 @@ async function procesarLote() {
             }
         }
 
-        // Importante: Asegúrate de usar la URL que corresponde a tu controlador (con o sin /api)
         const peticion = fetch(`${BACKEND_URL}/mantenimientos/registrar`, {
             method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }, // Sin Content-Type
+            headers: { 'Authorization': `Bearer ${token}` },
             body: formData
         }).then(async (res) => {
             if (!res.ok) {
@@ -311,6 +321,7 @@ async function procesarLote() {
         setTimeout(() => {
             document.getElementById('tablaLote').innerHTML = '';
             document.getElementById('inputFotos').value = '';
+            document.getElementById('globalGerencia').value = ''; // Limpiar select
             fotosLote = []; 
             renderizarMiniaturas();
             agregarFila();

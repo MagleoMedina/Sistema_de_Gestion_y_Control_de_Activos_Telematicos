@@ -142,4 +142,8 @@ app.get('/registro-mantenimiento', (req, res) => {
     res.render('pages/registro-mantenimiento');
 });
 
+app.get('/consultar-mantenimientos', (req, res) => {
+    res.render('pages/consultar-mantenimientos');
+});
+
 module.exports = { server, PORT, HOST, BACKEND_URL };

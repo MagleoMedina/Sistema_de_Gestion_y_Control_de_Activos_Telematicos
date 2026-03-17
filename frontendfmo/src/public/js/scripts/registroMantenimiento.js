@@ -1,5 +1,6 @@
 let fotosLote = []; 
 let estructuraGlobal = []; 
+let catalogoEquipos = []; // <--- NUEVO: Almacenará Marcas y Modelos
 
 async function getBackendUrl() {
     if (typeof BASE_URL !== 'undefined' && BASE_URL) return BASE_URL;
@@ -10,7 +11,6 @@ async function getBackendUrl() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Establecer fecha por defecto y analista
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('globalFecha').value = today;
 
@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     document.getElementById('globalAnalista').value = nombreAnalista;
 
-    // 2. Cargar TODAS las gerencias al iniciar la página
+    // Cargar estructuras de base de datos
     await cargarEstructura();
+    await cargarCatalogoEquipos(); // <--- NUEVO: Carga las marcas
 
-    // 3. Detectar cuando se SELECCIONE una gerencia para cargar sus departamentos
     const selectGerencia = document.getElementById('globalGerencia');
     if (selectGerencia) {
         selectGerencia.addEventListener('change', (e) => {
@@ -41,19 +41,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
     
-    // 4. Agregar la primera fila en blanco
     agregarFila();
 });
 
 // ==========================================
-// CARGAR ESTRUCTURA COMPLETA
+// CARGAR ESTRUCTURA Y CATÁLOGOS
 // ==========================================
 async function cargarEstructura() {
     try {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
-        
-        // Llamamos al endpoint que trae todas las gerencias
         const res = await fetch(`${BACKEND_URL}/estructura/gerencias`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -61,34 +58,36 @@ async function cargarEstructura() {
         if (res.ok) {
             estructuraGlobal = await res.json();
             const selectG = document.getElementById('globalGerencia');
-            
-            // Limpiamos y dejamos la opción por defecto
             selectG.innerHTML = '<option value="" disabled selected>Seleccione una Gerencia...</option>';
-            
-            // Llenamos el Select
             estructuraGlobal.forEach(g => {
                 const option = document.createElement('option');
                 option.value = g.nombre;
-                option.textContent = g.nombre; // El texto visible en la lista
+                option.textContent = g.nombre;
                 selectG.appendChild(option);
             });
         }
-    } catch (error) {
-        console.error("Error cargando estructura de gerencias:", error);
-    }
+    } catch (error) { console.error("Error cargando gerencias:", error); }
 }
 
-// ==========================================
-// CARGAR DATALISTS SECUNDARIOS (DEPARTAMENTOS)
-// ==========================================
+async function cargarCatalogoEquipos() {
+    try {
+        const token = sessionStorage.getItem('jwt_token');
+        const BACKEND_URL = await getBackendUrl();
+        const res = await fetch(`${BACKEND_URL}/catalogo/equipos`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (res.ok) {
+            catalogoEquipos = await res.json();
+        }
+    } catch (error) { console.error("Error cargando equipos:", error); }
+}
+
 function actualizarDatalistDepartamentos(nombreGerencia) {
     const datalistD = document.getElementById('listaDepartamentos');
     datalistD.innerHTML = ''; 
-    
     if(!nombreGerencia) return;
-
     const gerenciaFiltro = estructuraGlobal.find(g => g.nombre.toLowerCase() === nombreGerencia.toLowerCase());
-    
     if (gerenciaFiltro && gerenciaFiltro.departamentos) {
         gerenciaFiltro.departamentos.forEach(d => {
             const option = document.createElement('option');
@@ -99,14 +98,11 @@ function actualizarDatalistDepartamentos(nombreGerencia) {
 }
 
 // ==========================================
-// PREVISUALIZADOR DE MÚLTIPLES FOTOS
+// PREVISUALIZADOR DE FOTOS
 // ==========================================
 function mostrarMiniaturas(input) {
     if (input.files && input.files.length > 0) {
-        Array.from(input.files).forEach(file => {
-            fotosLote.push(file);
-        });
-        
+        Array.from(input.files).forEach(file => { fotosLote.push(file); });
         input.value = ''; 
         renderizarMiniaturas();
     }
@@ -115,13 +111,11 @@ function mostrarMiniaturas(input) {
 function renderizarMiniaturas() {
     const container = document.getElementById('previewContainer');
     container.innerHTML = ''; 
-
     fotosLote.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = function(e) {
             const wrapper = document.createElement('div');
             wrapper.className = 'img-preview-wrapper';
-            
             const img = document.createElement('img');
             img.src = e.target.result;
             img.title = file.name;
@@ -156,6 +150,9 @@ function agregarFila() {
     const tr = document.createElement('tr');
     tr.className = 'fila-mantenimiento';
 
+    // Generamos un ID único para la fila actual (Ej: 16954201)
+    const rowId = Date.now() + Math.floor(Math.random() * 1000);
+
     tr.innerHTML = `
         <td class="col-num row-number text-muted">1</td>
         <td class="col-ficha"><input type="number" class="in-ficha" placeholder="Ej: 9900" required></td>
@@ -166,10 +163,19 @@ function agregarFila() {
             <select class="in-tipo">
                 <option value="CPU">CPU</option>
                 <option value="Impresora">Impresora</option>
+                <option value="Laptop">Laptop</option>
+                <option value="Monitor">Monitor</option>
+                <option value="Otro">Otro</option>
             </select>
         </td>
-        <td class="col-marca"><input type="text" class="in-marca" list="listaMarcas" placeholder="Marca" required></td>
-        <td class="col-modelo"><input type="text" class="in-modelo" list="listaModelos" placeholder="Modelo" required></td>
+        <td class="col-marca">
+            <input type="text" class="in-marca" list="marcas-${rowId}" placeholder="Marca" autocomplete="off" required>
+            <datalist id="marcas-${rowId}"></datalist>
+        </td>
+        <td class="col-modelo">
+            <input type="text" class="in-modelo" list="modelos-${rowId}" placeholder="Modelo" autocomplete="off" required>
+            <datalist id="modelos-${rowId}"></datalist>
+        </td>
         <td class="col-so"><input type="text" class="in-so" placeholder="Ej: Win 10"></td>
         <td class="col-obs"><input type="text" class="in-obs" placeholder="Observaciones..."></td>
         <td class="col-accion">
@@ -182,22 +188,47 @@ function agregarFila() {
     tbody.appendChild(tr);
     actualizarNumeros();
 
-    // --- EVENTO PARA AUTOCOMPLETAR USUARIO POR FICHA ---
+    // --- CASCADA: MARCA A MODELO ---
+    const inputMarca = tr.querySelector('.in-marca');
+    const datalistMarca = tr.querySelector(`#marcas-${rowId}`);
+    const datalistModelo = tr.querySelector(`#modelos-${rowId}`);
+
+    // 1. Poblamos la lista de Marcas de esta fila
+    catalogoEquipos.forEach(marca => {
+        const option = document.createElement('option');
+        option.value = marca.nombre;
+        datalistMarca.appendChild(option);
+    });
+
+    // 2. Al escribir/seleccionar una marca, poblamos sus modelos
+    inputMarca.addEventListener('input', (e) => {
+        const marcaSeleccionada = e.target.value.trim().toLowerCase();
+        datalistModelo.innerHTML = ''; // Limpiamos opciones previas
+
+        const marcaEncontrada = catalogoEquipos.find(m => m.nombre.toLowerCase() === marcaSeleccionada);
+        
+        if (marcaEncontrada && marcaEncontrada.modelos) {
+            marcaEncontrada.modelos.forEach(mod => {
+                const option = document.createElement('option');
+                option.value = mod.nombre;
+                datalistModelo.appendChild(option);
+            });
+        }
+    });
+
+    // --- AUTOCOMPLETADO DE USUARIO POR FICHA ---
     const inputFicha = tr.querySelector('.in-ficha');
     const inputUsuario = tr.querySelector('.in-usuario');
 
     inputFicha.addEventListener('blur', async (e) => {
         const fichaVal = e.target.value.trim();
         if (!fichaVal) return;
-
         try {
             const token = sessionStorage.getItem('jwt_token');
             const BACKEND_URL = await getBackendUrl();
-            
             const res = await fetch(`${BACKEND_URL}/stock/usuario/${fichaVal}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            
             if (res.ok) {
                 const usuarioDB = await res.json();
                 if (usuarioDB && usuarioDB.nombre) {
@@ -207,7 +238,7 @@ function agregarFila() {
                 }
             }
         } catch (error) {
-            console.log("Ficha nueva, proceda a escribir el nombre.");
+            console.log("Ficha no encontrada.");
         }
     });
 }
@@ -215,7 +246,6 @@ function agregarFila() {
 function eliminarFila(btn) {
     const tr = btn.closest('tr');
     const tbody = document.getElementById('tablaLote');
-    
     if (tbody.children.length > 1) {
         tr.remove();
         actualizarNumeros();
@@ -232,10 +262,10 @@ function actualizarNumeros() {
 }
 
 // ==========================================
-// PROCESAR LOTE COMPLETO (GUARDAR MÚLTIPLES)
+// GUARDAR PLANILLA
 // ==========================================
 async function procesarLote() {
-    const gerencia = document.getElementById('globalGerencia').value.trim();
+    const gerencia = document.getElementById('globalGerencia').value;
     const fecha = document.getElementById('globalFecha').value;
     const analista = document.getElementById('globalAnalista').value;
 
@@ -293,9 +323,7 @@ async function procesarLote() {
                 const text = await res.text();
                 throw new Error(`Equipo ${fmo}: ${text}`);
             }
-        }).catch(err => {
-            errores.push(err.message);
-        });
+        }).catch(err => { errores.push(err.message); });
 
         tareasPendientes.push(peticion);
     }
@@ -318,7 +346,7 @@ async function procesarLote() {
         setTimeout(() => {
             document.getElementById('tablaLote').innerHTML = '';
             document.getElementById('inputFotos').value = '';
-            document.getElementById('globalGerencia').value = ''; // Limpiar select
+            document.getElementById('globalGerencia').value = ''; 
             fotosLote = []; 
             renderizarMiniaturas();
             agregarFila();

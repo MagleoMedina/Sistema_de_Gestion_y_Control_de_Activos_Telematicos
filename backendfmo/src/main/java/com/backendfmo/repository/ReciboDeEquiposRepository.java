@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.backendfmo.models.reciboequipos.ReciboDeEquipos;
 
+@Repository
 public interface ReciboDeEquiposRepository extends JpaRepository<ReciboDeEquipos, Long> {
 
    @Query("SELECT COUNT(d) FROM ReciboDeEquipos d JOIN d.encabezadoRelacion e WHERE e.estatus = :estatus")

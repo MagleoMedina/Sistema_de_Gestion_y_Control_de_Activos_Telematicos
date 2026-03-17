@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.backendfmo.models.pasantes.Pasante;
 
+@Repository
 public interface PasanteRepository extends JpaRepository<Pasante, Long> {
     // Aquí puedes agregar métodos de búsqueda si necesitas luego
 

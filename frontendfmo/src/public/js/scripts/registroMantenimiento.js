@@ -166,9 +166,6 @@ function agregarFila() {
             <select class="in-tipo">
                 <option value="CPU">CPU</option>
                 <option value="Impresora">Impresora</option>
-                <option value="Laptop">Laptop</option>
-                <option value="Monitor">Monitor</option>
-                <option value="Otro">Otro</option>
             </select>
         </td>
         <td class="col-marca"><input type="text" class="in-marca" list="listaMarcas" placeholder="Marca" required></td>

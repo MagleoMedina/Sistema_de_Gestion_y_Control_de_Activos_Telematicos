@@ -126,7 +126,7 @@ public class MantenimientoService {
                     }
                     
                     // Nombre único: FMO_UUID.extension
-                    String nombreFinal = dto.getFmo() + "_" + UUID.randomUUID().toString() + extension;
+                    String nombreFinal = dto.getGerencia()+ "_" + dto.getFecha()+ "_" + UUID.randomUUID() + extension;
                     Path rutaArchivo = rootFotosMantenimiento.resolve(nombreFinal);
                     Files.copy(foto.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
 

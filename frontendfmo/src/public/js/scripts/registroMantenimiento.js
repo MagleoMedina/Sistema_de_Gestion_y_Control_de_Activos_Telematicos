@@ -260,9 +260,8 @@ function actualizarNumeros() {
         fila.querySelector('.row-number').textContent = index + 1;
     });
 }
-
 // ==========================================
-// GUARDAR PLANILLA
+// GUARDAR PLANILLA (UN SOLO LOTE)
 // ==========================================
 async function procesarLote() {
     const gerencia = document.getElementById('globalGerencia').value;
@@ -272,17 +271,19 @@ async function procesarLote() {
     if (!gerencia) return mostrarModal("Debe especificar la Gerencia en la cabecera.", "warning");
 
     const filas = document.querySelectorAll('#tablaLote .fila-mantenimiento');
-    let tareasPendientes = [];
-    let errores = [];
+    
+    // 1. Armamos el objeto principal con la cabecera
+    const datosLote = {
+        gerencia: gerencia.trim(),
+        fecha: fecha,
+        analista: analista,
+        equipos: [] // Aquí meteremos todos los equipos
+    };
 
     const primeraFilaFmo = filas[0].querySelector('.in-fmo').value.trim();
     if (!primeraFilaFmo) return mostrarModal("La planilla está vacía. Ingrese al menos un equipo.", "warning");
 
-    mostrarModal(`<div class="spinner-border text-danger me-2"></div> Guardando lote, por favor espere...`, "info");
-
-    const token = sessionStorage.getItem('jwt_token');
-    const BACKEND_URL = await getBackendUrl();
-
+    // 2. Recorremos la tabla y llenamos el arreglo
     for (let i = 0; i < filas.length; i++) {
         const fila = filas[i];
         const fmo = fila.querySelector('.in-fmo').value.trim();
@@ -290,59 +291,55 @@ async function procesarLote() {
         
         if (!fmo || !fichaStr) continue; 
 
-        const datosEquipo = {
+        datosLote.equipos.push({
             ficha: parseInt(fichaStr),
             nombreUsuario: fila.querySelector('.in-usuario').value.trim(),
-            gerencia: gerencia, 
             departamento: fila.querySelector('.in-depto').value.trim(),
             fmo: fmo,
             tipoDispositivo: fila.querySelector('.in-tipo').value,
             marca: fila.querySelector('.in-marca').value.trim(),
             modelo: fila.querySelector('.in-modelo').value.trim(),
-            fecha: fecha, 
-            analista: analista, 
             so: fila.querySelector('.in-so').value.trim() || "N/A",
             observaciones: fila.querySelector('.in-obs').value.trim()
-        };
+        });
+    }
 
-        const formData = new FormData();
-        formData.append('datos', JSON.stringify(datosEquipo));
+    if (datosLote.equipos.length === 0) return mostrarModal("No hay equipos válidos para guardar.", "warning");
 
-        if (fotosLote.length > 0) {
-            for (let f = 0; f < fotosLote.length; f++) {
-                formData.append('fotos', fotosLote[f]);
-            }
+    mostrarModal(`<div class="spinner-border text-danger me-2"></div> Guardando lote, por favor espere...`, "info");
+
+    const token = sessionStorage.getItem('jwt_token');
+    const BACKEND_URL = await getBackendUrl();
+
+    // 3. Empaquetamos en el FormData
+    const formData = new FormData();
+    formData.append('datos', JSON.stringify(datosLote));
+
+    if (fotosLote.length > 0) {
+        for (let f = 0; f < fotosLote.length; f++) {
+            formData.append('fotos', fotosLote[f]);
         }
+    }
 
-        const peticion = fetch(`${BACKEND_URL}/mantenimientos/registrar`, {
+    // 4. Hacemos UNA SOLA PETICIÓN al servidor
+    try {
+        const res = await fetch(`${BACKEND_URL}/mantenimientos/registrar`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
-        }).then(async (res) => {
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`Equipo ${fmo}: ${text}`);
-            }
-        }).catch(err => { errores.push(err.message); });
+        });
 
-        tareasPendientes.push(peticion);
-    }
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text);
+        }
 
-    await Promise.all(tareasPendientes);
-
-    if (errores.length > 0) {
-        mostrarModal(`
-            <strong>Se guardó parcialmente con errores:</strong><br>
-            <ul class="text-start mt-2" style="font-size:0.85rem;">
-                ${errores.map(e => `<li>${e}</li>`).join('')}
-            </ul>
-        `, "error");
-    } else {
         mostrarModal(`
             <strong>¡Planilla Guardada Exitosamente!</strong><br>
-            Todos los equipos fueron registrados.
+            El mantenimiento y sus ${datosLote.equipos.length} equipos fueron registrados.
         `, "success");
 
+        // Limpieza final
         setTimeout(() => {
             document.getElementById('tablaLote').innerHTML = '';
             document.getElementById('inputFotos').value = '';
@@ -351,5 +348,8 @@ async function procesarLote() {
             renderizarMiniaturas();
             agregarFila();
         }, 2000);
+
+    } catch (error) {
+        mostrarModal(`<strong>Error al guardar:</strong><br>${error.message}`, "error");
     }
 }

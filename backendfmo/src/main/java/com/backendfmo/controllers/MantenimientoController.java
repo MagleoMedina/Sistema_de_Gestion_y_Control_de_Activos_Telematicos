@@ -5,6 +5,8 @@ import com.backendfmo.dtos.request.mantenimiento.MantenimientoResponseDTO;
 import com.backendfmo.services.MantenimientoService;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,6 +71,42 @@ public class MantenimientoController {
             return ResponseEntity.ok(mantenimientoService.obtenerPorGerencia(gerencia));
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+    // ==========================================
+    // ENDPOINT PARA ELIMINAR
+    // ==========================================
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<?> eliminarMantenimiento(@PathVariable Long id) {
+        try {
+            mantenimientoService.eliminarMantenimiento(id);
+            return ResponseEntity.ok().body("{\"mensaje\": \"Lote de mantenimiento y fotografías eliminados con éxito\"}");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("{\"error\": \"Error al eliminar: " + e.getMessage() + "\"}");
+        }
+        
+}
+
+@PostMapping(value = "/exportar/csv", produces = "text/csv")
+    public ResponseEntity<byte[]> exportarCsv(@RequestBody List<MantenimientoResponseDTO> listaMantenimientos) {
+        try {
+            // 1. Delegamos la lógica pesada al Servicio
+            byte[] archivoCsv = mantenimientoService.generarCsvMantenimientos(listaMantenimientos);
+
+            // 2. Configuramos las cabeceras HTTP
+            HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_mantenimientos.csv");
+            headers.setContentType(MediaType.parseMediaType("text/csv"));
+
+            // 3. Retornamos el archivo
+            return new ResponseEntity<>(archivoCsv, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }

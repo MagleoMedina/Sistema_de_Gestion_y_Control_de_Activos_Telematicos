@@ -163,6 +163,82 @@ public class MantenimientoService {
                 .toList();
     }
 
+    // ==========================================
+    // MÉTODO PARA ELIMINAR (DELETE)
+    // ==========================================
+    @Transactional
+    public void eliminarMantenimiento(Long id) {
+        // 1. Buscar el mantenimiento por su ID
+        Mantenimiento mantenimiento = mantenimientoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mantenimiento con ID " + id + " no encontrado"));
+
+        // 2. Eliminar las fotos físicas del disco duro
+        if (mantenimiento.getFotos() != null && !mantenimiento.getFotos().isEmpty()) {
+            for (MantenimientoFoto foto : mantenimiento.getFotos()) {
+                try {
+                    // Resuelve la ruta completa del archivo y lo elimina si existe
+                    Path rutaArchivo = rootFotosMantenimiento.resolve(foto.getFotoPath());
+                    Files.deleteIfExists(rutaArchivo);
+                } catch (IOException e) {
+                    System.err.println("Advertencia: No se pudo eliminar la foto física: " + foto.getFotoPath());
+                    e.printStackTrace();
+                    // No lanzamos la excepción aquí para que, aunque falte la foto física, 
+                    // el registro de la BD sí se pueda eliminar.
+                }
+            }
+        }
+
+        // 3. Eliminar el registro de la Base de Datos
+        // (Gracias a CascadeType.ALL, esto borrará también los detalles y las referencias de las fotos)
+        mantenimientoRepository.delete(mantenimiento);
+    }
+
+    // ==========================================
+    // LÓGICA DE NEGOCIO: GENERACIÓN DE CSV
+    // ==========================================
+    public byte[] generarCsvMantenimientos(List<MantenimientoResponseDTO> listaMantenimientos) {
+        StringBuilder csv = new StringBuilder();
+        
+        // 1. Escribir las cabeceras solicitadas
+        csv.append("Gerencia,Fecha,Analista,Ficha,Usuario,Departamento,CPU/IMP,Marca,Modelo,FMO/Serial,SO,Observaciones\n");
+
+        // 2. Recorrer el JSON y transformarlo a filas de texto
+        for (MantenimientoResponseDTO dto : listaMantenimientos) {
+            csv.append(escaparCsv(dto.getGerencia())).append(",")
+               .append(escaparCsv(dto.getFecha())).append(",")
+               .append(escaparCsv(dto.getAnalista())).append(",")
+               .append(dto.getFicha() != null ? dto.getFicha() : "").append(",")
+               .append(escaparCsv(dto.getNombreUsuario())).append(",")
+               .append(escaparCsv(dto.getDepartamento())).append(",")
+               .append(escaparCsv(dto.getTipoDispositivo())).append(",")
+               .append(escaparCsv(dto.getMarca())).append(",")
+               .append(escaparCsv(dto.getModelo())).append(",")
+               .append(escaparCsv(dto.getFmo())).append(",")
+               .append(escaparCsv(dto.getSo())).append(",")
+               .append(escaparCsv(dto.getObservaciones())).append("\n");
+        }
+
+        // 3. Convertir a Bytes y añadir BOM (Byte Order Mark) para compatibilidad UTF-8 en Excel
+        byte[] csvBytes = csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        byte[] bomAndCsv = new byte[csvBytes.length + 3];
+        bomAndCsv[0] = (byte) 0xEF;
+        bomAndCsv[1] = (byte) 0xBB;
+        bomAndCsv[2] = (byte) 0xBF;
+        System.arraycopy(csvBytes, 0, bomAndCsv, 3, csvBytes.length);
+
+        return bomAndCsv;
+    }
+
+    // Método auxiliar para limpiar el texto de caracteres que rompen el CSV
+    private String escaparCsv(String valor) {
+        if (valor == null) return "";
+        String valorLimpio = valor.trim();
+        if (valorLimpio.contains(",") || valorLimpio.contains("\"") || valorLimpio.contains("\n")) {
+            return "\"" + valorLimpio.replace("\"", "\"\"") + "\"";
+        }
+        return valorLimpio;
+    }
+
     private MantenimientoResponseDTO convertirADTO(Mantenimiento m, MantenimientoDepartamento detalle) {
         MantenimientoResponseDTO dto = new MantenimientoResponseDTO();
         dto.setId(m.getId());

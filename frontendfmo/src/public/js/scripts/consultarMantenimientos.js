@@ -486,7 +486,7 @@ async function exportarCSV() {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
         
-        const res = await fetch(`${BACKEND_URL}/mantenimientos/exportar/csv`, {
+        const res = await fetch(`${BACKEND_URL}/mantenimientos/exportar/csv/resumen`, {
             method: 'POST',
             headers: { 
                 'Authorization': `Bearer ${token}`,

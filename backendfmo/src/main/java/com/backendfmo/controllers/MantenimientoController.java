@@ -110,4 +110,26 @@ public class MantenimientoController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    // ==========================================
+    // ENDPOINT PARA EXPORTAR CSV RESUMIDO
+    // ==========================================
+    @PostMapping(value = "/exportar/csv/resumen", produces = "text/csv")
+    public ResponseEntity<?> exportarCsvResumen(@RequestBody List<MantenimientoResponseDTO> listaMantenimientos) {
+        try {
+            // Llamamos al nuevo método resumido
+            byte[] archivoCsv = mantenimientoService.generarCsvResumenMantenimientos(listaMantenimientos);
+
+            HttpHeaders headers = new HttpHeaders();
+            // Le damos un nombre distinto para diferenciarlo del detallado
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=resumen_estadistico_mantenimientos.csv");
+            headers.setContentType(MediaType.parseMediaType("text/csv"));
+
+            return new ResponseEntity<>(archivoCsv, headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

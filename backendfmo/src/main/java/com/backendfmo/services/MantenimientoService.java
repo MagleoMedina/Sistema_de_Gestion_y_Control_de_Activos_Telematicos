@@ -1,9 +1,23 @@
 package com.backendfmo.services;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +55,7 @@ public class MantenimientoService {
         this.rootFotosMantenimiento = Paths.get(projectRoot, "src", "main", "resources", "mantenimientos", "fotos");
     }
 
-    @Transactional
+@Transactional
     public void registrarMantenimiento(MantenimientoRegistroDTO dto, List<MultipartFile> fotos) throws IOException {
         
         // 1. Gestionar Gerencia (Cabecera)
@@ -117,31 +131,29 @@ public class MantenimientoService {
             mantDeptoRepository.save(detalle);
         }
 
-        // 4. Guardar Fotos (Una sola vez para todo el lote)
+        // 4. Guardar Fotos (Una sola vez para todo el lote) APLICANDO COMPRESIÓN
         if (fotos != null && !fotos.isEmpty()) {
             if (!Files.exists(rootFotosMantenimiento)) {
                 Files.createDirectories(rootFotosMantenimiento);
             }
             for (MultipartFile foto : fotos) {
                 if (foto != null && !foto.isEmpty()) {
-                    String extension = "";
-                    String originalName = foto.getOriginalFilename();
-                    if (originalName != null && originalName.contains(".")) {
-                        extension = originalName.substring(originalName.lastIndexOf("."));
-                    }
-                    String nombreFinal = dto.getGerencia()+ "_" + dto.getFecha()+ "_" + UUID.randomUUID() + extension;
-                    Path rutaArchivo = rootFotosMantenimiento.resolve(nombreFinal);
-                    Files.copy(foto.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+                    // Generamos un nombre único sin extensión
+                    String nombreBase = dto.getGerencia().replaceAll("\\s+", "_") + "_" + dto.getFecha() + "_" + UUID.randomUUID().toString().substring(0, 8);
+                    
+                    // Llamamos al algoritmo de compresión
+                    String nombreFinal = guardarFotoComprimida(foto, rootFotosMantenimiento, nombreBase);
 
                     MantenimientoFoto mantFoto = new MantenimientoFoto();
                     mantFoto.setMantenimiento(mantenimiento);
-                    mantFoto.setFotoPath(nombreFinal);
+                    mantFoto.setFotoPath(nombreFinal); // Guardamos la ruta del archivo comprimido
                     mantFotoRepository.save(mantFoto);
                 }
             }
         }
+
         // =========================================================================
-        // 5. NUEVO: VALIDACIÓN Y ACTUALIZACIÓN ESTRICTA DEL ESTADO PROGRAMADO
+        // 5. VALIDACIÓN Y ACTUALIZACIÓN ESTRICTA DEL ESTADO PROGRAMADO
         // =========================================================================
         if (dto.getIdProgramacion() != null) {
             MantenimientoProgramado programado = programadoRepository.findById(dto.getIdProgramacion())
@@ -151,6 +163,50 @@ public class MantenimientoService {
             programado.setEstatus("Completado");
             programadoRepository.save(programado);
         }
+    }
+
+    // =========================================================================
+    // ALGORITMO DE COMPRESIÓN POR CUANTIZACIÓN (JPEG)
+    // =========================================================================
+    private String guardarFotoComprimida(MultipartFile file, Path rutaBase, String nombreCompletoSinExtension) throws IOException {
+        String nombreFinal = nombreCompletoSinExtension + ".jpg"; // Forzamos salida a JPG para cuantización
+        File archivoDestino = rutaBase.resolve(nombreFinal).toFile();
+
+        try (InputStream is = file.getInputStream();
+             ImageOutputStream ios = ImageIO.createImageOutputStream(new FileOutputStream(archivoDestino))) {
+            
+            BufferedImage image = ImageIO.read(is);
+            if (image == null) {
+                // Fallback de seguridad si el archivo subido no es una imagen procesable
+                Files.copy(file.getInputStream(), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                return nombreFinal;
+            }
+
+            // Eliminar canal Alpha (transparencia) si es PNG, ya que JPEG no lo soporta (fondo blanco)
+            BufferedImage newBufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+            newBufferedImage.createGraphics().drawImage(image, 0, 0, java.awt.Color.WHITE, null);
+
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+            if (!writers.hasNext()) throw new IllegalStateException("No se encontró un escritor JPEG.");
+            
+            ImageWriter writer = writers.next();
+            writer.setOutput(ios);
+
+            // Configurar el algoritmo de compresión (0.0 = máxima compresión, 1.0 = calidad máxima)
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(0.65f); // 65% de calidad: Reduce drasticamente el peso manteniendo la legibilidad
+            }
+
+            writer.write(null, new IIOImage(newBufferedImage, null, null), param);
+            writer.dispose();
+        } catch (Exception e) {
+             // Si el proceso de compresión falla (ej: archivo corrupto), lo guarda original
+             Files.copy(file.getInputStream(), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+        
+        return nombreFinal;
     }
 
     // ==========================================
@@ -182,28 +238,20 @@ public class MantenimientoService {
     // ==========================================
     @Transactional
     public void eliminarMantenimiento(Long id) {
-        // 1. Buscar el mantenimiento por su ID
         Mantenimiento mantenimiento = mantenimientoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mantenimiento con ID " + id + " no encontrado"));
 
-        // 2. Eliminar las fotos físicas del disco duro
         if (mantenimiento.getFotos() != null && !mantenimiento.getFotos().isEmpty()) {
             for (MantenimientoFoto foto : mantenimiento.getFotos()) {
                 try {
-                    // Resuelve la ruta completa del archivo y lo elimina si existe
                     Path rutaArchivo = rootFotosMantenimiento.resolve(foto.getFotoPath());
                     Files.deleteIfExists(rutaArchivo);
                 } catch (IOException e) {
                     System.err.println("Advertencia: No se pudo eliminar la foto física: " + foto.getFotoPath());
                     e.printStackTrace();
-                    // No lanzamos la excepción aquí para que, aunque falte la foto física, 
-                    // el registro de la BD sí se pueda eliminar.
                 }
             }
         }
-
-        // 3. Eliminar el registro de la Base de Datos
-        // (Gracias a CascadeType.ALL, esto borrará también los detalles y las referencias de las fotos)
         mantenimientoRepository.delete(mantenimiento);
     }
 
@@ -213,10 +261,8 @@ public class MantenimientoService {
     public byte[] generarCsvMantenimientos(List<MantenimientoResponseDTO> listaMantenimientos) {
         StringBuilder csv = new StringBuilder();
         
-        // 1. Escribir las cabeceras solicitadas
         csv.append("Gerencia,Fecha,Analista,Ficha,Usuario,Departamento,CPU/IMP,Marca,Modelo,FMO/Serial,SO,Observaciones\n");
 
-        // 2. Recorrer el JSON y transformarlo a filas de texto
         for (MantenimientoResponseDTO dto : listaMantenimientos) {
             csv.append(escaparCsv(dto.getGerencia())).append(",")
                .append(escaparCsv(dto.getFecha())).append(",")
@@ -232,8 +278,7 @@ public class MantenimientoService {
                .append(escaparCsv(dto.getObservaciones())).append("\n");
         }
 
-        // 3. Convertir a Bytes y añadir BOM (Byte Order Mark) para compatibilidad UTF-8 en Excel
-        byte[] csvBytes = csv.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        byte[] csvBytes = csv.toString().getBytes(StandardCharsets.UTF_8);
         byte[] bomAndCsv = new byte[csvBytes.length + 3];
         bomAndCsv[0] = (byte) 0xEF;
         bomAndCsv[1] = (byte) 0xBB;
@@ -243,7 +288,6 @@ public class MantenimientoService {
         return bomAndCsv;
     }
 
-    // Método auxiliar para limpiar el texto de caracteres que rompen el CSV
     private String escaparCsv(String valor) {
         if (valor == null) return "";
         String valorLimpio = valor.trim();
@@ -276,5 +320,38 @@ public class MantenimientoService {
             dto.setFotos(m.getFotos().stream().map(MantenimientoFoto::getFotoPath).toList());
         }
         return dto;
+    }
+
+    // ==========================================
+    // LÓGICA DE NEGOCIO: GENERACIÓN DE CSV (RESUMIDO)
+    // ==========================================
+    public byte[] generarCsvResumenMantenimientos(List<MantenimientoResponseDTO> listaMantenimientos) {
+        StringBuilder csv = new StringBuilder();
+        
+        csv.append("Fecha,Gerencia,Analista,Cantidad Atendidos\n");
+
+       Map<Long, List<MantenimientoResponseDTO>> lotesAgrupados = listaMantenimientos.stream()
+                .collect(Collectors.groupingBy(MantenimientoResponseDTO::getId));
+
+        for (List<MantenimientoResponseDTO> lote : lotesAgrupados.values()) {
+            if (!lote.isEmpty()) {
+                MantenimientoResponseDTO ref = lote.get(0);
+                int cantidadAtendidos = lote.size();
+
+                csv.append(escaparCsv(ref.getFecha())).append(",")
+                   .append(escaparCsv(ref.getGerencia())).append(",")
+                   .append(escaparCsv(ref.getAnalista())).append(",")
+                   .append(cantidadAtendidos).append("\n");
+            }
+        }
+
+        byte[] csvBytes = csv.toString().getBytes(StandardCharsets.UTF_8);
+        byte[] bomAndCsv = new byte[csvBytes.length + 3];
+        bomAndCsv[0] = (byte) 0xEF;
+        bomAndCsv[1] = (byte) 0xBB;
+        bomAndCsv[2] = (byte) 0xBF;
+        System.arraycopy(csvBytes, 0, bomAndCsv, 3, csvBytes.length);
+
+        return bomAndCsv;
     }
 }

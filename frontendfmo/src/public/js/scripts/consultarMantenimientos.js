@@ -1,4 +1,5 @@
 let mantenimientosAgrupados = {}; 
+let programadosAgrupados = {}; // NUEVO: Para guardar los mantenimientos pendientes
 let dataCruda = []; 
 
 async function getBackendUrl() {
@@ -51,22 +52,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// DESCARGAR Y AGRUPAR DATOS
+// DESCARGAR Y AGRUPAR DATOS (HISTORIAL + PENDIENTES)
 // ==========================================
 async function descargarMantenimientos() {
-    //mostrarModal(`<div class="spinner-border text-danger me-2"></div> Cargando datos del calendario...`, "info");
+    // mostrarModal(`<div class="spinner-border text-danger me-2"></div> Cargando datos del calendario...`, "info");
     
     try {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
         
-        const res = await fetch(`${BACKEND_URL}/mantenimientos`, {
+        // 1. Descargar Historial (Completados)
+        const resHistorial = await fetch(`${BACKEND_URL}/mantenimientos`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
-        if (res.ok) {
-            dataCruda = await res.json();
-            
+        if (resHistorial.ok) {
+            dataCruda = await resHistorial.json();
             mantenimientosAgrupados = {};
             dataCruda.forEach(mant => {
                 if (!mantenimientosAgrupados[mant.fecha]) {
@@ -74,21 +75,33 @@ async function descargarMantenimientos() {
                 }
                 mantenimientosAgrupados[mant.fecha].push(mant);
             });
-            
-            const modalActual = bootstrap.Modal.getInstance(document.getElementById('fmoModalSystem'));
-            if(modalActual) modalActual.hide();
-            
-        } else if (res.status === 404) {
-            // Si no hay registros, cerramos el modal de carga y dejamos el calendario en blanco
+        } else if (resHistorial.status === 404) {
             mantenimientosAgrupados = {};
-            const modalActual = bootstrap.Modal.getInstance(document.getElementById('fmoModalSystem'));
-            if(modalActual) modalActual.hide();
-        } else {
-            throw new Error("Error del servidor al descargar mantenimientos");
         }
+
+        // 2. Descargar Programaciones (Pendientes)
+        const resProg = await fetch(`${BACKEND_URL}/programaciones/pendientes`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (resProg.ok) {
+            const dataProg = await resProg.json();
+            programadosAgrupados = {};
+            dataProg.forEach(prog => {
+                if (!programadosAgrupados[prog.fechaProgramada]) {
+                    programadosAgrupados[prog.fechaProgramada] = [];
+                }
+                programadosAgrupados[prog.fechaProgramada].push(prog);
+            });
+        }
+            
+        // Cerrar modal si estaba abierto
+        const modalActual = bootstrap.Modal.getInstance(document.getElementById('fmoModalSystem'));
+        if(modalActual) modalActual.hide();
+            
     } catch (error) {
         console.error(error);
-        mostrarModal("Ocurrió un error al descargar el historial de mantenimientos.", "error");
+        mostrarModal("Ocurrió un error al descargar los datos del calendario.", "error");
     }
 }
 
@@ -140,8 +153,11 @@ function generarCalendarioUI(anio) {
             const diaFormat = String(dia).padStart(2, '0');
             const fechaString = `${anio}-${mesFormat}-${diaFormat}`;
 
+            // Lógica de colores: Naranja si hay completados, Azul si solo hay pendientes
             if (mantenimientosAgrupados[fechaString]) {
                 celda.classList.add('dia-mantenimiento'); 
+            } else if (programadosAgrupados[fechaString]) {
+                celda.classList.add('dia-programado'); 
             }
 
             celda.onclick = () => manejarClicDia(fechaString, `${dia} de ${nombresMeses[mes]} de ${anio}`);
@@ -154,122 +170,154 @@ function generarCalendarioUI(anio) {
 }
 
 // ==========================================
+// REDIRECCIÓN A REGISTRO
+// ==========================================
+function irARegistrar(idProgramacion, gerencia) {
+    // Redirige a la vista de registro llevando el ID y la Gerencia en la URL
+    window.location.href = `/registro-mantenimiento?progId=${idProgramacion}&gerencia=${encodeURIComponent(gerencia)}`;
+}
+
+// ==========================================
 // INTERACTIVIDAD Y AGRUPACIÓN POR LOTE
 // ==========================================
 function manejarClicDia(fechaDb, fechaLegible) {
-    const mantenimientosDelDia = mantenimientosAgrupados[fechaDb];
+    const completados = mantenimientosAgrupados[fechaDb] || [];
+    const pendientes = programadosAgrupados[fechaDb] || [];
 
-    if (!mantenimientosDelDia || mantenimientosDelDia.length === 0) {
-        return mostrarModal(`No se registraron mantenimientos el <b>${fechaLegible}</b>.`, "warning");
+    if (completados.length === 0 && pendientes.length === 0) {
+        return mostrarModal(`No hay eventos registrados el <b>${fechaLegible}</b>.`, "warning");
     }
 
     document.getElementById('tituloDiaModal').textContent = fechaLegible;
     const contenedorLotes = document.getElementById('contenedorLotesDia');
     contenedorLotes.innerHTML = ''; 
 
-    const lotesPorId = {};
-    mantenimientosDelDia.forEach(mant => {
-        if (!lotesPorId[mant.id]) {
-            lotesPorId[mant.id] = {
-                id: mant.id,
-                gerencia: mant.gerencia,
-                analista: mant.analista,
-                fotos: mant.fotos || [], 
-                equipos: []
-            };
-        }
-        lotesPorId[mant.id].equipos.push(mant);
-    });
+    // 1. RENDERIZAR PENDIENTES (Tarjetas Azules)
+    if (pendientes.length > 0) {
+        pendientes.forEach(prog => {
+            contenedorLotes.innerHTML += `
+                <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden" style="border-left: 5px solid #0d6efd !important;">
+                    <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-light">
+                        <div class="mb-3 mb-md-0">
+                            <h5 class="fw-bold m-0 text-primary"><i class="bi bi-clock-history me-2"></i>Mantenimiento Programado</h5>
+                            <h6 class="text-dark fw-bold mt-1 mb-0">${prog.gerencia}</h6>
+                            <small class="text-muted"><i class="bi bi-person me-1"></i>Analista Asignado: ${prog.analistaResponsable}</small>
+                        </div>
+                        <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" onclick="irARegistrar(${prog.id}, '${prog.gerencia}')">
+                            <i class="bi bi-play-circle-fill me-2"></i> Ejecutar Mantenimiento
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+    }
 
-    // Verificamos si el usuario es ADMIN una sola vez
-    const elUsuarioEsAdmin = esAdmin();
+    // 2. RENDERIZAR COMPLETADOS (Tarjetas Originales)
+    if (completados.length > 0) {
+        const lotesPorId = {};
+        completados.forEach(mant => {
+            if (!lotesPorId[mant.id]) {
+                lotesPorId[mant.id] = {
+                    id: mant.id,
+                    gerencia: mant.gerencia,
+                    analista: mant.analista,
+                    fotos: mant.fotos || [], 
+                    equipos: []
+                };
+            }
+            lotesPorId[mant.id].equipos.push(mant);
+        });
 
-    Object.values(lotesPorId).forEach((lote, indexLote) => {
-        
-        const jsonLoteParaFotos = encodeURIComponent(JSON.stringify({ fotos: lote.fotos }));
-        const tieneFotos = lote.fotos && lote.fotos.length > 0;
-        
-        const btnFotosLote = tieneFotos 
-            ? `<button class="btn btn-sm btn-danger px-3 rounded-pill shadow-sm" onclick="abrirGaleria('${jsonLoteParaFotos}')" title="Ver Fotos"><i class="bi bi-images me-1"></i>Ver ${lote.fotos.length} Fotos</button>`
-            : `<span class="badge bg-secondary rounded-pill px-3 py-2"><i class="bi bi-camera-video-off me-1"></i>Sin fotos</span>`;
+        // Verificamos si el usuario es ADMIN una sola vez
+        const elUsuarioEsAdmin = esAdmin();
 
-// --- NUEVO BOTÓN: EXPORTAR LOTE INDIVIDUAL ---
-        const btnExportarLote = `<button class="btn btn-sm btn-outline-success px-3 rounded-pill shadow-sm ms-2" onclick="exportarLoteCSV(${lote.id})" title="Exportar este lote a Excel"><i class="bi bi-filetype-csv me-1"></i>CSV</button>`;
+        Object.values(lotesPorId).forEach((lote, indexLote) => {
             
-        // Si es ADMIN, creamos el botón de eliminar apuntando al ID del Lote
-        const btnEliminarLote = elUsuarioEsAdmin 
-            ? `<button class="btn btn-sm btn-outline-danger px-3 rounded-pill shadow-sm ms-2" onclick="borrarMantenimiento(${lote.id})" title="Eliminar Lote Completo y sus fotos"><i class="bi bi-trash-fill"></i></button>`
-            : '';
+            const jsonLoteParaFotos = encodeURIComponent(JSON.stringify({ fotos: lote.fotos }));
+            const tieneFotos = lote.fotos && lote.fotos.length > 0;
+            
+            const btnFotosLote = tieneFotos 
+                ? `<button class="btn btn-sm btn-danger px-3 rounded-pill shadow-sm" onclick="abrirGaleria('${jsonLoteParaFotos}')" title="Ver Fotos"><i class="bi bi-images me-1"></i>Ver ${lote.fotos.length} Fotos</button>`
+                : `<span class="badge bg-secondary rounded-pill px-3 py-2"><i class="bi bi-camera-video-off me-1"></i>Sin fotos</span>`;
+
+            // BOTÓN: EXPORTAR LOTE INDIVIDUAL
+            const btnExportarLote = `<button class="btn btn-sm btn-outline-success px-3 rounded-pill shadow-sm ms-2" onclick="exportarLoteCSV(${lote.id})" title="Exportar este lote a Excel"><i class="bi bi-filetype-csv me-1"></i>CSV</button>`;
+                
+            // Si es ADMIN, creamos el botón de eliminar apuntando al ID del Lote
+            const btnEliminarLote = elUsuarioEsAdmin 
+                ? `<button class="btn btn-sm btn-outline-danger px-3 rounded-pill shadow-sm ms-2" onclick="borrarMantenimiento(${lote.id})" title="Eliminar Lote Completo y sus fotos"><i class="bi bi-trash-fill"></i></button>`
+                : '';
 
             let filasHtml = '';
 
-        lote.equipos.forEach((mant, indexEquipo) => {
-            const jsonMant = encodeURIComponent(JSON.stringify(mant));
-            filasHtml += `
-                <tr>
-                    <td class="text-center fw-bold text-muted">${indexEquipo + 1}</td>
-                    <td>
-                        <div class="fw-bold text-dark">${mant.nombreUsuario || 'N/A'}</div>
-                        <small class="text-muted">Ficha: ${mant.ficha || 'S/N'}</small>
-                    </td>
-                    <td><span class="badge bg-light text-dark border">${mant.departamento || 'N/A'}</span></td>
-                    <td>
-                        <div class="text-primary fw-bold">${mant.fmo || 'S/N'}</div>
-                        <small class="text-muted">${mant.tipoDispositivo || 'N/A'} - ${mant.marca || ''}</small>
-                    </td>
-                    <td><span class="text-truncate d-inline-block text-muted" style="max-width: 250px;" title="${mant.observaciones || ''}">${mant.observaciones || 'Sin observaciones'}</span></td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-danger" onclick="abrirDetalles('${jsonMant}')" title="Ver Detalles">
-                            <i class="bi bi-eye-fill"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
+            lote.equipos.forEach((mant, indexEquipo) => {
+                const jsonMant = encodeURIComponent(JSON.stringify(mant));
+                filasHtml += `
+                    <tr>
+                        <td class="text-center fw-bold text-muted">${indexEquipo + 1}</td>
+                        <td>
+                            <div class="fw-bold text-dark">${mant.nombreUsuario || 'N/A'}</div>
+                            <small class="text-muted">Ficha: ${mant.ficha || 'S/N'}</small>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">${mant.departamento || 'N/A'}</span></td>
+                        <td>
+                            <div class="text-primary fw-bold">${mant.fmo || 'S/N'}</div>
+                            <small class="text-muted">${mant.tipoDispositivo || 'N/A'} - ${mant.marca || ''}</small>
+                        </td>
+                        <td><span class="text-truncate d-inline-block text-muted" style="max-width: 250px;" title="${mant.observaciones || ''}">${mant.observaciones || 'Sin observaciones'}</span></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-danger" onclick="abrirDetalles('${jsonMant}')" title="Ver Detalles">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
 
-        const loteHtml = `
-            <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
-                <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                        <div class="mb-2 mb-md-0">
-                            <h5 class="fw-bold m-0" style="color: var(--fmo-red-dark);"><i class="bi bi-building me-2"></i>${lote.gerencia}</h5>
-                            <small class="text-muted fw-semibold">
-                                <i class="bi bi-person-badge me-1"></i>Analista: ${lote.analista} 
-                                <span class="mx-2">|</span> 
-                                <i class="bi bi-pc-display me-1"></i>Equipos: ${lote.equipos.length}
-                            </small>
+            const loteHtml = `
+                <div class="card mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-white border-bottom-0 pt-3 pb-2">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                            <div class="mb-2 mb-md-0">
+                                <h5 class="fw-bold m-0" style="color: var(--fmo-red-dark);"><i class="bi bi-building me-2"></i>${lote.gerencia}</h5>
+                                <small class="text-muted fw-semibold">
+                                    <i class="bi bi-person-badge me-1"></i>Analista: ${lote.analista} 
+                                    <span class="mx-2">|</span> 
+                                    <i class="bi bi-pc-display me-1"></i>Equipos: ${lote.equipos.length}
+                                </small>
+                            </div>
+                            <div>
+                                ${btnFotosLote}
+                                ${btnExportarLote}
+                                ${btnEliminarLote}
+                            </div>
                         </div>
-                        <div>
-                            ${btnFotosLote}
-                            ${btnEliminarLote}
-                            ${btnExportarLote}
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle mb-0 table-hover bg-white border-top">
+                                <thead class="bg-light text-muted" style="font-size: 0.85rem;">
+                                    <tr>
+                                        <th class="text-center bg-light text-secondary" width="5%">#</th>
+                                        <th class="bg-light text-secondary" width="20%">Usuario</th>
+                                        <th class="bg-light text-secondary" width="15%">Departamento</th>
+                                        <th class="bg-light text-secondary" width="20%">Equipo</th>
+                                        <th class="bg-light text-secondary" width="30%">Observaciones</th>
+                                        <th class="text-center bg-light text-secondary" width="10%">Detalle</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filasHtml}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-custom align-middle mb-0 table-hover bg-white border-top">
-                            <thead class="bg-light text-muted" style="font-size: 0.85rem;">
-                                <tr>
-                                    <th class="text-center bg-light text-secondary" width="5%">#</th>
-                                    <th class="bg-light text-secondary" width="20%">Usuario</th>
-                                    <th class="bg-light text-secondary" width="15%">Departamento</th>
-                                    <th class="bg-light text-secondary" width="20%">Equipo</th>
-                                    <th class="bg-light text-secondary" width="30%">Observaciones</th>
-                                    <th class="text-center bg-light text-secondary" width="10%">Detalle</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${filasHtml}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        contenedorLotes.innerHTML += loteHtml;
-    });
+            `;
+            
+            contenedorLotes.innerHTML += loteHtml;
+        });
+    }
 
     new bootstrap.Modal(document.getElementById('modalListaDia')).show();
 }
@@ -278,11 +326,9 @@ function manejarClicDia(fechaDb, fechaLegible) {
 // FUNCIÓN PARA ELIMINAR (SOLO ADMIN)
 // ==========================================
 function borrarMantenimiento(idMantenimiento) {
-    // 1. Verificamos si el modal ya existe en el HTML para no duplicarlo
     let modalExistente = document.getElementById('modalConfirmacionDelete');
     if (modalExistente) modalExistente.remove();
 
-    // 2. Creamos el diseño del Modal de Confirmación
     const modalHtml = `
         <div class="modal fade" id="modalConfirmacionDelete" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -308,7 +354,6 @@ function borrarMantenimiento(idMantenimiento) {
         </div>
     `;
 
-    // 3. Lo inyectamos en el documento y lo mostramos en pantalla
     document.body.insertAdjacentHTML('beforeend', modalHtml);
     const modal = new bootstrap.Modal(document.getElementById('modalConfirmacionDelete'));
     modal.show();
@@ -318,11 +363,9 @@ function borrarMantenimiento(idMantenimiento) {
 // EJECUCIÓN DEL BORRADO (DESPUÉS DE CONFIRMAR)
 // ==========================================
 async function ejecutarBorradoDefinitivo(idMantenimiento) {
-    // 1. Ocultar el modal de confirmación
     const modalConfirmacion = bootstrap.Modal.getInstance(document.getElementById('modalConfirmacionDelete'));
     if (modalConfirmacion) modalConfirmacion.hide();
 
-    // 2. Ejecutar la petición al servidor
     try {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
@@ -333,14 +376,11 @@ async function ejecutarBorradoDefinitivo(idMantenimiento) {
         });
 
         if (res.ok) {
-            // Cerramos el modal gigante de la lista del día
             const modalDiaInst = bootstrap.Modal.getInstance(document.getElementById('modalListaDia'));
             if(modalDiaInst) modalDiaInst.hide();
 
-            // Mostramos tu modal de éxito
             mostrarModal("Mantenimiento y fotografías eliminados exitosamente.", "success");
             
-            // Recargamos silenciosamente los datos y redibujamos el calendario
             await descargarMantenimientos(); 
             generarCalendarioUI(parseInt(document.getElementById('anioSelector').value));
         } else {
@@ -425,7 +465,6 @@ async function abrirGaleria(jsonEncoded) {
     }
 }
 
-
 // ==========================================
 // EXPORTAR A CSV (MEDIANTE EL BACKEND)
 // ==========================================
@@ -434,7 +473,6 @@ async function exportarCSV() {
         return mostrarModal("No hay datos disponibles para exportar.", "warning");
     }
 
-    // Opcional: Filtramos para que solo te exporte los mantenimientos del año que estás viendo
     const anioSeleccionado = document.getElementById('anioSelector').value;
     const dataAExportar = dataCruda.filter(mant => mant.fecha.startsWith(anioSeleccionado));
 
@@ -448,7 +486,6 @@ async function exportarCSV() {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
         
-        // Enviamos el JSON filtrado al backend
         const res = await fetch(`${BACKEND_URL}/mantenimientos/exportar/csv`, {
             method: 'POST',
             headers: { 
@@ -459,15 +496,13 @@ async function exportarCSV() {
         });
 
         if (res.ok) {
-            // El backend responde con un archivo (Blob)
             const blob = await res.blob();
             
-            // Magia del navegador para descargar archivos desde la memoria
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = `Mantenimientos_FMO_${anioSeleccionado}.csv`; // Nombre dinámico
+            a.download = `Mantenimientos_FMO_${anioSeleccionado}.csv`; 
             
             document.body.appendChild(a);
             a.click();
@@ -475,7 +510,6 @@ async function exportarCSV() {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
 
-            // Cerramos el modal de carga en silencio
             const modalActual = bootstrap.Modal.getInstance(document.getElementById('fmoModalSystem'));
             if(modalActual) modalActual.hide();
 
@@ -492,7 +526,6 @@ async function exportarCSV() {
 // EXPORTAR UN SOLO LOTE A CSV
 // ==========================================
 async function exportarLoteCSV(idLote) {
-    // 1. Filtramos la data cruda para obtener solo los equipos de este lote exacto
     const dataAExportar = dataCruda.filter(mant => mant.id === idLote);
 
     if (!dataAExportar || dataAExportar.length === 0) {
@@ -505,7 +538,6 @@ async function exportarLoteCSV(idLote) {
         const token = sessionStorage.getItem('jwt_token');
         const BACKEND_URL = await getBackendUrl();
         
-        // 2. Enviamos el JSON (solo con los datos de esta gerencia) al MISMO endpoint
         const res = await fetch(`${BACKEND_URL}/mantenimientos/exportar/csv`, {
             method: 'POST',
             headers: { 
@@ -522,7 +554,6 @@ async function exportarLoteCSV(idLote) {
             a.style.display = 'none';
             a.href = url;
             
-            // 3. Nombramos el archivo dinámicamente: Ej: Mantenimiento_Telematica_2026-03-20.csv
             const nombreGerenciaLimpio = dataAExportar[0].gerencia.replace(/\s+/g, '_'); 
             const fecha = dataAExportar[0].fecha;
             a.download = `Mantenimiento_${nombreGerenciaLimpio}_${fecha}.csv`;
@@ -533,7 +564,6 @@ async function exportarLoteCSV(idLote) {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
 
-            // Cerramos el modal de carga silenciosamente
             const modalActual = bootstrap.Modal.getInstance(document.getElementById('fmoModalSystem'));
             if(modalActual) modalActual.hide();
 

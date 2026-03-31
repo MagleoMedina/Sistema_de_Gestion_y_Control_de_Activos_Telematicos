@@ -146,4 +146,8 @@ app.get('/consultar-mantenimientos', (req, res) => {
     res.render('pages/consultar-mantenimientos');
 });
 
+app.get('/crear-mantenimientos', (req, res) => {
+    res.render('pages/mantenimiento-programado');
+});
+
 module.exports = { server, PORT, HOST, BACKEND_URL };

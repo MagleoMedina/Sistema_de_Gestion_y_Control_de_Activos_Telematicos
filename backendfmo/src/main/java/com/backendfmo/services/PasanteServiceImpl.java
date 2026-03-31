@@ -1,13 +1,25 @@
 package com.backendfmo.services;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,8 +117,8 @@ public class PasanteServiceImpl {
         String nombreBaseFoto = usuarioGuardado.getFicha() + "_foto_" + nombreSinEspacios;
         String nombreBaseInforme = usuarioGuardado.getFicha() + "_informe_" + nombreSinEspacios;
 
-        String rutaFoto = guardarArchivo(fotoFile, rootFoto, nombreBaseFoto);
-        String rutaInforme = guardarArchivo(informeFile, rootInforme, nombreBaseInforme);
+        String rutaFoto = guardarFotoComprimida(fotoFile, rootFoto, nombreBaseFoto);
+        String rutaInforme = guardarPdfComprimido(informeFile, rootInforme, nombreBaseInforme);
 
         // 5. CREACIÓN DEL PASANTE
         Pasante pasante = pasanteRepository.findById(usuarioGuardado.getId().longValue()) 
@@ -128,21 +140,82 @@ public class PasanteServiceImpl {
         return pasanteRepository.save(pasante);
     }
 
-    private String guardarArchivo(MultipartFile file, Path rutaBase, String nombreCompletoSinExtension) throws IOException {
+
+    // =========================================================================
+    // ALGORITMO DE COMPRESIÓN POR CUANTIZACIÓN (JPEG)
+    // =========================================================================
+    private String guardarFotoComprimida(MultipartFile file, Path rutaBase, String nombreCompletoSinExtension) throws IOException {
         if (file == null || file.isEmpty()) return null;
         if (!Files.exists(rutaBase)) {
             Files.createDirectories(rutaBase);
         }
-        String originalFilename = file.getOriginalFilename();
-        String extension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+
+        String nombreFinal = nombreCompletoSinExtension + ".jpg"; // Forzamos salida a JPG para cuantización
+        File archivoDestino = rutaBase.resolve(nombreFinal).toFile();
+
+        try (InputStream is = file.getInputStream();
+             ImageOutputStream ios = ImageIO.createImageOutputStream(new FileOutputStream(archivoDestino))) {
+            
+            BufferedImage image = ImageIO.read(is);
+            if (image == null) {
+                // Fallback de seguridad si no es una imagen procesable
+                Files.copy(file.getInputStream(), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                return nombreFinal;
+            }
+
+            // Eliminar canal Alpha (transparencia) si es PNG, ya que JPEG no lo soporta
+            BufferedImage newBufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+            newBufferedImage.createGraphics().drawImage(image, 0, 0, java.awt.Color.WHITE, null);
+
+            Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+            if (!writers.hasNext()) throw new IllegalStateException("No se encontró un escritor JPEG.");
+            
+            ImageWriter writer = writers.next();
+            writer.setOutput(ios);
+
+            // Configurar el algoritmo de compresión (0.0 = máxima compresión, 1.0 = calidad máxima)
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            if (param.canWriteCompressed()) {
+                param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                param.setCompressionQuality(0.65f); // 65% conserva legibilidad visual reduciendo drásticamente el peso
+            }
+
+            writer.write(null, new IIOImage(newBufferedImage, null, null), param);
+            writer.dispose();
         }
-        String nombreFinal = nombreCompletoSinExtension + extension;
-        Path rutaArchivo = rutaBase.resolve(nombreFinal);
-        Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
-        return nombreFinal; 
+        
+        return nombreFinal;
     }
+
+    // =========================================================================
+    // ALGORITMO LZW/FLATE PARA PDFS (Vía Apache PDFBox)
+    // =========================================================================
+    private String guardarPdfComprimido(MultipartFile file, Path rutaBase, String nombreCompletoSinExtension) throws IOException {
+        if (file == null || file.isEmpty()) return null;
+        if (!Files.exists(rutaBase)) {
+            Files.createDirectories(rutaBase);
+        }
+
+        String nombreFinal = nombreCompletoSinExtension + ".pdf";
+        File archivoDestino = rutaBase.resolve(nombreFinal).toFile();
+
+        try {
+            // PDFBox carga el documento y re-comprime internamente sus flujos de datos (streams)
+            // utilizando FlateDecode (la implementación moderna del estándar original LZW para PDF)
+            PDDocument document = PDDocument.load(file.getInputStream());
+            
+            // Al guardar el documento, la API comprime los streams de objetos que no estaban comprimidos
+            document.save(archivoDestino);
+            document.close();
+            
+        } catch (Exception e) {
+            // Fallback: Si el PDF está encriptado o corrupto, se guarda sin re-comprimir
+            Files.copy(file.getInputStream(), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return nombreFinal;
+    }
+    
 
     public List<PasanteResponseDTO> obtenerTodosLosPasantes() {
         List<Pasante> pasantes = pasanteRepository.findAll();
@@ -250,27 +323,17 @@ public class PasanteServiceImpl {
         pasante.setTituloPretendido(dto.getTituloPretendido());
 
         // 6. MANEJO DE ARCHIVOS: Sobreescribir si se envían archivos nuevos
+        // SE UTILIZAN LOS MISMOS MÉTODOS DE COMPRESIÓN PARA LAS ACTUALIZACIONES
         if (fotoFile != null && !fotoFile.isEmpty()) {
-            if (pasante.getRutaFotografia() != null && !pasante.getRutaFotografia().isEmpty()) {
-                // Sobreescribe manteniendo el nombre exacto registrado en la BD
-                sobreescribirArchivo(fotoFile, rootFoto, pasante.getRutaFotografia());
-            } else {
-                // Si por alguna razón no tenía foto previa, creamos una nueva
-                String nombreSinEspacios = usuario.getNombre().replaceAll("\\s+", "");
-                String nombreBaseFoto = usuario.getFicha() + "_foto_" + nombreSinEspacios;
-                pasante.setRutaFotografia(guardarArchivo(fotoFile, rootFoto, nombreBaseFoto));
-            }
+            String nombreSinEspacios = usuario.getNombre().replaceAll("\\s+", "");
+            String nombreBaseFoto = usuario.getFicha() + "_foto_" + nombreSinEspacios;
+            pasante.setRutaFotografia(guardarFotoComprimida(fotoFile, rootFoto, nombreBaseFoto));
         }
 
         if (informeFile != null && !informeFile.isEmpty()) {
-            if (pasante.getRutaInforme() != null && !pasante.getRutaInforme().isEmpty()) {
-                // Sobreescribe manteniendo el nombre exacto registrado en la BD
-                sobreescribirArchivo(informeFile, rootInforme, pasante.getRutaInforme());
-            } else {
-                String nombreSinEspacios = usuario.getNombre().replaceAll("\\s+", "");
-                String nombreBaseInforme = usuario.getFicha() + "_informe_" + nombreSinEspacios;
-                pasante.setRutaInforme(guardarArchivo(informeFile, rootInforme, nombreBaseInforme));
-            }
+            String nombreSinEspacios = usuario.getNombre().replaceAll("\\s+", "");
+            String nombreBaseInforme = usuario.getFicha() + "_informe_" + nombreSinEspacios;
+            pasante.setRutaInforme(guardarPdfComprimido(informeFile, rootInforme, nombreBaseInforme));
         }
 
         // Guardar y retornar el DTO
@@ -278,18 +341,6 @@ public class PasanteServiceImpl {
         return convertirEntidadADTO(pasanteActualizado);
     }
 
-    // --- NUEVO MÉTODO PARA SOBREESCRIBIR ---
-    private void sobreescribirArchivo(MultipartFile file, Path rutaBase, String nombreExacto) throws IOException {
-        if (!Files.exists(rutaBase)) {
-            Files.createDirectories(rutaBase);
-        }
-        
-        // Se usa el nombreExacto que ya incluye la extensión (ej: "9900_foto_Juan.png")
-        Path rutaArchivo = rutaBase.resolve(nombreExacto);
-        
-        // REPLACE_EXISTING reemplaza el contenido del archivo si ya existe
-        Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
-    }
 
 
     @Transactional

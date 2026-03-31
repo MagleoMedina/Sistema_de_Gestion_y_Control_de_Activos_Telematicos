@@ -31,6 +31,9 @@ public class MantenimientoService {
     @Autowired private MantenimientoDepartamentoRepository mantDeptoRepository;
     @Autowired private MantenimientoFotoRepository mantFotoRepository;
 
+    // --- NUEVO REPOSITORIO INYECTADO ---
+    @Autowired private MantenimientoProgramadoRepository programadoRepository;
+
     private final Path rootFotosMantenimiento;
 
     public MantenimientoService() {
@@ -136,6 +139,17 @@ public class MantenimientoService {
                     mantFotoRepository.save(mantFoto);
                 }
             }
+        }
+        // =========================================================================
+        // 5. NUEVO: VALIDACIÓN Y ACTUALIZACIÓN ESTRICTA DEL ESTADO PROGRAMADO
+        // =========================================================================
+        if (dto.getIdProgramacion() != null) {
+            MantenimientoProgramado programado = programadoRepository.findById(dto.getIdProgramacion())
+                    .orElseThrow(() -> new RuntimeException("La programación vinculada con ID " + dto.getIdProgramacion() + " no existe."));
+            
+            // Actualizamos el estado porque la planilla acaba de ser guardada con éxito
+            programado.setEstatus("Completado");
+            programadoRepository.save(programado);
         }
     }
 

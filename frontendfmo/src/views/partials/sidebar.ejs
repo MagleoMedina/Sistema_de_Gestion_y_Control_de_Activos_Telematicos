@@ -25,10 +25,29 @@
         flex-shrink: 0;
         z-index: 1050; /* Z-index alto para mobile */
         overflow-x: hidden;
-        white-space: nowrap;
+        overflow-y: auto; /* Permite el scroll vertical si hay muchos menús */
         background-color: var(--sidebar-bg) !important;
         position: relative;
         border-right: 1px solid rgba(255,255,255,0.05);
+        
+        /* Custom Scrollbar para Firefox */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.15) var(--sidebar-bg);
+    }
+
+    /* --- CUSTOM SCROLLBAR (Chrome, Edge, Safari) --- */
+    #sidebar::-webkit-scrollbar {
+        width: 6px; /* Scrollbar más delgada y elegante */
+    }
+    #sidebar::-webkit-scrollbar-track {
+        background: var(--sidebar-bg); /* Mismo fondo oscuro del sidebar */
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.15); /* Gris semitransparente */
+        border-radius: 10px;
+    }
+    #sidebar::-webkit-scrollbar-thumb:hover {
+        background-color: var(--fmo-orange); /* Se ilumina en naranja al pasar el mouse */
     }
 
     .no-transition { transition: none !important; }
@@ -108,11 +127,21 @@
         transition: color 0.3s;
     }
 
+    /* Control de desbordamiento de texto */
+    .link-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
     .nav-pills .nav-link {
         color: #e0e0e0;
         margin-bottom: 4px;
         transition: all 0.2s ease;
         border-radius: 8px;
+        overflow: hidden;
     }
 
     .nav-pills .nav-link:hover {
@@ -274,6 +303,37 @@
             </div>
         </li>
 
+        <li class="nav-item mb-1">
+            <button class="nav-link text-white w-100 d-flex align-items-center collapsed" 
+                    data-bs-toggle="collapse" data-bs-target="#submenuMantenimientos" aria-expanded="false" id="btnGrupoMantenimientos">
+                <span class="icon-container"><i class="bi bi-tools"></i></span>
+                <span class="link-text flex-grow-1 text-start">Mantenimientos</span>
+                <span class="dropdown-toggle"></span> 
+            </button>
+            <div class="collapse" id="submenuMantenimientos">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    <li>
+                        <a href="/crear-mantenimientos" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-calendar-plus"></i></span>
+                            <span class="link-text">Programar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/registro-mantenimiento" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-table"></i></span>
+                            <span class="link-text">Registro Tabular</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/consultar-mantenimientos" class="nav-link text-white submenu-link">
+                            <span class="icon-container"><i class="bi bi-journal-check"></i></span>
+                            <span class="link-text">Historial</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+
         <li>
             <a href="/exportar" class="nav-link text-white d-flex align-items-center">
                 <span class="icon-container"><i class="bi bi-file-earmark-arrow-down"></i></span>
@@ -304,20 +364,7 @@
                 <span class="link-text">Gerencias</span>
             </a>
         </li>
-        <li>
-            <a href="/registro-mantenimiento" class="nav-link text-white d-flex align-items-center">
-                <span class="icon-container"><i class="bi bi-building"></i></span>
-                <span class="link-text">Registro Mantenimiento</span>
-            </a>
-        </li>
-            <li>
-            <a href="/consultar-mantenimientos" class="nav-link text-white d-flex align-items-center">
-                <span class="icon-container"><i class="bi bi-building"></i></span>
-                <span class="link-text">Consultar Mantenimientos</span>
-            </a>
-        </li>
     </ul>
-    
     
     <hr style="border-color: rgba(255,255,255,0.15);">
     

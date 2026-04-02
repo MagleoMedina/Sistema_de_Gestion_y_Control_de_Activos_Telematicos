@@ -46,4 +46,7 @@ public class Mantenimiento {
     @OneToMany(mappedBy = "mantenimiento", cascade = CascadeType.ALL)
     @JsonManagedReference  
     private List<MantenimientoFoto> fotos;
+
+    @Column(name = "estatus", nullable = false)
+    private String estatus;
 }

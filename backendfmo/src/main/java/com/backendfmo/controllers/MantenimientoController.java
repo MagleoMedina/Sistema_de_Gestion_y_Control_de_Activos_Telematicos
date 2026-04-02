@@ -1,5 +1,7 @@
 package com.backendfmo.controllers;
 
+import com.backendfmo.dtos.request.mantenimiento.MantenimientoProgramadoRequestDTO;
+import com.backendfmo.dtos.request.mantenimiento.MantenimientoProgramadoResponseDTO;
 import com.backendfmo.dtos.request.mantenimiento.MantenimientoRegistroDTO;
 import com.backendfmo.dtos.request.mantenimiento.MantenimientoResponseDTO;
 import com.backendfmo.services.MantenimientoService;
@@ -21,6 +23,46 @@ public class MantenimientoController {
 
     @Autowired
     private MantenimientoService mantenimientoService;
+
+    // ==========================================
+    // ENDPOINTS DE PROGRAMACIÓN (PENDIENTES)
+    // ==========================================
+
+    @PostMapping("/programados/crear")
+    public ResponseEntity<?> crearProgramacion(@RequestBody MantenimientoProgramadoRequestDTO dto) {
+        try {
+            MantenimientoProgramadoResponseDTO respuesta = mantenimientoService.programarMantenimiento(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Error al programar: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/programados/pendientes")
+    public ResponseEntity<List<MantenimientoProgramadoResponseDTO>> obtenerPendientes() {
+        try {
+            return ResponseEntity.ok(mantenimientoService.obtenerPendientes());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/programados/actualizar/{id}")
+    public ResponseEntity<?> actualizarProgramacion(@PathVariable Long id, @RequestBody MantenimientoProgramadoRequestDTO dto) {
+        try {
+            MantenimientoProgramadoResponseDTO respuesta = mantenimientoService.actualizarProgramacion(id, dto);
+            return ResponseEntity.ok(respuesta);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("{\"error\": \"Error al actualizar: " + e.getMessage() + "\"}");
+        }
+    }
+
+    // ==========================================
+    // ENDPOINTS DE EJECUCIÓN (COMPLETADOS)
+    // ==========================================
 
     @PostMapping(value = "/registrar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registrarMantenimiento(
@@ -46,10 +88,8 @@ public class MantenimientoController {
             return ResponseEntity.ok(mantenimientoService.obtenerTodos());
         } catch (RuntimeException e) {
             e.printStackTrace();
-            
             return ResponseEntity.status(404).body(e.getMessage());
-        }catch (Exception e) {
-            //e.printStackTrace();
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
@@ -75,61 +115,44 @@ public class MantenimientoController {
         }
     }
 
-
-    // ==========================================
-    // ENDPOINT PARA ELIMINAR
-    // ==========================================
+    // Funciona tanto para borrar programaciones pendientes como completadas
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<?> eliminarMantenimiento(@PathVariable Long id) {
         try {
             mantenimientoService.eliminarMantenimiento(id);
-            return ResponseEntity.ok().body("{\"mensaje\": \"Lote de mantenimiento y fotografías eliminados con éxito\"}");
+            return ResponseEntity.ok().body("{\"mensaje\": \"Registro eliminado con éxito\"}");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("{\"error\": \"Error al eliminar: " + e.getMessage() + "\"}");
         }
-        
-}
+    }
 
-@PostMapping(value = "/exportar/csv", produces = "text/csv")
+    @PostMapping(value = "/exportar/csv", produces = "text/csv")
     public ResponseEntity<byte[]> exportarCsv(@RequestBody List<MantenimientoResponseDTO> listaMantenimientos) {
         try {
-            // 1. Delegamos la lógica pesada al Servicio
             byte[] archivoCsv = mantenimientoService.generarCsvMantenimientos(listaMantenimientos);
-
-            // 2. Configuramos las cabeceras HTTP
-            HttpHeaders headers = new org.springframework.http.HttpHeaders();
-            headers.set(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_mantenimientos.csv");
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_mantenimientos.csv");
             headers.setContentType(MediaType.parseMediaType("text/csv"));
-
-            // 3. Retornamos el archivo
             return new ResponseEntity<>(archivoCsv, headers, HttpStatus.OK);
-            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
 
-    // ==========================================
-    // ENDPOINT PARA EXPORTAR CSV RESUMIDO
-    // ==========================================
     @PostMapping(value = "/exportar/csv/resumen", produces = "text/csv")
     public ResponseEntity<?> exportarCsvResumen(@RequestBody List<MantenimientoResponseDTO> listaMantenimientos) {
         try {
-            // Llamamos al nuevo método resumido
             byte[] archivoCsv = mantenimientoService.generarCsvResumenMantenimientos(listaMantenimientos);
-
             HttpHeaders headers = new HttpHeaders();
-            // Le damos un nombre distinto para diferenciarlo del detallado
             headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=resumen_estadistico_mantenimientos.csv");
             headers.setContentType(MediaType.parseMediaType("text/csv"));
-
             return new ResponseEntity<>(archivoCsv, headers, HttpStatus.OK);
-            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
 }
+

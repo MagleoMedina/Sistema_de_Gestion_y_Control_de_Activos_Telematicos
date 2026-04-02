@@ -257,6 +257,7 @@ CREATE TABLE IF NOT EXISTS "mantenimiento" (
 	"gerencia_id" INTEGER NOT NULL,
 	"analista" TEXT NOT NULL,
 	"fecha" TEXT NOT NULL,
+	"estatus" TEXT NOT NULL,
 	FOREIGN KEY (gerencia_id) REFERENCES gerencia(id) ON UPDATE CASCADE ON DELETE CASCADE
 ); 
 

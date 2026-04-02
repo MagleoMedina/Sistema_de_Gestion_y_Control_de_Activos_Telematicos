@@ -47,7 +47,7 @@ async function guardarProgramacion() {
     mostrarModal(`<div class="spinner-border text-danger me-2"></div> Agendando mantenimiento...`, "info");
 
     try {
-        const res = await ApiService.fetchAutenticado('/programaciones/crear', {
+        const res = await ApiService.fetchAutenticado('/mantenimientos/programados/crear', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ gerencia, fechaProgramada: fecha, analistaResponsable: analista })
@@ -73,7 +73,7 @@ async function cargarPendientes() {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-warning me-2"></div>Cargando pendientes...</td></tr>`;
 
     try {
-        const res = await ApiService.fetchAutenticado('/programaciones/pendientes');
+        const res = await ApiService.fetchAutenticado('/mantenimientos/programados/pendientes');
         if (!res.ok) throw new Error("No se pudo conectar con el servidor.");
         const data = await res.json();
         renderTablaPendientes(data);
@@ -155,7 +155,7 @@ async function guardarEdicion() {
     mostrarModal(`<div class="spinner-border text-primary me-2"></div> Guardando cambios...`, "info");
 
     try {
-        const res = await ApiService.fetchAutenticado(`/programaciones/actualizar/${id}`, {
+        const res = await ApiService.fetchAutenticado(`/mantenimientos/programados/actualizar/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ gerencia, fechaProgramada: fecha, analistaResponsable: analista })
@@ -190,7 +190,7 @@ async function ejecutarBorrado(id) {
     mostrarModal(`<div class="spinner-border text-danger me-2"></div> Anulando programación...`, "info");
 
     try {
-        const res = await ApiService.fetchAutenticado(`/programaciones/eliminar/${id}`, {
+        const res = await ApiService.fetchAutenticado(`/mantenimientos/eliminar/${id}`, {
             method: 'DELETE'
         });
 

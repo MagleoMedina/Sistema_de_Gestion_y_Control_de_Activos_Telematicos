@@ -80,7 +80,7 @@ async function descargarMantenimientos() {
         }
 
         // 2. Descargar Programaciones (Pendientes)
-        const resProg = await fetch(`${BACKEND_URL}/programaciones/pendientes`, {
+        const resProg = await fetch(`${BACKEND_URL}/mantenimientos/programados/pendientes`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

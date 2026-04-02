@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.backendfmo.dtos.request.mantenimiento.EquipoDetalleDTO;
+import com.backendfmo.dtos.request.mantenimiento.MantenimientoProgramadoRequestDTO;
+import com.backendfmo.dtos.request.mantenimiento.MantenimientoProgramadoResponseDTO;
 import com.backendfmo.dtos.request.mantenimiento.MantenimientoRegistroDTO;
 import com.backendfmo.dtos.request.mantenimiento.MantenimientoResponseDTO;
 import com.backendfmo.models.mantenimiento.*;
@@ -45,9 +47,6 @@ public class MantenimientoService {
     @Autowired private MantenimientoDepartamentoRepository mantDeptoRepository;
     @Autowired private MantenimientoFotoRepository mantFotoRepository;
 
-    // --- NUEVO REPOSITORIO INYECTADO ---
-    @Autowired private MantenimientoProgramadoRepository programadoRepository;
-
     private final Path rootFotosMantenimiento;
 
     public MantenimientoService() {
@@ -55,10 +54,12 @@ public class MantenimientoService {
         this.rootFotosMantenimiento = Paths.get(projectRoot, "src", "main", "resources", "mantenimientos", "fotos");
     }
 
-@Transactional
-    public void registrarMantenimiento(MantenimientoRegistroDTO dto, List<MultipartFile> fotos) throws IOException {
-        
-        // 1. Gestionar Gerencia (Cabecera)
+    // =========================================================================
+    // LÓGICA DE PROGRAMACIONES (PENDIENTES)
+    // =========================================================================
+
+    @Transactional
+    public MantenimientoProgramadoResponseDTO programarMantenimiento(MantenimientoProgramadoRequestDTO dto) {
         Gerencia gerencia = gerenciaRepository.findByNombreIgnoreCase(dto.getGerencia())
                 .orElseGet(() -> {
                     Gerencia g = new Gerencia();
@@ -66,16 +67,91 @@ public class MantenimientoService {
                     return gerenciaRepository.save(g);
                 });
 
-        // 2. Crear un solo Mantenimiento (Cabecera)
-        Mantenimiento mantenimiento = new Mantenimiento();
-        mantenimiento.setGerencia(gerencia);
-        mantenimiento.setAnalista(dto.getAnalista());
-        mantenimiento.setFecha(dto.getFecha());
+        Mantenimiento nuevo = new Mantenimiento();
+        nuevo.setGerencia(gerencia);
+        nuevo.setFecha(dto.getFechaProgramada());
+        nuevo.setAnalista(dto.getAnalistaResponsable());
+        nuevo.setEstatus("Pendiente"); // Estatus inicial sin equipos
+        
+        nuevo = mantenimientoRepository.save(nuevo);
+        return convertirAProgramadoDTO(nuevo);
+    }
+
+    @Transactional(readOnly = true)
+    public List<MantenimientoProgramadoResponseDTO> obtenerPendientes() {
+        return mantenimientoRepository.findAll().stream()
+                .filter(m -> "Pendiente".equalsIgnoreCase(m.getEstatus()))
+                .map(this::convertirAProgramadoDTO)
+                .toList();
+    }
+
+    @Transactional
+    public MantenimientoProgramadoResponseDTO actualizarProgramacion(Long id, MantenimientoProgramadoRequestDTO dto) {
+        Mantenimiento existente = mantenimientoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Programación no encontrada con el ID: " + id));
+
+        Gerencia gerencia = gerenciaRepository.findByNombreIgnoreCase(dto.getGerencia())
+                .orElseGet(() -> {
+                    Gerencia g = new Gerencia();
+                    g.setNombre(dto.getGerencia());
+                    return gerenciaRepository.save(g);
+                });
+
+        existente.setGerencia(gerencia);
+        existente.setFecha(dto.getFechaProgramada());
+        existente.setAnalista(dto.getAnalistaResponsable());
+        
+        Mantenimiento actualizado = mantenimientoRepository.save(existente);
+        return convertirAProgramadoDTO(actualizado);
+    }
+
+    private MantenimientoProgramadoResponseDTO convertirAProgramadoDTO(Mantenimiento m) {
+        MantenimientoProgramadoResponseDTO dto = new MantenimientoProgramadoResponseDTO();
+        dto.setId(m.getId());
+        dto.setGerencia(m.getGerencia().getNombre());
+        dto.setFechaProgramada(m.getFecha());
+        dto.setAnalistaResponsable(m.getAnalista());
+        dto.setEstado(m.getEstatus());
+        return dto;
+    }
+
+
+    // =========================================================================
+    // EJECUCIÓN DEL MANTENIMIENTO (REGISTRO)
+    // =========================================================================
+
+    @Transactional
+    public void registrarMantenimiento(MantenimientoRegistroDTO dto, List<MultipartFile> fotos) throws IOException {
+        
+        Gerencia gerencia = gerenciaRepository.findByNombreIgnoreCase(dto.getGerencia())
+                .orElseGet(() -> {
+                    Gerencia g = new Gerencia();
+                    g.setNombre(dto.getGerencia());
+                    return gerenciaRepository.save(g);
+                });
+
+        Mantenimiento mantenimiento;
+
+        // Si viene un ID, actualizamos la programación existente a "Completado"
+        if (dto.getIdProgramacion() != null) {
+            mantenimiento = mantenimientoRepository.findById(dto.getIdProgramacion())
+                    .orElseThrow(() -> new RuntimeException("La programación vinculada con ID " + dto.getIdProgramacion() + " no existe."));
+            mantenimiento.setGerencia(gerencia);
+            mantenimiento.setAnalista(dto.getAnalista());
+            mantenimiento.setFecha(dto.getFecha());
+            mantenimiento.setEstatus("Completado");
+        } else {
+            // Si no viene ID, es un mantenimiento espontáneo (nuevo)
+            mantenimiento = new Mantenimiento();
+            mantenimiento.setGerencia(gerencia);
+            mantenimiento.setAnalista(dto.getAnalista());
+            mantenimiento.setFecha(dto.getFecha());
+            mantenimiento.setEstatus("Completado");
+        }
+        
         mantenimiento = mantenimientoRepository.save(mantenimiento);
 
-        // 3. Iterar y guardar los múltiples equipos vinculados a la cabecera
         for (EquipoDetalleDTO equipoDto : dto.getEquipos()) {
-            
             Usuario usuario = usuarioRepository.findByFicha(equipoDto.getFicha())
                     .orElseGet(() -> {
                         Usuario u = new Usuario();
@@ -120,7 +196,6 @@ public class MantenimientoService {
             dispositivo.setModelo(modelo);
             dispositivo = dispositivoRepository.save(dispositivo);
 
-            // Detalle del Mantenimiento
             MantenimientoDepartamento detalle = new MantenimientoDepartamento();
             detalle.setMantenimiento(mantenimiento);
             detalle.setUsuario(usuario);
@@ -131,45 +206,26 @@ public class MantenimientoService {
             mantDeptoRepository.save(detalle);
         }
 
-        // 4. Guardar Fotos (Una sola vez para todo el lote) APLICANDO COMPRESIÓN
         if (fotos != null && !fotos.isEmpty()) {
             if (!Files.exists(rootFotosMantenimiento)) {
                 Files.createDirectories(rootFotosMantenimiento);
             }
             for (MultipartFile foto : fotos) {
                 if (foto != null && !foto.isEmpty()) {
-                    // Generamos un nombre único sin extensión
                     String nombreBase = dto.getGerencia().replaceAll("\\s+", "_") + "_" + dto.getFecha() + "_" + UUID.randomUUID().toString().substring(0, 8);
-                    
-                    // Llamamos al algoritmo de compresión
                     String nombreFinal = guardarFotoComprimida(foto, rootFotosMantenimiento, nombreBase);
 
                     MantenimientoFoto mantFoto = new MantenimientoFoto();
                     mantFoto.setMantenimiento(mantenimiento);
-                    mantFoto.setFotoPath(nombreFinal); // Guardamos la ruta del archivo comprimido
+                    mantFoto.setFotoPath(nombreFinal); 
                     mantFotoRepository.save(mantFoto);
                 }
             }
         }
-
-        // =========================================================================
-        // 5. VALIDACIÓN Y ACTUALIZACIÓN ESTRICTA DEL ESTADO PROGRAMADO
-        // =========================================================================
-        if (dto.getIdProgramacion() != null) {
-            MantenimientoProgramado programado = programadoRepository.findById(dto.getIdProgramacion())
-                    .orElseThrow(() -> new RuntimeException("La programación vinculada con ID " + dto.getIdProgramacion() + " no existe."));
-            
-            // Actualizamos el estado porque la planilla acaba de ser guardada con éxito
-            programado.setEstatus("Completado");
-            programadoRepository.save(programado);
-        }
     }
 
-    // =========================================================================
-    // ALGORITMO DE COMPRESIÓN POR CUANTIZACIÓN (JPEG)
-    // =========================================================================
     private String guardarFotoComprimida(MultipartFile file, Path rutaBase, String nombreCompletoSinExtension) throws IOException {
-        String nombreFinal = nombreCompletoSinExtension + ".jpg"; // Forzamos salida a JPG para cuantización
+        String nombreFinal = nombreCompletoSinExtension + ".jpg"; 
         File archivoDestino = rutaBase.resolve(nombreFinal).toFile();
 
         try (InputStream is = file.getInputStream();
@@ -177,12 +233,10 @@ public class MantenimientoService {
             
             BufferedImage image = ImageIO.read(is);
             if (image == null) {
-                // Fallback de seguridad si el archivo subido no es una imagen procesable
                 Files.copy(file.getInputStream(), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 return nombreFinal;
             }
 
-            // Eliminar canal Alpha (transparencia) si es PNG, ya que JPEG no lo soporta (fondo blanco)
             BufferedImage newBufferedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
             newBufferedImage.createGraphics().drawImage(image, 0, 0, java.awt.Color.WHITE, null);
 
@@ -192,17 +246,15 @@ public class MantenimientoService {
             ImageWriter writer = writers.next();
             writer.setOutput(ios);
 
-            // Configurar el algoritmo de compresión (0.0 = máxima compresión, 1.0 = calidad máxima)
             ImageWriteParam param = writer.getDefaultWriteParam();
             if (param.canWriteCompressed()) {
                 param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                param.setCompressionQuality(0.65f); // 65% de calidad: Reduce drasticamente el peso manteniendo la legibilidad
+                param.setCompressionQuality(0.65f); 
             }
 
             writer.write(null, new IIOImage(newBufferedImage, null, null), param);
             writer.dispose();
         } catch (Exception e) {
-             // Si el proceso de compresión falla (ej: archivo corrupto), lo guarda original
              Files.copy(file.getInputStream(), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
         
@@ -210,11 +262,12 @@ public class MantenimientoService {
     }
 
     // ==========================================
-    // MÉTODOS DE CONSULTA APLANADOS PARA LA VISTA
+    // MÉTODOS DE CONSULTA (Solo Completados para el Historial)
     // ==========================================
     @Transactional(readOnly = true)
     public List<MantenimientoResponseDTO> obtenerTodos() {
         return mantenimientoRepository.findAll().stream()
+                .filter(m -> "Completado".equalsIgnoreCase(m.getEstatus()))
                 .flatMap(m -> m.getDetalles().stream().map(d -> convertirADTO(m, d)))
                 .toList();
     }
@@ -222,6 +275,7 @@ public class MantenimientoService {
     @Transactional(readOnly = true)
     public List<MantenimientoResponseDTO> obtenerPorFecha(String fecha) {
         return mantenimientoRepository.findByFecha(fecha).stream()
+                .filter(m -> "Completado".equalsIgnoreCase(m.getEstatus()))
                 .flatMap(m -> m.getDetalles().stream().map(d -> convertirADTO(m, d)))
                 .toList();
     }
@@ -229,13 +283,11 @@ public class MantenimientoService {
     @Transactional(readOnly = true)
     public List<MantenimientoResponseDTO> obtenerPorGerencia(String gerencia) {
         return mantenimientoRepository.findByGerenciaNombreContainingIgnoreCase(gerencia).stream()
+                .filter(m -> "Completado".equalsIgnoreCase(m.getEstatus()))
                 .flatMap(m -> m.getDetalles().stream().map(d -> convertirADTO(m, d)))
                 .toList();
     }
 
-    // ==========================================
-    // MÉTODO PARA ELIMINAR (DELETE)
-    // ==========================================
     @Transactional
     public void eliminarMantenimiento(Long id) {
         Mantenimiento mantenimiento = mantenimientoRepository.findById(id)
@@ -248,7 +300,6 @@ public class MantenimientoService {
                     Files.deleteIfExists(rutaArchivo);
                 } catch (IOException e) {
                     System.err.println("Advertencia: No se pudo eliminar la foto física: " + foto.getFotoPath());
-                    e.printStackTrace();
                 }
             }
         }
@@ -256,13 +307,11 @@ public class MantenimientoService {
     }
 
     // ==========================================
-    // LÓGICA DE NEGOCIO: GENERACIÓN DE CSV
+    // EXPORTACIONES CSV
     // ==========================================
     public byte[] generarCsvMantenimientos(List<MantenimientoResponseDTO> listaMantenimientos) {
         StringBuilder csv = new StringBuilder();
-        
         csv.append("Gerencia,Fecha,Analista,Ficha,Usuario,Departamento,CPU/IMP,Marca,Modelo,FMO/Serial,SO,Observaciones\n");
-
         for (MantenimientoResponseDTO dto : listaMantenimientos) {
             csv.append(escaparCsv(dto.getGerencia())).append(",")
                .append(escaparCsv(dto.getFecha())).append(",")
@@ -277,14 +326,35 @@ public class MantenimientoService {
                .append(escaparCsv(dto.getSo())).append(",")
                .append(escaparCsv(dto.getObservaciones())).append("\n");
         }
+        return aplicarBom(csv.toString());
+    }
 
-        byte[] csvBytes = csv.toString().getBytes(StandardCharsets.UTF_8);
+    public byte[] generarCsvResumenMantenimientos(List<MantenimientoResponseDTO> listaMantenimientos) {
+        StringBuilder csv = new StringBuilder();
+        csv.append("Fecha,Gerencia,Analista,Cantidad Atendidos\n");
+
+        Map<Long, List<MantenimientoResponseDTO>> lotesAgrupados = listaMantenimientos.stream()
+                .collect(Collectors.groupingBy(MantenimientoResponseDTO::getId));
+
+        for (List<MantenimientoResponseDTO> lote : lotesAgrupados.values()) {
+            if (!lote.isEmpty()) {
+                MantenimientoResponseDTO ref = lote.get(0);
+                csv.append(escaparCsv(ref.getFecha())).append(",")
+                   .append(escaparCsv(ref.getGerencia())).append(",")
+                   .append(escaparCsv(ref.getAnalista())).append(",")
+                   .append(lote.size()).append("\n");
+            }
+        }
+        return aplicarBom(csv.toString());
+    }
+
+    private byte[] aplicarBom(String csv) {
+        byte[] csvBytes = csv.getBytes(StandardCharsets.UTF_8);
         byte[] bomAndCsv = new byte[csvBytes.length + 3];
         bomAndCsv[0] = (byte) 0xEF;
         bomAndCsv[1] = (byte) 0xBB;
         bomAndCsv[2] = (byte) 0xBF;
         System.arraycopy(csvBytes, 0, bomAndCsv, 3, csvBytes.length);
-
         return bomAndCsv;
     }
 
@@ -303,55 +373,16 @@ public class MantenimientoService {
         dto.setFecha(m.getFecha());
         dto.setAnalista(m.getAnalista());
         dto.setGerencia(m.getGerencia().getNombre());
-        
         dto.setFicha(detalle.getUsuario().getFicha());
         dto.setNombreUsuario(detalle.getUsuario().getNombre());
         dto.setDepartamento(detalle.getDepartamento().getNombre());
-        
         dto.setFmo(detalle.getDispositivo().getFmo());
         dto.setTipoDispositivo(detalle.getDispositivo().getTipo());
         dto.setMarca(detalle.getDispositivo().getModelo().getMarca().getNombre());
         dto.setModelo(detalle.getDispositivo().getModelo().getNombre());
-        
         dto.setSo(detalle.getSo());
         dto.setObservaciones(detalle.getObservaciones());
-
-        if (m.getFotos() != null) {
-            dto.setFotos(m.getFotos().stream().map(MantenimientoFoto::getFotoPath).toList());
-        }
+        if (m.getFotos() != null) dto.setFotos(m.getFotos().stream().map(MantenimientoFoto::getFotoPath).toList());
         return dto;
-    }
-
-    // ==========================================
-    // LÓGICA DE NEGOCIO: GENERACIÓN DE CSV (RESUMIDO)
-    // ==========================================
-    public byte[] generarCsvResumenMantenimientos(List<MantenimientoResponseDTO> listaMantenimientos) {
-        StringBuilder csv = new StringBuilder();
-        
-        csv.append("Fecha,Gerencia,Analista,Cantidad Atendidos\n");
-
-       Map<Long, List<MantenimientoResponseDTO>> lotesAgrupados = listaMantenimientos.stream()
-                .collect(Collectors.groupingBy(MantenimientoResponseDTO::getId));
-
-        for (List<MantenimientoResponseDTO> lote : lotesAgrupados.values()) {
-            if (!lote.isEmpty()) {
-                MantenimientoResponseDTO ref = lote.get(0);
-                int cantidadAtendidos = lote.size();
-
-                csv.append(escaparCsv(ref.getFecha())).append(",")
-                   .append(escaparCsv(ref.getGerencia())).append(",")
-                   .append(escaparCsv(ref.getAnalista())).append(",")
-                   .append(cantidadAtendidos).append("\n");
-            }
-        }
-
-        byte[] csvBytes = csv.toString().getBytes(StandardCharsets.UTF_8);
-        byte[] bomAndCsv = new byte[csvBytes.length + 3];
-        bomAndCsv[0] = (byte) 0xEF;
-        bomAndCsv[1] = (byte) 0xBB;
-        bomAndCsv[2] = (byte) 0xBF;
-        System.arraycopy(csvBytes, 0, bomAndCsv, 3, csvBytes.length);
-
-        return bomAndCsv;
     }
 }

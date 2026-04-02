@@ -42,6 +42,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     agregarFila();
+
+   // 1. ATRAPAMOS LOS PARÁMETROS DE LA URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const progId = urlParams.get('progId');
+    const gerenciaUrl = urlParams.get('gerencia');
+    const fechaUrl = urlParams.get('fecha');
+    const analistaUrl = urlParams.get('analista');
+
+    // 2. SI EXISTE UN PROGRAMADO VÁLIDO, AUTOCOMPLETAMOS Y BLOQUEAMOS
+    // Verificamos que el ID no sea nulo ni la palabra "undefined"
+    if (progId && progId !== 'undefined' && progId !== 'null') {
+        
+        window.idProgramacionActiva = progId; 
+        
+        setTimeout(() => {
+            const selectGerencia = document.getElementById('globalGerencia');
+            if (selectGerencia && gerenciaUrl && gerenciaUrl !== 'undefined') {
+                selectGerencia.value = gerenciaUrl;
+                selectGerencia.disabled = true; 
+                selectGerencia.dispatchEvent(new Event('change')); 
+            }
+
+            const inputFecha = document.getElementById('globalFecha');
+            // Solo lo asignamos si trae una fecha válida, si no, dejará la fecha de hoy por defecto
+            if (inputFecha && fechaUrl && fechaUrl !== 'undefined' && fechaUrl !== 'null') {
+                inputFecha.value = fechaUrl;
+                inputFecha.disabled = true; 
+            }
+
+            const inputAnalista = document.getElementById('globalAnalista');
+            // Solo lo asignamos si trae un nombre válido
+            if (inputAnalista && analistaUrl && analistaUrl !== 'undefined' && analistaUrl !== 'null') {
+                inputAnalista.value = analistaUrl;
+                inputAnalista.readOnly = true; 
+            }
+            
+            mostrarModal("Modo de Ejecución Programada activado. Los datos de cabecera han sido bloqueados.", "info");
+        }, 500); 
+    }
 });
 
 // ==========================================
@@ -274,6 +313,7 @@ async function procesarLote() {
     
     // 1. Armamos el objeto principal con la cabecera
     const datosLote = {
+        idProgramacion: window.idProgramacionActiva ? parseInt(window.idProgramacionActiva) : null,
         gerencia: gerencia.trim(),
         fecha: fecha,
         analista: analista,

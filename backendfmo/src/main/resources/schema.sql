@@ -282,14 +282,6 @@ CREATE TABLE IF NOT EXISTS "mantenimiento_fotos"(
 	FOREIGN KEY (mantenimiento_id) REFERENCES mantenimiento(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "mantenimiento_programado" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"gerencia_id" INTEGER NOT NULL,
-	"fecha_programada" TEXT NOT NULL,
-	"analista_responsable" TEXT NOT NULL,
-	FOREIGN KEY (gerencia_id) REFERENCES gerencia(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
 
 INSERT INTO "perifericos" ("id","nombre") VALUES (1,'MONITOR');
 INSERT INTO "perifericos" ("id","nombre") VALUES (2,'TECLADO');

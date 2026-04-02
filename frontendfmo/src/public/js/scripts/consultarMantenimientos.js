@@ -172,9 +172,9 @@ function generarCalendarioUI(anio) {
 // ==========================================
 // REDIRECCIÓN A REGISTRO
 // ==========================================
-function irARegistrar(idProgramacion, gerencia) {
-    // Redirige a la vista de registro llevando el ID y la Gerencia en la URL
-    window.location.href = `/registro-mantenimiento?progId=${idProgramacion}&gerencia=${encodeURIComponent(gerencia)}`;
+function irARegistrar(idProgramacion, gerencia, fecha, analista) {
+    // Viajamos a la vista de registro empacando toda la información en la URL
+    window.location.href = `/registro-mantenimiento?progId=${idProgramacion}&gerencia=${encodeURIComponent(gerencia)}&fecha=${encodeURIComponent(fecha)}&analista=${encodeURIComponent(analista)}`;
 }
 
 // ==========================================
@@ -203,7 +203,7 @@ function manejarClicDia(fechaDb, fechaLegible) {
                             <h6 class="text-dark fw-bold mt-1 mb-0">${prog.gerencia}</h6>
                             <small class="text-muted"><i class="bi bi-person me-1"></i>Analista Asignado: ${prog.analistaResponsable}</small>
                         </div>
-                        <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" onclick="irARegistrar(${prog.id}, '${prog.gerencia}')">
+                        <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" onclick="irARegistrar(${prog.id}, '${prog.gerencia}', '${prog.fechaProgramada}', '${prog.analistaResponsable}')">
                             <i class="bi bi-play-circle-fill me-2"></i> Ejecutar Mantenimiento
                         </button>
                     </div>

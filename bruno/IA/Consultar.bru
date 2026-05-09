@@ -1,0 +1,22 @@
+meta {
+  name: Consultar
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/ia/consultar
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "prompt": "El monitor de mi estación de trabajo se apaga de repente después de 10 minutos de uso y huele a plástico quemado. Estoy en la Gerencia de Telemática."
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

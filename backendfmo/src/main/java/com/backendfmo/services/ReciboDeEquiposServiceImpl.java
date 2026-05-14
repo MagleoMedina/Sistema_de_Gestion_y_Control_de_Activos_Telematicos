@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +20,13 @@ import com.backendfmo.repository.PerifericoRepository;
 import com.backendfmo.repository.ReciboDeEquiposRepository;
 import com.backendfmo.repository.UsuarioRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 @Service
 public class ReciboDeEquiposServiceImpl{
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(ReciboDeEquiposServiceImpl.class);
+    
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -233,6 +238,8 @@ public class ReciboDeEquiposServiceImpl{
                 respuesta.add(convertirEntidadADTO(recibo));
             }
         }
+        logger.info("Guardado usuario '{}' con {} recibos asociados", usuarioGuardado.getNombre(),
+                usuarioGuardado.getRecibos() != null ? usuarioGuardado.getRecibos().size() : 0);
         return respuesta;
     }
 
@@ -253,7 +260,7 @@ public class ReciboDeEquiposServiceImpl{
         for (ReciboDeEquipos recibo : listaEncabezados) {
             respuestaLista.add(convertirEntidadADTO(recibo.getEncabezadoRelacion()));
         }
-
+        logger.info("Encontrados {} recibos para el FMO '{}'", respuestaLista.size(), fmoEquipo);
         return respuestaLista;
     }
 
@@ -276,7 +283,7 @@ public class ReciboDeEquiposServiceImpl{
         for (ReciboDeEquipos recibo : todos) {
             respuestaLista.add(convertirEntidadADTO(recibo.getEncabezadoRelacion()));
         }
-
+        logger.info("Encontrados {} recibos en total", respuestaLista.size());
         return respuestaLista;
     }
 
@@ -294,7 +301,7 @@ public class ReciboDeEquiposServiceImpl{
         for (EncabezadoRecibo encabezado : todos) {
             respuestaLista.add(convertirEntidadADTO(encabezado));
         }
-
+        logger.info("Encontrados {} recibos para la fecha '{}'", respuestaLista.size(), fecha);
         return respuestaLista;
     }
 
@@ -314,7 +321,7 @@ public class ReciboDeEquiposServiceImpl{
         for (EncabezadoRecibo encabezado : todos) {
             respuestaLista.add(convertirEntidadADTO(encabezado));
         }
-
+        logger.info("Encontrados {} recibos entre las fechas '{}' y '{}'", respuestaLista.size(), fechaInicio, fechaFin);
         return respuestaLista;
     }
 
@@ -332,6 +339,7 @@ public class ReciboDeEquiposServiceImpl{
         EncabezadoRecibo actualizado = encabezadoRepository.save(encabezado);
 
         // 4. Retornar el DTO completo actualizado (reusando tu método privado existente)
+        logger.info("Actualizando estatus del recibo con ID '{}' a '{}'", idEncabezado, nuevoEstatus);
         return convertirEntidadADTO(actualizado);
     }
 
@@ -344,6 +352,7 @@ public class ReciboDeEquiposServiceImpl{
         
         // Al ejecutar esto, JPA busca la lista de equipos, perifericos, etc.,
         // y lanza los DELETE correspondientes automáticamente.
+        logger.info("Eliminando recibo con ID '{}'", id);
         encabezadoRepository.deleteById(id);
     }
 
@@ -362,7 +371,7 @@ public class ReciboDeEquiposServiceImpl{
         for (EncabezadoRecibo encabezado : listaEncabezados) {
             respuestaLista.add(convertirEntidadADTO(encabezado));
         }
-
+        logger.info("Encontrados {} recibos para la ficha '{}'", respuestaLista.size(), ficha);
         return respuestaLista;
     }
 
@@ -478,6 +487,7 @@ public class ReciboDeEquiposServiceImpl{
             }
         }
         dto.setEquipos(listaEquiposDto);
+        logger.info("Convertido recibo con ID '{}' a DTO completo", encabezado.getId());
         return dto;
     }
 

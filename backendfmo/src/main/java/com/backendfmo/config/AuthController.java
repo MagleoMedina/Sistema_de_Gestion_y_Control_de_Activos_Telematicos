@@ -6,6 +6,9 @@ import com.backendfmo.repository.UsuarioSistemaRepository;
 
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +31,9 @@ public class AuthController {
     @Autowired
     private UsuarioSistemaRepository usuarioRepository;
 
+    // 1. Declarar el Logger para esta clase
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/login")
     public String login(@Valid @RequestBody UsuarioSistemaDTO authRequest) {
         // 1. Autenticar (Valida usuario y clave)
@@ -42,7 +48,7 @@ public class AuthController {
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
             // 3. GENERAR EL TOKEN PASANDO USUARIO Y ROL (TIPO)
-            // Asegúrate de haber actualizado JwtUtil como en el Paso 1
+            logger.info("Usuario '{}' autenticado con rol '{}'", usuario.getUsername(), usuario.getTipo());
             return jwtUtil.generateToken(usuario.getUsername(), usuario.getTipo());
             
         } else {

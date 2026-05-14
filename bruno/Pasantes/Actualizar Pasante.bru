@@ -1,0 +1,15 @@
+meta {
+  name: Actualizar Pasante
+  type: http
+  seq: 4
+}
+
+put {
+  url: 127.0.0.1:8081/api/actualizarPasante/{id}
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

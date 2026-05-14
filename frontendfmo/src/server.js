@@ -123,7 +123,31 @@ app.get('/casos/buscar', (req, res) => {
 });
 // Iniciar servidor
 const server = app.listen(PORT, HOST, () => {
-    console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
+    //console.log(`Frontend Express corriendo en http://${HOST}:${PORT}`);
+});
+
+app.get('/registrar-pasante', (req, res) => {
+    res.render('pages/registro-pasantes', { title: 'Registrar Pasante' });
+});
+
+app.get('/consultar-pasante', (req, res) => {
+    res.render('pages/consultar-pasantes', { title: 'Consultar Pasantes' });
+});
+app.get('/gestion-estructura', (req, res) => {
+    res.render('pages/gestion-estructura');
+});
+
+// En Express
+app.get('/registro-mantenimiento', (req, res) => {
+    res.render('pages/registro-mantenimiento');
+});
+
+app.get('/consultar-mantenimientos', (req, res) => {
+    res.render('pages/consultar-mantenimientos');
+});
+
+app.get('/crear-mantenimientos', (req, res) => {
+    res.render('pages/mantenimiento-programado');
 });
 
 module.exports = { server, PORT, HOST, BACKEND_URL };

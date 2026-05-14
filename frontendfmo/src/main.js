@@ -1,22 +1,9 @@
-const { app, BrowserWindow } = require('electron');
-const path = require('path');
 
 // 1. Iniciar el servidor Express
 // Al requerir el archivo, el servidor comienza a escuchar en el puerto 3000
 const { PORT, HOST } = require('./server'); 
-
-// 2. Configuración de Hot Reload
-// Esto recarga la ventana si cambias un HTML/EJS, 
-// y reinicia la app si cambias el código de Electron/Node (main.js o server.js)
-if(!app.isPackaged){
-try {
-    require('electron-reload')(__dirname, {
-        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
-        awaitWriteFinish: true
-    });
-} catch (_) {}
-}
-
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
 
 function createWindow() {
     // Crear la ventana del navegador
@@ -37,6 +24,21 @@ function createWindow() {
         mainWindow.setMenu(null);
     }
 }
+
+function electron(){
+
+// 2. Configuración de Hot Reload
+// Esto recarga la ventana si cambias un HTML/EJS, 
+// y reinicia la app si cambias el código de Electron/Node (main.js o server.js)
+if(!app.isPackaged){
+try {
+    require('electron-reload')(__dirname, {
+        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
+        awaitWriteFinish: true
+    });
+} catch (_) {}
+}
+
 //app.disableHardwareAcceleration();
 // Inicialización de Electron
 app.whenReady().then(() => {
@@ -50,3 +52,20 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
+
+
+}
+
+function navegador(){
+    // --- NUEVA LÓGICA PARA MODO NAVEGADOR ---
+console.log(`\n=======================================================`);
+console.log(`Sistema ejecutándose en MODO WEB (Electron deshabilitado)`);
+console.log(`👉 Abre tu navegador de preferencia y visita:`);
+console.log(`   http://${HOST}:${PORT}`);
+console.log(`=======================================================\n`);
+
+}
+
+//electron();
+
+navegador();

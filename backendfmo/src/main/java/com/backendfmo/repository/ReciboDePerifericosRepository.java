@@ -6,10 +6,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.backendfmo.models.perifericos.ReciboDePerifericos;
 
-
+@Repository
 public interface ReciboDePerifericosRepository extends JpaRepository<ReciboDePerifericos, Long> {
     
     // Spring JPA genera la query automáticamente basándose en el nombre del método

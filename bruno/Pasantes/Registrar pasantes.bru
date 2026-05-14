@@ -1,0 +1,50 @@
+meta {
+  name: Registrar pasantes
+  type: http
+  seq: 1
+}
+
+post {
+  url: 127.0.0.1:8081/api/registrarPasante
+  body: multipartForm
+  auth: none
+}
+
+body:json {
+  {
+    "ficha": 99015,
+    "nombre": "Carlos Alcaraz",
+    "extension": "4040",
+    "gerencia": "Gerencia de Telemática",
+    "nombreInstituto": "Universidad Nacional Experimental de Guayana (UNEG)",
+    "fechaInicio": "2026-03-01",
+    "fechaFinalizacion": "2026-07-30",
+    "areaAsignada": "Desarrollo Web",
+    "fechaNacimiento": "2004-05-15",
+    "tituloPretendido": "Ingeniero en Informática"
+  }
+}
+
+body:multipart-form {
+  fotografia: @file(/home/magleo/Imágenes/1400571.jpg) @contentType(Text)
+  informe: @file(/home/magleo/Escritorio/Informe de Pasantia Magleo Medina V-30696510.pdf) @contentType(File)
+  datos: '''
+    {
+      "ficha": 9,
+      "nombre": "Mayer",
+      "extension": "4040",
+      "gerencia": "Gerencia de Telemática",
+      "nombreInstituto": "Universidad Nacional Experimental de Guayana (UNEG)",
+      "fechaInicio": "2026-03-01",
+      "fechaFinalizacion": "2026-07-30",
+      "areaAsignada": "Desarrollo Web",
+      "fechaNacimiento": "2004-05-15",
+      "tituloPretendido": "Ingeniero en Informática"
+    }
+  '''
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

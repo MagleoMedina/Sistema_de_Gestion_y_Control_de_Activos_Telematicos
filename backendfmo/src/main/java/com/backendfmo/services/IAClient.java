@@ -1,7 +1,7 @@
 package com.backendfmo.services;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +12,8 @@ import com.backendfmo.dtos.request.ia.IAPromptRequest;
 import com.backendfmo.dtos.request.ia.IAResponse;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.annotation.PostConstruct;
 
@@ -30,23 +32,26 @@ public class IAClient implements LLMClient {
     // Instancia del cliente oficial de Google
     private Client client;
 
+    @Autowired
+    private EmbeddingService embeddingService; // Inyectamos el nuevo servicio
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     // Se ejecuta automáticamente al arrancar la aplicación
     @PostConstruct
     public void init() {
         this.client = Client.builder().apiKey(apiKey).build();
     }
 
-    @Override
+@Override
     public String generarRespuesta(String prompt) {
         try {
-            // Petición limpia y directa usando el SDK
             GenerateContentResponse response = client.models.generateContent(
                 modelName,
                 prompt,
                 null
             );
             
-            // Validación de seguridad
             if (response != null && response.text() != null) {
                 return response.text();
             } else {
@@ -54,78 +59,89 @@ public class IAClient implements LLMClient {
             }
 
         } catch (Exception e) {
-            return "Error inesperado al conectar con el servicio de IA: " + e.getMessage();
+            String errorMsg = e.getMessage().toLowerCase();
+            //System.out.println("[DEBUG IA] Error capturado: " + e.getMessage());
+
+            // --- VALIDACIÓN 1: SIN INTERNET O CONEXIÓN ---
+            if (errorMsg.contains("timeout") || errorMsg.contains("connection") || errorMsg.contains("unreachable")|| errorMsg.contains("failed")) {
+                return "Error de conectividad: No se pudo establecer comunicación con el servidor de IA. Verifique su conexión a internet.";
+            }
+
+            // --- VALIDACIÓN 2: SIN TOKENS O CUOTA EXCEDIDA ---
+            if (errorMsg.contains("429") || errorMsg.contains("quota") || errorMsg.contains("exhausted") || errorMsg.contains("limit")) {
+                return "Error de Recursos: Se ha alcanzado el límite de tokens o cuota diaria de la API de IA.";
+            }
+
+            return "Error inesperado en el servicio de IA: " + e.getMessage();
         }
     }
 
     public IAResponse procesarConsultaIA(IAPromptRequest request) {
+        System.out.println("========== INICIANDO BÚSQUEDA VECTORIAL ==========");
         IAResponse response = new IAResponse();
 
-        // 1. BUSCAR MEJOR COINCIDENCIA EN LA BASE DE DATOS USANDO IA
-        List<CasoConUsuarioDTO> historial = casosResueltos.listarTodos();
+        // 1. Vectorizar el prompt del usuario
+        List<Float> vectorUsuario = embeddingService.generarVector(request.getPrompt());
         
-        Long idMejorCoincidencia = buscarMejorIdConIA(request.getPrompt(), historial);
-
+        List<CasoConUsuarioDTO> historial = casosResueltos.listarTodos();
         CasoConUsuarioDTO mejorMatch = null;
-        if (idMejorCoincidencia != null) {
-            mejorMatch = historial.stream()
-                .filter(m -> m.getId() != null && m.getId().equals(idMejorCoincidencia))
-                .findFirst()
-                .orElse(null);
+        double mejorPuntuacion = -1.0;
+
+        // 2. Búsqueda por Similitud de Coseno en Memoria
+        if (vectorUsuario != null && historial != null) {
+            for (CasoConUsuarioDTO caso : historial) {
+                if (caso.getVectorEmbedding() != null && !caso.getVectorEmbedding().isEmpty()) {
+                    try {
+                        // Convertir el JSON de SQLite de vuelta a List<Float>
+                        List<Float> vectorCaso = objectMapper.readValue(
+                            caso.getVectorEmbedding(), 
+                            new TypeReference<List<Float>>(){}
+                        );
+                        
+                        double similitud = embeddingService.calcularSimilitud(vectorUsuario, vectorCaso);
+                        
+                        // Si la similitud es mayor al 75% (0.75) y es la más alta hasta ahora
+                        if (similitud > 0.75 && similitud > mejorPuntuacion) {
+                            mejorPuntuacion = similitud;
+                            mejorMatch = caso;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("[DEBUG] Error procesando vector del ID " + caso.getId());
+                    }
+                }
+            }
+        }
+
+        if (mejorMatch != null) {
+            System.out.println("[DEBUG] Mejor match vectorial: ID " + mejorMatch.getId() + " (Score: " + mejorPuntuacion + ")");
+        } else {
+            System.out.println("[DEBUG] No se encontraron coincidencias vectoriales con similitud > 75%");
         }
 
         response.setMejorCoincidenciaDB(mejorMatch);
 
-        // 2. GENERAR SOLUCIÓN PROPIA CON IA
+        // 3. Generar la solución final con el contexto encontrado
         String contextoDB = (mejorMatch != null) 
-            ? "Historial relevante encontrado en la base de datos: " + mejorMatch.getReporte()
+            ? "Contexto histórico muy similar encontrado: " + mejorMatch.getReporte()
             : "No hay antecedentes exactos en la base de datos.";
 
         String promptFinal = String.format(
-            "Actúa como un experto en soporte técnico de la Gerencia de Telemática de CVG Ferrominera. " +
-            "Problema reportado: %s. %s. " +
-            "Genera una solución técnica detallada, paso a paso y profesional para este escenario.",
+            "Rol: Analista Experto de Telemática (Nivel 3).\n" +
+            "Falla: '%s'\n" +
+            "Contexto BD: '%s'\n\n" +
+            "Instrucción: Genera una solución técnica elocuente y directa. " +
+            "Para optimizar tokens, cumple estas REGLAS ESTRICTAS:\n" +
+            "1. CERO saludos, introducciones o conclusiones.\n" +
+            "2. Proporciona solo un diagnóstico breve (1 línea) y pasos de acción concretos en viñetas.\n" +
+            "3. Usa lenguaje técnico preciso y profesional.",
             request.getPrompt(), contextoDB
         );
 
         response.setSolucionIA(this.generarRespuesta(promptFinal));
-        response.setAnalisisContexto(mejorMatch != null ? "Sugerencia basada en IA y experiencia previa." : "Generado puramente por IA.");
+        response.setAnalisisContexto(mejorMatch != null ? "Sugerencia basada en RAG (Vectores)." : "Generado puramente por IA.");
 
+        System.out.println("========== FIN BÚSQUEDA VECTORIAL ==========\n");
         return response;
     }
 
-    /**
-     * Usa la IA para comparar el problema actual contra el historial 
-     * y devolver únicamente el ID del registro más parecido por contexto.
-     */
-    private Long buscarMejorIdConIA(String promptUsuario, List<CasoConUsuarioDTO> historial) {
-        if (historial == null || historial.isEmpty()) return null;
-
-        // Construimos una lista simplificada para no saturar de tokens a la IA
-        // Se asume que CasoConUsuarioDTO tiene el método getId()
-        String listaCasos = historial.stream()
-            .map(m -> "ID: " + m.getId() + " -> Resumen: " + m.getReporte())
-            .collect(Collectors.joining("\n"));
-
-        String promptBusqueda = String.format(
-            "Dada la siguiente lista de casos técnicos resueltos:\n%s\n\n" +
-            "¿Cuál de estos casos (proporciona solo el número de ID) es el más relevante para resolver este problema: '%s'?\n" +
-            "Si ninguno tiene relación técnica real, responde exclusivamente: null. No des explicaciones ni añadas texto extra.",
-            listaCasos, promptUsuario
-        );
-
-        String respuestaIA = this.generarRespuesta(promptBusqueda).trim();
-
-        try {
-            if (respuestaIA.equalsIgnoreCase("null")) return null;
-            
-            // Limpiamos la respuesta por si la IA agrega texto extra (ej. "El ID es: 12")
-            String idLimpio = respuestaIA.replaceAll("[^0-9]", "");
-            if (idLimpio.isEmpty()) return null;
-            
-            return Long.parseLong(idLimpio);
-        } catch (Exception e) {
-            return null; // Si hay un error de parseo, asumimos que no hubo coincidencia
-        }
-    }
 }

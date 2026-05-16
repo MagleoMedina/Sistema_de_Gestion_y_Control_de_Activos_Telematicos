@@ -16,6 +16,8 @@ import com.backendfmo.models.reciboequipos.Usuario;
 import com.backendfmo.repository.CasosResueltosRepository;
 import com.backendfmo.repository.UsuarioRepository;
 import com.backendfmo.dtos.request.casos.CasoConUsuarioDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +30,15 @@ public class CasosResueltosServiceImpl {
     @Autowired
     private UsuarioRepository usuarioRepository; // Para validar la existencia del usuario
 
+    @Autowired
+    private EmbeddingService embeddingService; // Para generar vectores de texto
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     // 1. Declarar el Logger para esta clase
     private static final Logger logger = LoggerFactory.getLogger(CasosResueltosServiceImpl.class);
     @Transactional
-    public CasoConUsuarioDTO guardarCasoConNuevoUsuario(CasoConUsuarioDTO dto) {
+    public CasoConUsuarioDTO guardarCasoConNuevoUsuario(CasoConUsuarioDTO dto) throws JsonProcessingException {
         // 1. Crear y guardar el Usuario primero
     Usuario usuarioProcesar;
         
@@ -67,6 +74,9 @@ public class CasosResueltosServiceImpl {
         nuevoCaso.setReporte(dto.getReporte());
         nuevoCaso.setAtendidoPor(dto.getAtendidoPor());
         nuevoCaso.setEquipo(dto.getEquipo());
+        String jsonVector = objectMapper.writeValueAsString(embeddingService.generarVector(nuevoCaso.getReporte()));
+   
+        nuevoCaso.setVectorEmbedding(jsonVector);
 
         logger.info("Guardando caso resuelto para usuario con ficha: {}", usuarioProcesar.getFicha());
 
@@ -94,6 +104,7 @@ public class CasosResueltosServiceImpl {
         dto.setReporte(entidad.getReporte());
         dto.setAtendidoPor(entidad.getAtendidoPor());
         dto.setEquipo(entidad.getEquipo());
+        dto.setVectorEmbedding(entidad.getVectorEmbedding());
 
         return dto;
     }

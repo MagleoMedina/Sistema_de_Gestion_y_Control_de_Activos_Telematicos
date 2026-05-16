@@ -1,0 +1,93 @@
+<style>
+    /* Animaciones exclusivas para la IA */
+    .ia-glow {
+        box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+        transition: all 0.3s ease;
+    }
+    .ia-glow:focus {
+        box-shadow: 0 0 20px rgba(255, 193, 7, 0.8);
+        border-color: #ffc107;
+    }
+    .fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .pulsing-text {
+        animation: pulseText 1.5s infinite;
+    }
+    @keyframes pulseText {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; text-shadow: 0 0 8px rgba(255,193,7,0.5); }
+        100% { opacity: 0.6; }
+    }
+</style>
+
+<div class="modal fade" id="modalAsistenteIA" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-robot text-warning me-2 fs-4"></i>Asistente Técnico de IA
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body bg-light p-4">
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark"><i class="bi bi-chat-right-text-fill text-muted me-2"></i>Describe la falla que presenta el usuario:</label>
+                    <textarea id="ia_prompt" class="form-control ia-glow border-secondary" rows="3" placeholder="Ej: El switch principal de la Planta de Pellas no da red y tiene un olor a quemado..."></textarea>
+                    
+                    <button class="btn btn-dark fw-bold mt-3 w-100 py-2 shadow-sm" id="btnConsultarIA" onclick="consultarIA()">
+                        <i class="bi bi-stars text-warning me-2"></i>Analizar Problema con IA
+                    </button>
+                </div>
+
+                <div id="ia_loading" class="text-center py-5" style="display: none;">
+                    <div class="spinner-grow text-warning mb-3" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <h5 class="fw-bold text-dark pulsing-text">Analizando base de datos y generando solución...</h5>
+                    <p class="text-muted small">Esto puede tomar unos segundos.</p>
+                </div>
+
+                <div id="ia_resultados" style="display: none;" class="fade-in-up">
+                    
+                    <div class="card border-0 shadow-sm mb-4" style="border-left: 5px solid #ffc107;">
+                        <div class="card-header bg-white fw-bold border-bottom-0 pb-0">
+                            <i class="bi bi-cpu-fill text-warning me-2"></i>Diagnóstico y Solución (IA)
+                        </div>
+                        <div class="card-body">
+                            <div id="ia_respuesta_texto" class="text-dark" style="line-height: 1.6;"></div>
+                            <hr class="opacity-25 my-3">
+                            <small class="text-muted fw-bold"><i class="bi bi-info-circle me-1"></i>Contexto: <span id="ia_analisis_contexto" class="fw-normal"></span></small>
+                        </div>
+                    </div>
+
+                    <div id="ia_coincidencia_db" style="display: none;">
+                        <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-database-check text-success me-2"></i>Mejor Coincidencia en el Historial</h6>
+                        <div class="card border-success bg-success bg-opacity-10 shadow-sm">
+                            <div class="card-body">
+                                <div class="row small text-dark">
+                                    <div class="col-md-6 mb-2"><strong>ID del Caso:</strong> <span id="ia_db_id" class="badge bg-success"></span></div>
+                                    <div class="col-md-6 mb-2"><strong>Fecha:</strong> <span id="ia_db_fecha"></span></div>
+                                    <div class="col-md-6 mb-2"><strong>Usuario:</strong> <span id="ia_db_usuario"></span> (<span id="ia_db_ficha"></span>)</div>
+                                    <div class="col-md-6 mb-2"><strong>Atendido por:</strong> <span id="ia_db_analista" class="fw-bold"></span></div>
+                                </div>
+                                <hr class="border-success opacity-25 my-2">
+                                <strong class="small text-success">Reporte / Solución Histórica Aplicada:</strong>
+                                <p class="mt-1 mb-0 text-dark small" id="ia_db_reporte" style="white-space: pre-wrap;"></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="ia_sin_coincidencia" class="alert alert-secondary mt-3 shadow-sm border-0" style="display: none;">
+                        <i class="bi bi-shield-exclamation me-2 text-muted"></i>La IA determinó que <strong>no existen casos previos</strong> en la base de datos que coincidan técnicamente con este problema.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

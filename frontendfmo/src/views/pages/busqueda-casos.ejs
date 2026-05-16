@@ -88,14 +88,16 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2">
-                            <button class="btn w-100 text-white fw-bold" 
+                     <div class="col-md-2 d-flex flex-column gap-2">
+                            <button class="btn btn-dark w-100 fw-bold border-0 shadow-sm" onclick="abrirModalIA()">
+                                <i class="bi bi-robot text-warning me-2"></i>Asistente IA
+                            </button>
+                            <button class="btn w-100 text-white fw-bold shadow-sm" 
                                     style="background: linear-gradient(to right, #d6291c, #fa812f);"
                                     onclick="ejecutarBusqueda()">
                                 <i class="bi bi-search me-2"></i>Buscar
                             </button>
                         </div>
-                    </div>
                 </div>
             </div>
 
@@ -182,9 +184,11 @@
     </div>
 
     <%- include('../partials/modal') %>
+    <%- include('../partials/modal-ia') %>
 
     <script src="/js/utils/api.js"></script>
     <script src="/js/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="/js/scripts/busquedaCasos.js"></script>
+    
 </body>
 </html>

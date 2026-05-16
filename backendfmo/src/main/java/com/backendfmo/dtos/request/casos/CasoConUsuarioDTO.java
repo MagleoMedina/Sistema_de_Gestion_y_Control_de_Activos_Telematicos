@@ -16,4 +16,5 @@ public class CasoConUsuarioDTO {
     private String reporte;
     private String atendidoPor;
     private String equipo;
+    private String vectorEmbedding; // Guardará el array como "[0.012, -0.045, 0.112...]"
 }

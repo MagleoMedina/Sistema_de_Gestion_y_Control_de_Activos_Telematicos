@@ -12,6 +12,8 @@ import com.backendfmo.dtos.request.ia.IAPromptRequest;
 import com.backendfmo.dtos.request.ia.IAResponse;
 import com.backendfmo.services.IAClient;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/ia")
@@ -22,7 +24,7 @@ public class IAController {
     private IAClient iAClient;
     
     @PostMapping("/consultar")
-    public ResponseEntity<IAResponse> consultarIA(@RequestBody IAPromptRequest request) {
+    public ResponseEntity<IAResponse> consultarIA(@Valid @RequestBody IAPromptRequest request) {
         try {
             IAResponse resultado = iAClient.procesarConsultaIA(request);
             return ResponseEntity.ok(resultado);

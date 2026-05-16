@@ -201,3 +201,99 @@ function verDetalle(index) {
 
     new bootstrap.Modal(document.getElementById('modalDetalleCaso')).show();
 }
+
+// ==========================================
+// MÓDULO DE ASISTENTE DE IA
+// ==========================================
+
+function abrirModalIA() {
+    // Resetear la vista del modal cada vez que se abre
+    document.getElementById('ia_prompt').value = '';
+    document.getElementById('ia_resultados').style.display = 'none';
+    document.getElementById('ia_loading').style.display = 'none';
+    
+    const modalIA = new bootstrap.Modal(document.getElementById('modalAsistenteIA'));
+    modalIA.show();
+}
+
+async function consultarIA() {
+    const prompt = document.getElementById('ia_prompt').value.trim();
+    
+    // Validación de campo vacío
+    if (!prompt) {
+        // Usamos tu función mostrarModal existente para las alertas
+        return mostrarModal("Campo Vacío", "Por favor, describe la falla técnica para que la IA pueda analizarla.", "warning");
+    }
+
+    if (prompt.length < 10) {
+        return mostrarModal("Descripción Corta", "Proporciona un poco más de detalles técnicos para un mejor análisis.", "warning");
+    }
+
+    // 1. Preparar la Interfaz (Modo Carga)
+    document.getElementById('btnConsultarIA').disabled = true;
+    document.getElementById('ia_resultados').style.display = 'none';
+    document.getElementById('ia_loading').style.display = 'block';
+
+    try {
+        // 1. Preparar la Interfaz (Modo Carga)
+        document.getElementById('btnConsultarIA').disabled = true;
+        document.getElementById('ia_resultados').style.display = 'none';
+        document.getElementById('ia_loading').style.display = 'block';
+
+        // 2. Ejecutar la Petición POST al Endpoint de IA usando tu ApiService
+        const response = await ApiService.fetchAutenticado('/ia/consultar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        // Si ApiService maneja errores de red internamente y devuelve null, detenemos la ejecución
+        if (!response) throw new Error("No se obtuvo respuesta del servidor.");
+        
+        if (!response.ok) {
+            const errorTxt = await response.text();
+            throw new Error(errorTxt || `Error HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // 3. Renderizar Respuesta de la IA
+        const solucionFormateada = data.solucionIA 
+            ? data.solucionIA.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')
+            : "La IA no proporcionó una respuesta.";
+            
+        document.getElementById('ia_respuesta_texto').innerHTML = solucionFormateada;
+        document.getElementById('ia_analisis_contexto').textContent = data.analisisContexto || 'Análisis finalizado.';
+
+        // 4. Renderizar Coincidencia en BD (Si existe)
+        if (data.mejorCoincidenciaDB) {
+            const match = data.mejorCoincidenciaDB;
+            document.getElementById('ia_db_id').textContent = match.id || 'N/A';
+            document.getElementById('ia_db_fecha').textContent = match.fecha || 'N/A';
+            document.getElementById('ia_db_usuario').textContent = match.nombre || 'Desconocido';
+            document.getElementById('ia_db_ficha').textContent = match.ficha || 'N/A';
+            document.getElementById('ia_db_analista').textContent = match.atendidoPor || 'N/A';
+            document.getElementById('ia_db_reporte').textContent = match.reporte || 'Sin registro detallado.';
+            
+            document.getElementById('ia_sin_coincidencia').style.display = 'none';
+            document.getElementById('ia_coincidencia_db').style.display = 'block';
+        } else {
+            document.getElementById('ia_coincidencia_db').style.display = 'none';
+            document.getElementById('ia_sin_coincidencia').style.display = 'block';
+        }
+
+        // 5. Mostrar Resultados con Animación
+        document.getElementById('ia_loading').style.display = 'none';
+        document.getElementById('ia_resultados').style.display = 'block';
+
+    } catch (error) {
+        console.error("Error al consultar la IA:", error);
+        document.getElementById('ia_loading').style.display = 'none';
+        mostrarModal("Error de Conexión", "No se pudo completar el análisis de la IA. Verifique su conexión y contacte al administrador si el problema persiste.", "error");
+    } finally {
+        // Habilitar botón nuevamente
+        document.getElementById('btnConsultarIA').disabled = false;
+    }
+}

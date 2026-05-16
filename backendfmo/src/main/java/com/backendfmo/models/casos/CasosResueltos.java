@@ -43,4 +43,7 @@ public class CasosResueltos {
 
     @Column(name = "equipo")
     private String equipo;
+    
+    @Column(name = "vector_embedding", nullable = false)
+    private String vectorEmbedding; // Guardará el array como "[0.012, -0.045, 0.112...]"
 }

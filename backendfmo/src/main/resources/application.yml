@@ -27,5 +27,5 @@ ia:
   llm:
     provider: gemini
     api:
-      key: AIzaSyAIWURA5C6_vtMUvMfFsT9PILkq2txPYws
+      key: TUA_API_KEY_AQUI
     model: gemini-3-flash-preview
